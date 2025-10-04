@@ -1,0 +1,96 @@
+# hello_world (C++/CMake)
+
+Write code for exercises, drills, and “Try this” from the book “Programming: Principles and Practice Using C++ (3rd Edition)” by Bjarne Stroustrup.
+
+## Overview
+This repository is a scratchpad for working through PPP3 (Programming: Principles and Practice Using C++). It builds a single executable target named `hello_world`. The source set includes `main.cpp` (the entry point) and a collection of exercise/demo files (e.g., `ex_2_*.cpp`, `drill_2_1.cpp`, `try_3_4*.cpp`, etc.). In `main.cpp`, most calls are commented out; you can uncomment the ones you want to try.
+
+## Tech Stack
+- Language: C++20
+- Build system: CMake (minimum 3.31)
+- IDE/Workflow: CLion (project already configured)
+- No third-party package manager is used.
+
+## Requirements
+- CMake ≥ 3.31
+- A C++20-compatible compiler
+  - On macOS: Apple Clang (Command Line Tools or Xcode)
+  - On Linux: GCC ≥ 10 or Clang ≥ 10
+  - On Windows: MSVC (C++20); project includes MSVC-only options guarded by `if (MSVC)`
+- (Optional) JetBrains CLion for IDE integration
+
+## Project Structure
+Top-level files of interest:
+- `CMakeLists.txt` — CMake configuration, sets C++20 and defines the `hello_world` executable
+- `main.cpp` — program entry point; may call functions from the other sources
+- Sources with exercises/demos: `ex2.cpp`, `ex3.cpp`, `sec_2_9.cpp`, `drill_2_1.cpp`, `ex_2_2.cpp`, `ex_2_4.cpp`, `ex_2_6.cpp`, `ex_2_8.cpp`, `ex_2_9.cpp`, `ex_2_10.cpp`, `ex_2_11.cpp`, `try_3_4.cpp`, `try_3_4_2_2.cpp`, `drills_3.cpp`
+- `PPP.h` — placeholder header for any helpers/types you might add while following the book (currently empty)
+
+Generated/build artifacts (example):
+- `cmake-build-debug/` — CLion-managed CMake build directory for the Debug profile
+
+## Targets and Entry Point
+- Executable target: `hello_world`
+- Entry point source: `main.cpp`
+
+## Setup and Build
+You can build the project either from CLion or from the command line.
+
+### Build and Run from CLion
+- Open the project in CLion.
+- Use the existing Debug profile and run the `hello_world` target.
+- Alternatively, use CLion’s Run/Debug configurations (green Run triangle).
+
+### Build and Run from the Command Line (using the CLion build directory)
+If you’re using the CLion-generated directory shown in this repo metadata (`cmake-build-debug`):
+```
+# Configure (only needed if the build folder doesn’t have rules yet)
+cmake -S . -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug
+
+# Build the target in the existing CLion Debug profile directory
+cmake --build cmake-build-debug --target hello_world
+
+# Run the executable
+./cmake-build-debug/hello_world
+```
+
+### Generic out-of-source build (alternative)
+```
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --target hello_world
+./build/hello_world
+```
+
+## How to Use / Run Specific Exercises
+- Open `main.cpp`.
+- Uncomment the function call(s) you want to run. Each function is implemented in one of the `ex_*.cpp`, `drill_*.cpp`, or `try_*.cpp` files.
+- Rebuild and run.
+
+Notes:
+- Do not include .cpp files from `main.cpp` (this causes duplicate symbols). Each .cpp is already compiled by CMake. If you need to call a function, either add a forward declaration (prototype) in `main.cpp` or introduce a tiny header for that function.
+- Keep includes local to each .cpp file (e.g., `#include <iostream>` where you use `std::cout`).
+
+## Naming conventions
+- `ex_<chapter>_<number>.cpp` — exercise solutions
+- `drill_<chapter>_<optional sub>.cpp` — drill solutions
+- `try_<chapter>_<section>.cpp` — “Try this” snippets
+- Free-form files like `ex2.cpp`/`ex3.cpp` are OK for scratch work; consider migrating to the above convention over time.
+
+## Scripts
+- No custom scripts are provided.
+- Primary interaction is through CMake targets (`hello_world`).
+
+## Environment Variables
+- None required.
+
+## Tests
+- No automated tests are present yet. You can add a test framework later (GoogleTest/Catch2) if desired.
+
+## License
+- No license file detected. Consider adding a `LICENSE` file if you plan to share/distribute.
+
+## Troubleshooting
+- If build fails with duplicate symbol errors, remove any `#include "*.cpp"` from `main.cpp` (already done in this repo) and rely on normal compilation via CMake.
+- If build fails due to missing standard symbols in a file, ensure that file includes the needed headers (e.g., `<iostream>` for `std::cout`).
+- Ensure your compiler supports C++20 and CMake meets the minimum version.
+- On macOS, make sure Command Line Tools are installed: `xcode-select --install`.

@@ -1,6 +1,8 @@
 //
 // Created by Dmytrenko Kyrylo on 03.07.2025.
 //
+#include <iostream>
+
 //this is school in Kapitanivka and we stay in gym face to door in corridor
 int go_to_bathroom() {
     std::cout << "description of left and right:\n";

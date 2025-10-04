@@ -1,6 +1,7 @@
 //
 // Created by Dmytrenko Kyrylo on 19.08.2025.
 //
+#include <iostream>
 using namespace std;
 void conversions() {
     double input_double = 0;

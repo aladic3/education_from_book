@@ -1,19 +1,9 @@
 #include <iostream>
-#include "ex3.cpp"
-#include "sec_2_9.cpp"
-#include "ex2.cpp"
-#include "drill_2_1.cpp"
-#include "ex_2_2.cpp"
-#include "ex_2_4.cpp"
-#include "ex_2_6.cpp"
-#include "ex_2_8.cpp"
-#include "ex_2_9.cpp"
-#include "ex_2_10.cpp"
-#include "ex_2_11.cpp"
-#include "try_3_4.cpp"
-#include "try_3_4_2_2.cpp"
-#include "drills_3.cpp"
 
+// Forward declarations (optional): add prototypes here if you want to call functions
+// implemented in the other source files from main.cpp.
+
+#include "PPP.h"
 int square(int);
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -53,7 +43,7 @@ int main() {
     //convert();
     //alphabet();
     //std::cout << "square " << square(4);
-    //prints_while_int();
+    prints_while_int();
     //print_each_char();
 
     //game_in_numbers();
