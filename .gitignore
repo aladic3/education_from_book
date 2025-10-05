@@ -1,0 +1,3 @@
+# Ignore the built executable named exactly "main" (no extension)
+# This prevents committing the local binary to GitHub
+main
