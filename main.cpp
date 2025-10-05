@@ -43,7 +43,7 @@ int main() {
     //convert();
     //alphabet();
     //std::cout << "square " << square(4);
-    prints_while_int();
+    //prints_while_int();
     //print_each_char();
 
     //game_in_numbers();
@@ -53,7 +53,14 @@ int main() {
     //rock_paper_scissors();
     //find_primes();
     //find_primes_sieve();
+    // std::vector<std::string> vector {"fa", "fa", "cd", "cdr", "cdr", "fasd", "cdr", "l"};
+    // std::cout << "mode = " << find_mode_str(vector) << "\n"
+    //         << "min = " << find_min_str(vector) << "\n"
+    //         << "max = " << find_max_str(vector) << "\n";
 
+    //solve_quadratic_equations();
+
+    names_scores_pairs();
     // TIP See CLion help at <a href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>. Also, you can try interactive lessons for CLion by selecting 'Help | Learn IDE Features' from the main menu.
 }
 

@@ -350,6 +350,189 @@ void find_primes_sieve() {
             << "Size of vector = " << is_primes.size();
 }
 
+int find_mode_int (std::vector<int> input) {
+    int result = 0;
+    int count_res = 0;
+
+    for (int el: input) {
+        int possible_result = el;
+        int count = 0;
+
+        for (int element: input) {
+            if (possible_result == element)
+                ++count;
+        }
+
+        if (count_res < count) {
+            result = possible_result;
+            count_res = count;
+        }
+
+    }
+
+
+    return result;
+}
+
+std::string find_min_str (const std::vector<std::string> & input) {
+    std::string result = input[0];
+
+    for (const std::string& str: input) {
+
+        if (result.size() > str.size())
+            result = str;
+
+    }
+
+    return result;
+}
+
+std::string find_max_str (const std::vector<std::string> & input) {
+    std::string result = input[0];
+
+    for (const std::string& str: input) {
+
+        if (result.size() < str.size())
+            result = str;
+
+    }
+
+    return result;
+}
+
+std::string find_mode_str (const std::vector<std::string> & input) {
+    std::string result;
+    int count_res = 0;
+
+    for (const std::string & el: input) {
+        const std::string & possible_result = el;
+        int count = 0;
+
+        for (const std::string & element: input) {
+            if (possible_result == element)
+                ++count;
+        }
+
+        if (count_res < count) {
+            result = possible_result;
+            count_res = count;
+        }
+
+    }
+
+
+    return result;
+}
+
+void solve_quadratic_equations() {
+    double a,b,c, x1, x2, discriminant = 0;
+
+    std::cout << "Enter a: ";
+    std::cin >> a;
+
+    std::cout << "Enter b: ";
+    std::cin >> b;
+
+    std::cout << "Enter c: ";
+    std::cin >> c;
+
+    discriminant = b*b - 4 * a * c;
+    std::cout << "discriminant = " << discriminant << "\n";
+
+    if (discriminant > 0) {
+        x1 = (-b + std::sqrt(discriminant)) / (2*a);
+        x2 = (-b - std::sqrt(discriminant)) / (2*a);
+        std::cout << "x1 = " << x1 << "\nx2 = " << x2;
+    }
+    else if (discriminant == 0) {
+        x1 = x2 = (-b) / (2*a);
+        std::cout << "x = " << x1;
+    }
+    else if (discriminant < 0) {
+        std::cout << "Solves not exist for this input values!";
+        return;
+    }
+}
+
+void names_scores_pairs() {
+    std::vector<std::string> names;
+    std::vector<int> scores;
+
+    std::string input_name;
+    int input_score;
+
+    std::cout << "Enter unicum name and score: ";
+
+    while (std::cin >> input_name && std::cin >> input_score) {
+        if (input_score == 0 && input_name == "NoName") {
+            break;
+        }
+
+
+        for (std::string & el_name: names) {
+            if (input_name == el_name) {
+                std::cout << "Error! Such name is exist in this vector!";
+                return;
+            }
+        }
+
+        names.push_back(input_name);
+        scores.push_back(input_score);
+
+        std::cout << "Enter unicum name and score: ";
+    }
+
+    std::cout << "Enter name to find score: ";
+    bool is_find = false;
+
+    while (std::cin >> input_name) {
+        if (input_name == "NoName")
+            break;
+
+        for (int i = 0; i < names.size(); ++i) {
+            if (names[i] == input_name) {
+                std::cout << names[i] << " " << scores[i] << "\n";
+                is_find = true;
+                break;
+            }
+        }
+
+        if (is_find == false) {
+            std::cout << "name not found\n";
+        }
+
+        std::cout << "Enter name to find score: ";
+        is_find = false;
+    }
+
+    std::cout << "Enter score to find all names: ";
+    while (std::cin >> input_score) {
+
+        if (input_score == -1)
+            break;
+
+        for (int i = 0; i < names.size(); ++i) {
+            if (scores[i] == input_score) {
+                std::cout << names[i] << " ";
+                is_find = true;
+
+            }
+        }
+
+        if (!is_find) {
+            std::cout << "names not found\n";
+        }
+
+        is_find = false;
+        std::cout << "\nEnter score to find all names: ";
+    }
+
+    // for (int i = 0; i < names.size(); ++i) {
+    //     std::cout << names[i] << " " << scores[i] << "\n";
+    // }
+
+
+}
 int max(int a, int b) {
     int result = a;
 
