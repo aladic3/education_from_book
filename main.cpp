@@ -60,7 +60,42 @@ int main() {
 
     //solve_quadratic_equations();
 
-    names_scores_pairs();
+    //names_scores_pairs();
+
+    // try 4
+
+    // int s1 = area(7,2;
+    // int s2 = area(7,2)
+    // Int s3 = area(7,2);
+    // int s4 = area('7, 2);
+    //
+
+    // int x0 = arena(7,2);
+    // int x1 = area(7);
+    // int x2 = area("seven", 2);
+    // int x3 = area ('2',3);
+
+    try {
+        test(3,5,4);
+        double d = 0;
+
+        std::cout << "\nhex = " << hexagon_area(2) << "\n";
+        // std::cin >> d;
+        // if (std::cin) {
+        //     std::cout << "GG " << d;
+        // }
+        // else {
+        //     error("Bad cin!\n");
+        // }
+
+    }catch (Bad_area) {
+        std::cerr << "OOps! Bad arguments to area()\n";
+    } catch (std::runtime_error& er) {
+        std::cerr << er.what();
+    } catch (...) {
+        std::cerr << "Something went wrong!\n";
+    }
+    //error("hmm");
     // TIP See CLion help at <a href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>. Also, you can try interactive lessons for CLion by selecting 'Help | Learn IDE Features' from the main menu.
 }
 
