@@ -6,6 +6,7 @@
 #include "PPP.h"
 int square(int);
 
+
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 int main() {
     // TIP Press <shortcut actionId="RenameElement"/> when your caret is at the <b>lang</b> variable name to see how CLion can help you rename it.
@@ -76,12 +77,12 @@ int main() {
     // int x3 = area ('2',3);
 
     try {
-        test(3,5,4);
-        double d = 0;
+        //test(3,5,-1);
+        // double d = 0;
+        //
+        // std::cout << "\nhex = " << hexagon_area(2) << "\n";
 
-        std::cout << "\nhex = " << hexagon_area(2) << "\n";
-
-        estimate_driving_flying_time_all_cities();
+        //estimate_driving_flying_time_all_cities();
         // std::cin >> d;
         // if (std::cin) {
         //     std::cout << "GG " << d;
@@ -90,15 +91,27 @@ int main() {
         //     error("Bad cin!\n");
         // }
 
-    }catch (Bad_area) {
-        std::cerr << "\n" << "OOps! Bad arguments to area()\n";
-        return -3;
-    } catch (std::runtime_error& er) {
-        std::cerr << "\n" << er.what();
-        return -1;
-    } catch (...) {
-        std::cerr << "\n" << "Something went wrong!\n";
-        return -2;
+       debugging_fragments();
+
+
+        return 0;
+
+    }
+    // catch (Bad_area) {
+    //     std::cerr << "\n" << "OOps! Bad arguments to area()\n";
+    //     return -3;
+    // }
+    // catch (std::runtime_error& er) {
+    //     std::cerr << "\nstd::runtime_error\n" << er.what();
+    //     return -1;
+    // }
+    catch (std::exception& ex) {
+        std::cerr << "\nerror: " << ex.what();
+        return 1;
+    }
+    catch (...) {
+        std::cerr << "\n ..." << "Something went wrong!\n";
+        return 2;
     }
     //error("hmm");
     // TIP See CLion help at <a href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>. Also, you can try interactive lessons for CLion by selecting 'Help | Learn IDE Features' from the main menu.
