@@ -80,6 +80,8 @@ int main() {
         double d = 0;
 
         std::cout << "\nhex = " << hexagon_area(2) << "\n";
+
+        estimate_driving_flying_time_all_cities();
         // std::cin >> d;
         // if (std::cin) {
         //     std::cout << "GG " << d;
@@ -89,11 +91,14 @@ int main() {
         // }
 
     }catch (Bad_area) {
-        std::cerr << "OOps! Bad arguments to area()\n";
+        std::cerr << "\n" << "OOps! Bad arguments to area()\n";
+        return -3;
     } catch (std::runtime_error& er) {
-        std::cerr << er.what();
+        std::cerr << "\n" << er.what();
+        return -1;
     } catch (...) {
-        std::cerr << "Something went wrong!\n";
+        std::cerr << "\n" << "Something went wrong!\n";
+        return -2;
     }
     //error("hmm");
     // TIP See CLion help at <a href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>. Also, you can try interactive lessons for CLion by selecting 'Help | Learn IDE Features' from the main menu.
