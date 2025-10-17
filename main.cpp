@@ -91,8 +91,9 @@ int main() {
         //     error("Bad cin!\n");
         // }
 
-       debugging_fragments();
-
+       //debugging_fragments();
+        solve_quadratic_equations();
+        //celsius_transfer();
 
         return 0;
 

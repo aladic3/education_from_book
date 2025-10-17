@@ -26,6 +26,7 @@ add_executable(hello_world main.cpp
         drills_3.cpp
         try4.cpp
         drill4.cpp
+        ex4.cpp
 
 )
 

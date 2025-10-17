@@ -449,8 +449,7 @@ void solve_quadratic_equations() {
         std::cout << "x = " << x1;
     }
     else if (discriminant < 0) {
-        std::cout << "Solves not exist for this input values!";
-        return;
+        error("Solves not exist for this input values!");
     }
 }
 
