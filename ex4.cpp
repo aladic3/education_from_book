@@ -6,7 +6,7 @@
 
 
 constexpr double END_OF_INPUT = std::numeric_limits<double>::max();
-constexpr int NOT_HAVE_COMMA = -1;
+constexpr size_t NOT_HAVE_COMMA = std::numeric_limits<size_t>::max();
 
 double celsius_to_kelvin(double celsius)
 // converts celsius to kelvin
@@ -138,18 +138,20 @@ int transparent_from_string_to_int(const std::string& possible_integer)
     return result;
 }
 
-int find_dot_position(const std::string& possible_double) {
-    for (int i = 0; i < possible_double.size(); ++i) {
-        char symbol = possible_double[i];
+size_t find_dot_position(const std::string& possible_double) {
+    for (size_t i = 0; i < possible_double.size(); ++i) {
+        const char symbol = possible_double[i];
 
         if (symbol == ',' || symbol == '.') return i;
     }
 
-    return NOT_HAVE_COMMA;
+    return possible_double.size();
 }
 
-double transparent_from_string_to_double(const std::string& possible_double) {
+double transparent_from_string_to_double(const std::string& wet_possible_double) {
     double result = 0;
+    int result_multiply = 1;
+    std::string possible_double;
 
     const  std::map<char, int> symbol_variants = {
         {'1',1},
@@ -164,18 +166,34 @@ double transparent_from_string_to_double(const std::string& possible_double) {
         {'0',0},
         {'|',-1},
         {'.',-2}, // is_have_dot
-        {',',-2},
-      //  {'-', -3}
+        {',',-2}
 
     };
+
+    const bool is_have_minus = wet_possible_double[0] == '-';
+    if (is_have_minus) {
+        result_multiply = -1;
+        for (size_t i = 1; i < wet_possible_double.size(); ++i) {
+            possible_double += wet_possible_double[i];
+        }
+    }
+    else
+        possible_double = wet_possible_double;
+
+
 
 
 
     const auto size_possible_double = possible_double.size();
 
-    const int position_of_dot = find_dot_position(possible_double);
+    const size_t position_of_dot = find_dot_position(possible_double);
+
     bool is_already_dot = false; // is find first dot or comma
-    //bool is_have_minus = possible_double[0] == '-';
+
+
+    /*if (position_of_dot == NOT_HAVE_COMMA) {
+        position_of_dot = size_possible_double;
+    }*/
 
 
 
@@ -198,10 +216,9 @@ double transparent_from_string_to_double(const std::string& possible_double) {
                 break;
 
 
-
             default:
                 if (!is_already_dot)
-                    result += finded_symbol->second * pow(10, (position_of_dot) - (i + 1));
+                    result += finded_symbol->second * pow(10, position_of_dot - (i + 1));
                 else
                     result += finded_symbol->second * pow(0.1, i - position_of_dot);
         }
@@ -209,7 +226,7 @@ double transparent_from_string_to_double(const std::string& possible_double) {
 
     }
 
-    return result;
+    return result * result_multiply;
 
 }
 
