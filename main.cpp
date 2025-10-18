@@ -93,8 +93,9 @@ int main() {
 
        //debugging_fragments();
         //solve_quadratic_equations();
-        sum_first_integers();
+        //sum_first_integers();
         //celsius_transfer();
+        sum_first_doubles();
 
         return 0;
 
