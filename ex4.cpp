@@ -360,6 +360,60 @@ void sum_first_integers()
 
 }
 
+void print_fibonacci(const std::vector<int>& fibonacci) {
+    std::cout << "Fibonacci:\n";
+
+    for (auto el: fibonacci) {
+        std::cout << el << " ";
+    }
+
+    std::cout << std::endl;
+}
+
+int find_largest_fibonacci()
+/*
+ *write a program that writes out the first N values of the Fibonacci series, that is, the series
+ *that starts with 1 1 2 3 5 8 13 21 34. The next number of the series is the sum of the two previous ones.
+ *Find the largest Fibonacci number that fits in an int.
+ */
+{
+    int largest_fibonacci = 1;
+    int input;
+    std::vector<int> fibonacci_vec {1,1};
+
+    std::cout << "Enter N: ";
+    std::cin >> input;
+
+    if (!std::cin) error("Bad input!");
+
+    const int N = input;
+
+    if (N < 3) return largest_fibonacci;
+
+    for (int i = 1; i < N - 1; ++i) {
+        int sum = fibonacci_vec[i] + fibonacci_vec[i - 1];
+
+        // overhead integer
+        if (sum < 0) {
+            largest_fibonacci = fibonacci_vec[i];
+            print_fibonacci(fibonacci_vec);
+            error("N ("+std::to_string(N)+") so big. Integer overflow!\n");
+            return largest_fibonacci;
+
+        }
+
+        fibonacci_vec.push_back(sum);
+    }
+
+    largest_fibonacci = fibonacci_vec[N-1];
+
+    print_fibonacci(fibonacci_vec);
+
+    std::cout << "Largest: " << largest_fibonacci << std::endl;
+
+    return largest_fibonacci;
+}
+
 
 
 
