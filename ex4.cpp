@@ -498,7 +498,7 @@ void game_bulls_cows() {
 
         std::cout << "Enter number (size " << size_num << "): ";
 
-        for (std::string number; std::cin >> number && bulls_cows.first < size_num; ) {
+        for (std::string number; bulls_cows.first < size_num && std::cin >> number; ) {
 
             if (!std::cin || number.size() > size_num)
                 error("bad input!");
@@ -526,5 +526,103 @@ void game_bulls_cows() {
 
 
 
+int normalize_word(const std::string& input) { //return day iterator
+    const std::map<std::string, int> short_week_day = {
+        {"sun", 0},
+        {"mon", 1},
+        {"tue", 2},
+        {"wed", 3},
+        {"thu", 4},
+        {"fri", 5},
+        {"sat", 6},
+         {"|", -1}
+    };
+    const std::map<std::string, int> week_day = {
+        {"sunday", 0},
+        {"monday", 1},
+        {"tuesday", 2},
+        {"wednesday", 3},
+        {"thursday", 4},
+        {"friday", 5},
+        {"saturday", 6}
+    };
+
+    std::string result = input;
+
+    for (char & i : result) {
+        if (i >= 'A' && i <= 'Z') i += 32;
+    }
+
+    auto search_long_word = week_day.find(result);
+    auto search_short_word = short_week_day.find(result);
 
 
+    if (search_long_word !=week_day.end())
+        return search_long_word->second;
+
+    if (search_short_word != short_week_day.end())
+        return search_short_word->second;
+
+    return 7; // return iterator of not corrects inputted words
+}
+
+void print_day_results(const std::vector<int> & sums_of_days) {
+    const std::map<int, std::string> week_day = {
+        {0, "sunday"},
+        {1, "monday"},
+        {2, "tuesday"},
+        {3, "wednesday"},
+        {4, "thursday"},
+        {5, "friday"},
+        {6, "saturday"},
+        {7,"not correct days"}
+    };
+
+    std::cout << "Result of summarize: \n";
+
+    for (int i = 0; i < sums_of_days.size(); ++i) {
+        auto it = week_day.find(i);
+
+        if (it != week_day.end())
+            std::cout << it->second << " = "<< sums_of_days[i] << std::endl;
+        else
+            error("bad day print");
+    }
+
+}
+
+void day_of_weeks()
+/*
+Read (day-of-the-week, value) pairs from standard input. For example:
+Tuesday 23 Friday 56 Tuesday -3 Thursday 99
+Collect all the values for each day of the week in a vector‹int». Write out the values of the seven day-of-the-week vectors. Print out the sum of the values in each vector. Ignore illegal days of the week, such as Funday, but accept common synonyms such as Mon and monday.
+Write out the number of rejected values.
+
+ */
+
+{
+    std::string input_day;
+    int input_num, num_of_day = 100;
+    std::vector<int> sums_of_days(8,0);
+
+    std::cout << "Write (day-of-the-week, value) pairs. For example: Tuesday 23 Friday 56 Tuesday -3 Thursday 99."
+            << "\nIf you want to stop, enter '|'"
+            << "\nEnter pairs: ";
+
+    while (std::cin >> input_day >> input_num) {
+        if (!std::cin) error("bad input");
+
+        num_of_day = normalize_word(input_day);
+
+        if (num_of_day == -1) break;
+        if (num_of_day == 7) {
+            ++sums_of_days[num_of_day];
+            continue;
+        }
+
+        sums_of_days[num_of_day] += input_num;
+    }
+
+    print_day_results(sums_of_days);
+
+}

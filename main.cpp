@@ -98,7 +98,8 @@ int main() {
         //sum_first_doubles();
         //find_largest_fibonacci();
 
-        game_bulls_cows();
+        //game_bulls_cows();
+        day_of_weeks();
         return 0;
 
     }

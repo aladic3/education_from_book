@@ -6,8 +6,9 @@
 class Bad_area {
 };
 
-void error(std::string msg) {
+int error(std::string msg) {
     throw std::runtime_error(msg);
+    return -1;
 }
 
 int area(int length, int width) {
