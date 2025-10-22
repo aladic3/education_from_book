@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <map>
+#include <random>
 
 
 constexpr double END_OF_INPUT = std::numeric_limits<double>::max();
@@ -412,6 +413,115 @@ int find_largest_fibonacci()
     std::cout << "Largest: " << largest_fibonacci << std::endl;
 
     return largest_fibonacci;
+}
+
+void seed(std::__1::default_random_engine& engine) {
+    int time = static_cast<int>(std::time(nullptr));
+    engine.seed(time);
+
+}
+
+std::vector<int> generate_different_integers() {
+    std::__1::default_random_engine random_engine;
+    seed(random_engine);
+
+    std::vector<int> result (4,-1);
+
+    for (int i = 0; i < result.size(); ++i) {
+        std::uniform_int_distribution<int> dist(0,9);
+
+        while (result[i] == -1) {
+            int random_num = dist(random_engine);
+
+
+            // flag for check unicum
+            bool is_unicum = true;
+            for (int j = 0; j < i; ++j) {
+                if (result[j] == random_num) {
+                    is_unicum = false;
+                    break;
+                }
+            }
+            /*for (int element: result) {
+                if (element == random_num) {
+                    is_unicum = false;
+                    break;
+                }
+            }*/
+
+
+            result[i] = is_unicum ? random_num : -1;
+        }
+    }
+
+    return  result;
+}
+
+std::vector<int> get_inputted_vec_in_int(const std::string &number, const int size_num) {
+    //check
+    transparent_from_string_to_int(number);
+
+    std::vector<int> inputted_vec(size_num);
+
+    for (int i = 0; i < size_num; ++i) {
+        inputted_vec[i] = number[i] - '0';
+    }
+
+    return  inputted_vec;
+}
+
+
+std::pair<int,int> calculate_bulls_cows(const std::vector<int>& inputted_vec,
+    const std::vector<int>& generated_vec, const int size_vec) {
+    std::pair<int,int> bulls_and_cows = {0,0};
+    for (int i = 0; i < size_vec; ++i) {
+
+        for (int j = 0; j < size_vec; ++j) {
+            if (inputted_vec[i] == generated_vec[j] && i == j) {++bulls_and_cows.first; break;}
+
+            if (inputted_vec[i] == generated_vec[j] && i != j) {++bulls_and_cows.second; break;}
+        }
+    }
+
+    return bulls_and_cows;
+}
+
+void game_bulls_cows() {
+    std::string answer = "y";
+
+    while (answer == "y") {
+        std::vector<int> generated_vec = generate_different_integers();
+        const int size_num = static_cast<int>(generated_vec.size());
+        std::pair<int,int> bulls_cows = {0,0};
+
+
+
+        std::cout << "Enter number (size " << size_num << "): ";
+
+        for (std::string number; std::cin >> number && bulls_cows.first < size_num; ) {
+
+            if (!std::cin || number.size() > size_num)
+                error("bad input!");
+
+            std::vector<int> inputted_vec = get_inputted_vec_in_int(number, size_num);
+
+            bulls_cows = calculate_bulls_cows(inputted_vec,generated_vec,size_num);
+
+            std::cout << "Bulls = " << bulls_cows.first << " Cows = " << bulls_cows.second << std::endl;
+
+
+        }
+
+
+        std::cout << "Congratulations! You win!" << std::endl << "If you would proceed new game, input 'y': ";
+        std::cin >> answer;
+
+
+    }
+
+
+
+
 }
 
 

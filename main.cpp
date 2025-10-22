@@ -96,7 +96,9 @@ int main() {
         //sum_first_integers();
         //celsius_transfer();
         //sum_first_doubles();
-        find_largest_fibonacci();
+        //find_largest_fibonacci();
+
+        game_bulls_cows();
         return 0;
 
     }
