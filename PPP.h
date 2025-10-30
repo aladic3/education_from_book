@@ -6,6 +6,9 @@
 #include "ex3.cpp"
 #include "drill4.cpp"
 #include "ex4.cpp"
+#include "calculator.cpp"
+
+int error(std::string msg);
 // Currently empty on purpose.
 
 /*

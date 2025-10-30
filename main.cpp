@@ -99,7 +99,24 @@ int main() {
         //find_largest_fibonacci();
 
         //game_bulls_cows();
-        day_of_weeks();
+        //day_of_weeks();
+
+        //calculator >>>>>>>>>>>>>>
+        Token token{};
+        double result = 0;
+        while (std::cin) {
+            token = ts.get();
+
+            if (token.kind_of_token == 'q') break;
+            if (token.kind_of_token == ';') std::cout << "=" << result;
+            else  ts.putback(token);
+
+            result = expression();
+
+
+        }
+
+
         return 0;
 
     }
