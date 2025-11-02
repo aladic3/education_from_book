@@ -28,6 +28,7 @@ add_executable(hello_world main.cpp
         drill4.cpp
         ex4.cpp
         calculator.cpp
+        ex5.cpp
 
 )
 
