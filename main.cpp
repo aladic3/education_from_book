@@ -104,11 +104,19 @@ int main() {
         //calculator >>>>>>>>>>>>>>
         Token token{};
         double result = 0;
+        std::cout << "Welcome to out simple calculator.\nPlease enter expressions using floating-point numbers."
+                << std::endl << "Available operators: =, x, *, /, +, -, (, ), {, }." << std::endl << "Your expression: ";
+
+        /*
+        *case '=': case 'x': // for print and exit
+        case '*': case '/': case '+': case '-': case '(': case ')':
+         */
+
         while (std::cin) {
             token = ts.get();
 
-            if (token.kind_of_token == 'q') break;
-            if (token.kind_of_token == ';') std::cout << "=" << result;
+            if (token.kind_of_token == 'x') break;
+            if (token.kind_of_token == '=') std::cout << "=" << result;
             else  ts.putback(token);
 
             result = expression();

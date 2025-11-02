@@ -39,8 +39,8 @@ Token Token_stream::get() {
     if (! (std::cin >> input)) error ("Bad input in Token_stream::get(). std::cin error!");
 
     switch (input) {
-        case ';': case 'q': // for print and exit
-        case '*': case '/': case '+': case '-': case '(': case ')':
+        case '=': case 'x': // for print and exit
+        case '*': case '/': case '+': case '-': case '(': case ')': case '{': case '}': case '!':
             return Token{input};
 
         case '.': case '0': case '1': case '2': case '3': case '4':
@@ -61,6 +61,19 @@ Token_stream ts; // provides get() and pullback
 
 double expression(); // declaration so that primary() can call expression()
 
+int factorial(const int value) {
+    int result = 1;
+
+    if (value < 0) error("Minus factorial not exist!");
+    if (value <= 1) return result;
+
+    for (int i = 2; i <= value; ++i ) {
+        result *= i;
+    }
+
+    return result;
+}
+
 double primary() {  // deal with numbers and parentheses
     Token token  = ts.get();
 
@@ -74,10 +87,31 @@ double primary() {  // deal with numbers and parentheses
             return input;
 
         }
+        case '{': {
+            double input = expression();
+
+            token = ts.get();
+            if (token.kind_of_token != '}') error("Must be { expression }!");
+
+            return input;
+        }
 
 
-        case '8':
-            return token.value;
+        case '8': {
+            double result = token.value;
+
+            token = ts.get();
+
+            if (token.kind_of_token == '!')
+                result = factorial(static_cast<int>(result));
+            else
+                ts.putback(token);
+
+
+            return result;
+        }
+
+
 
         default:
             error("Primary expected!");
