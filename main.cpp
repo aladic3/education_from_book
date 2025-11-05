@@ -127,7 +127,34 @@ int main() {
         */
         // <<< calculator
 
-        names_scores_pairs_v2();
+        //names_scores_pairs_v2();
+
+        //game_bulls_cows_v2();
+
+        //bitwise calculator >>>>>>>>>>>>>>
+
+        Bitwise_token token{};
+
+        int result = 0;
+        std::cout << "Welcome to out simple calculator.\nPlease enter expressions using floating-point numbers."
+                << std::endl << "Available operators: =, x, &, |, ^, ~, !, (, ), {, }, !."
+                << std::endl << "Your expression: ";
+
+        while (std::cin) {
+            token = bitwise_ts.get();
+
+            if (token.kind_of_token == 'x') break;
+            if (token.kind_of_token == '=')
+                    std::cout << "=" << result
+                            << std::endl << "Enter expression: ";
+            else  bitwise_ts.putback(token);
+
+            result = bitwise_expression();
+
+
+        }
+
+        // <<< bitwise calculator
 
         return 0;
 

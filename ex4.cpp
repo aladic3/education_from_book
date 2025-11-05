@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <random>
+#include "error.h"
 
 
 constexpr double END_OF_INPUT = std::numeric_limits<double>::max();

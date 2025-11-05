@@ -1,7 +1,9 @@
 //
 // Created by Dmytrenko Kyrylo on 02.11.2025.
 //
-#include <iostream>
+#include <random>
+#include "error.h"
+#include "iostream"
 
 
 class Name_value {
@@ -83,9 +85,123 @@ void names_scores_pairs_v2() {
         std::cout << "\nEnter score to find all names: ";
     }
 
-    // for (int i = 0; i < names.size(); ++i) {
-    //     std::cout << names[i] << " " << scores[i] << "\n";
-    // }
+
+
+}
+
+
+void seed2(std::__1::default_random_engine& engine) {
+    int time = static_cast<int>(std::time(nullptr));
+    engine.seed(time);
+
+}
+
+
+std::vector<char> generate_different_letters() {
+    std::__1::default_random_engine random_engine;
+    seed2(random_engine);
+
+
+    std::vector<char> result (4,0);
+
+    for (int i = 0; i < result.size(); ++i) {
+        std::uniform_int_distribution<int> dist('a','z');
+
+        while (result[i] == 0) {
+            char random_letter = dist(random_engine);
+
+
+            // flag for check unicum
+            bool is_unicum = true;
+            for (int j = 0; j < i; ++j) {
+                if (result[j] == random_letter) {
+                    is_unicum = false;
+                    break;
+                }
+            }
+            /*for (int element: result) {
+                if (element == random_num) {
+                    is_unicum = false;
+                    break;
+                }
+            }*/
+
+
+            result[i] = is_unicum ? random_letter : 0; // if element of vector not generated go again
+        }
+    }
+
+    return  result;
+}
+
+char get_inputted_vec_in_alphabet(const char &input) {
+    //check is alphabet char
+    if (input >= 'a' && input <= 'z') return input;
+    if (input >= 'A' && input <= 'Z') return input+32;
+
+    // else
+
+    error("bad input");
+}
+
+
+std::pair<int,int> calculate_bulls_cows_v2(const std::vector<char>& inputted_vec,
+    const std::vector<char>& generated_vec, const int size_vec) {
+    std::pair<int,int> bulls_and_cows = {0,0};
+    for (int i = 0; i < size_vec; ++i) {
+
+        for (int j = 0; j < size_vec; ++j) {
+            if (inputted_vec[i] == generated_vec[j] && i == j) {++bulls_and_cows.first; break;}
+
+            if (inputted_vec[i] == generated_vec[j] && i != j) {++bulls_and_cows.second; break;}
+        }
+    }
+
+    return bulls_and_cows;
+}
+
+void game_bulls_cows_v2() {
+    std::string answer = "y";
+
+    while (answer == "y") {
+        std::vector<char> generated_vec = generate_different_letters();
+        const int size_num = static_cast<int>(generated_vec.size());
+        std::pair<int,int> bulls_cows = {0,0};
+
+
+
+        std::cout << "Enter letters (size " << size_num << "): ";
+
+        // while input and bulls < size_num (4)
+        for (std::string number; bulls_cows.first < size_num && std::cin >> number; ) {
+
+            if (!std::cin || number.size() > size_num)
+                error("bad input!");
+
+            std::vector<char> inputted_vec;
+
+            // add and check to vector our input
+            for (char & letter: number) {
+                char true_letter = get_inputted_vec_in_alphabet(letter);
+                inputted_vec.push_back(true_letter);
+            }
+
+
+            bulls_cows = calculate_bulls_cows_v2(inputted_vec,generated_vec,size_num);
+
+            std::cout << "Bulls = " << bulls_cows.first << " Cows = " << bulls_cows.second << std::endl;
+
+
+        }
+
+
+        std::cout << "Congratulations! You win!" << std::endl << "If you would proceed new game, input 'y': ";
+        std::cin >> answer;
+
+
+    }
+
+
 
 
 }

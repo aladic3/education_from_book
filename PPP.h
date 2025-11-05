@@ -8,8 +8,10 @@
 #include "drill4.cpp"
 #include "ex4.cpp"
 #include "calculator.cpp"
+#include "bitwise_calculator.cpp"
 
 int error(std::string msg);
+
 // Currently empty on purpose.
 
 /*

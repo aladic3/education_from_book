@@ -3,7 +3,7 @@
 //
 #include <complex>
 #include <iostream>
-#include <string>
+#include "error.h"
 
 int max(int,int);
 
