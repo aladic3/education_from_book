@@ -132,7 +132,7 @@ int main() {
         //game_bulls_cows_v2();
 
         //bitwise calculator >>>>>>>>>>>>>>
-
+        /*
         Bitwise_token token{};
 
         int result = 0;
@@ -153,9 +153,11 @@ int main() {
 
 
         }
-
+        */
         // <<< bitwise calculator
 
+
+        combination_and_permutation();
         return 0;
 
     }

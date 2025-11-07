@@ -200,8 +200,68 @@ void game_bulls_cows_v2() {
 
 
     }
+}
 
+unsigned long long factorial_l(const int value) {
+    unsigned long long result = 1;
 
+    if (value < 0) error("Minus factorial not exist!");
+    if (value <= 1) return result;
+
+    for (int i = 2; i <= value; ++i ) {
+        result *= i;
+    }
+
+    return result;
+}
+
+unsigned long long permutation(int a, int b) {
+    unsigned long long result = 0;
+
+    if (a < b) error("a cannot be less b!");
+    if (a < 0 || b < 0) error("negative not allowed!");
+
+    result = factorial_l(a) / factorial_l(a-b);
+
+    return result;
+
+}
+
+unsigned long long combination(int a, int b) {
+    unsigned long long result = 0;
+
+    result = permutation(a,b)/ factorial_l(b);
+
+    return result;
+}
+
+void combination_and_permutation() {
+    int a, b;
+
+    std::cout << "Enter two numbers: ";
+    std::cin >> a >> b;
+
+    if (!std::cin) error("bad input");
+
+    std::cout << "If you need combination or permutation, enter c or p: ";
+
+    char choise;
+    std::cin >> choise;
+
+    if (!std::cin) error ("bad input");
+
+    switch (choise) {
+        case 'c':
+            std::cout << "Combination = " << combination(a,b) << std::endl;
+            break;
+
+        case 'p':
+            std::cout << "Permutation = " << permutation(a,b) << std::endl;
+            break;
+
+        default:
+            std::cout << "This variant not exist.";
+    }
 
 
 }
