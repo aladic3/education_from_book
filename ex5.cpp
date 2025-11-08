@@ -216,12 +216,16 @@ unsigned long long factorial_l(const int value) {
 }
 
 unsigned long long permutation(int a, int b) {
-    unsigned long long result = 0;
+    unsigned long long result = 1;
 
     if (a < b) error("a cannot be less b!");
     if (a < 0 || b < 0) error("negative not allowed!");
 
-    result = factorial_l(a) / factorial_l(a-b);
+    //result = factorial_l(a) / factorial_l(a-b);
+
+    for (unsigned int i = a - b + 1; i <= a; ++i) {
+        result*=i;
+    }
 
     return result;
 
