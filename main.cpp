@@ -102,29 +102,9 @@ int main() {
         //day_of_weeks();
 
         //calculator >>>>>>>>>>>>>>
-        /*
-        Token token{};
-        double result = 0;
-        std::cout << "Welcome to out simple calculator.\nPlease enter expressions using floating-point numbers."
-                << std::endl << "Available operators: =, x, *, /, +, -, (, ), {, }, !." << std::endl << "Your expression: ";
 
+        calculation();
 
-       // *case '=': case 'x': // for print and exit
-        //case '*': case '/': case '+': case '-': case '(': case ')':
-
-
-        while (std::cin) {
-            token = ts.get();
-
-            if (token.kind_of_token == 'x') break;
-            if (token.kind_of_token == '=') std::cout << "=" << result;
-            else  ts.putback(token);
-
-            result = expression();
-
-
-        }
-        */
         // <<< calculator
 
         //names_scores_pairs_v2();
@@ -157,7 +137,9 @@ int main() {
         // <<< bitwise calculator
 
 
-        combination_and_permutation();
+        //combination_and_permutation();
+
+        //sum_first_integers();
         return 0;
 
     }

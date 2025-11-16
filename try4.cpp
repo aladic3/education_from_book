@@ -7,7 +7,7 @@ class Bad_area {
 };
 
 int error(std::string msg) {
-    throw std::runtime_error(msg);
+    throw std::runtime_error(msg + '\n');
     return -1;
 }
 

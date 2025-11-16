@@ -22,7 +22,7 @@ public:
 
 private:
     bool is_full = false;
-    Bitwise_token buffer;
+    Bitwise_token buffer{};
 
 };
 
@@ -61,6 +61,7 @@ Bitwise_token Token_stream_bitwise::get() {
             error("Bad input in Token_stream::get()!");
     }
 
+    return Bitwise_token{};
 }
 
 Token_stream_bitwise bitwise_ts; // provides get() and pullback
@@ -74,7 +75,7 @@ int bitwise_primary() {  // deal with numbers and parentheses
 
     switch (token.kind_of_token) {
         case '(': {
-            double input = bitwise_expression();
+            int input = bitwise_expression();
 
             token = bitwise_ts.get();
             if (token.kind_of_token != ')') error("Must be ( expression )!");
@@ -83,7 +84,7 @@ int bitwise_primary() {  // deal with numbers and parentheses
 
         }
         case '{': {
-            double input = bitwise_expression();
+            int input = bitwise_expression();
 
             token = bitwise_ts.get();
             if (token.kind_of_token != '}') error("Must be { expression }!");
@@ -109,6 +110,7 @@ int bitwise_primary() {  // deal with numbers and parentheses
 
     }
 
+    return -1;
 }
 
 int bitwise_secondary() {

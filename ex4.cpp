@@ -77,63 +77,19 @@ int celsius_transfer() {
 
 int transparent_from_string_to_int(const std::string& possible_integer)
 {
-    auto size_str = possible_integer.size();
+    const auto size_str = possible_integer.size();
     int result = 0;
 
 
     for (auto i = 0; i < size_str; ++i) {
-        char symbol = possible_integer[i];
-        int number = 0;
+        const char symbol = possible_integer[i];
 
-        switch (symbol) {
-            case '0':
-                number = 0;
-                break;
+        if (symbol == '|') return -1;
 
-            case '1':
-                number = 1;
-                break;
+        const int number = symbol - '0';
+        if (number > 9 || number < 0) error("Bad integer input!");
 
-            case '2':
-                number = 2;
-                break;
-
-            case '3':
-                number = 3;
-                break;
-
-            case '4':
-                number = 4;
-                break;
-
-            case '5':
-                number = 5;
-                break;
-
-            case '6':
-                number = 6;
-                break;
-
-            case '7':
-                number = 7;
-                break;
-            case '8':
-                number = 8;
-                break;
-
-            case '9':
-                number = 9;
-                break;
-
-            case '|':
-                return -1;
-
-            default:
-                error("Bad integer input!");
-
-        }
-
-        result += number * std::pow(10, size_str - (i + 1) );
+        result += number * std::pow(10, static_cast<int>(size_str) - (i + 1) );
     }
 
 
