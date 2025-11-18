@@ -3,6 +3,26 @@
 //
 /*
 grammars:
+    statement:
+        expression
+        declaration
+        print
+        quit
+
+    print:
+        constexpr char print
+
+    quit:
+        constexpr char quit
+
+    declaration:
+        let variable = expression //initializing
+        variable = expression //assert new value
+
+    variable:
+        string name
+
+
     expression:
         term
         expression + - term
@@ -18,6 +38,7 @@ grammars:
 
     primary:
         number
+        variable
         + - primary
         ( expression )
         { expression )
@@ -26,15 +47,10 @@ grammars:
         float
  */
 
+#include <utility>
+
 #include "iostream"
 #include "error.h"
-
-class Token {
-public:
-    char kind_of_token; // can be: q, ;, (, ), {, }, +, -, /, *, 8 (number)
-    double value;
-
-};
 
 
 const std::string input_prompt = "> ";
@@ -42,6 +58,39 @@ const std::string result_prompt = "= ";
 constexpr char quit = 'q';
 constexpr char print = ';';
 constexpr char number = '8';
+constexpr char let = 'L';
+constexpr char const_name = 'N';
+const std::string declarationKey = "let";
+
+class Token {
+public:
+    char kind_of_token; // can be: q, ;, (, ), {, }, +, -, /, *, 8 (number)
+    double value;
+    std::string name;
+
+    Token(): kind_of_token(){} //default
+    Token(char ch): kind_of_token{ch}{} //operation, quit, print
+    Token(char ch, double val): kind_of_token{ch}, value{val}{}
+    Token(std::string str, char ch): kind_of_token{ch}, name{std::move(str)}{}
+
+};
+
+class Variable {
+private:
+    std::string name;
+    double value;
+
+public:
+    Variable(std::string n): name(std::move(n)){}
+    Variable(){}
+
+
+    void setValue(double val){ value = val;}
+    double getValue() const {return value;}
+    void setName(std::string n) { name = n;}
+    std::string getName() {return name;}
+};
+
 
 class Token_stream {
 public:
@@ -50,6 +99,7 @@ public:
     void clean_mess();
 
 private:
+    static bool is_can_be_in_variable_name(char input);
     bool is_full = false;
     Token buffer;
 
@@ -67,6 +117,14 @@ void Token_stream::clean_mess() {
 }
 
 
+bool Token_stream::is_can_be_in_variable_name(char input)
+// can be char include in variable name?
+{
+    if (!std::isalpha(input) && !std::isdigit(input)) //if not in alphabet or not number
+        return  false;
+
+    return true;
+}
 
 
 
@@ -97,6 +155,7 @@ Token Token_stream::get() {
         case '{': case '}':
         case '!':
         case '%':
+        case '=':
             return Token{input};
 
         case '.': case '0': case '1': case '2': case '3': case '4':
@@ -107,14 +166,30 @@ Token Token_stream::get() {
 
             return Token{number, value};
         }
-            default:
-            error("Bad input in Token_stream::get()!");
+        default: {
+            if (!std::isalpha(input)) error("Bad input in Token_stream::get()!");
+
+            std::string variable_name;
+            variable_name += input;
+
+            while (std::cin.get(input) && is_can_be_in_variable_name(input)) {
+                variable_name += input;
+            }
+
+            std::cin.putback(input);
+
+            if (variable_name == declarationKey)
+                return Token{let};
+
+            return Token{variable_name, const_name};
+        }
+
     }
 
 }
 
 Token_stream ts; // provides get() and pullback
-
+std::vector<Variable> var_table;
 
 
 bool is_multiply_double_max_min_limit(double left, double right) {
@@ -123,6 +198,22 @@ bool is_multiply_double_max_min_limit(double left, double right) {
 
 bool is_factorial_ull_limit(unsigned long long left, int right) {
     return left > std::numeric_limits<unsigned long long>::max()/right;
+}
+
+bool is_declared(const std::string& name) {
+    for (Variable& element: var_table) {
+        if (name == element.getName()) return true;
+    }
+
+    return false;
+}
+
+Variable get_var_from_table(const std::string& name) {
+    for (Variable& var: var_table) {
+        if (var.getName() == name) return var;
+    }
+
+    return Variable{};
 }
 
 
@@ -157,6 +248,13 @@ double primary() {
             return primary();
         case number:
             return token.value;
+
+        case const_name: {
+            if (!is_declared(token.name)) error("name not declared");
+
+            Variable var = get_var_from_table(token.name);
+            return var.getValue();
+        }
 
         case '(': {
             double result = expression();
@@ -271,6 +369,46 @@ double expression() { // deal with + and -
 
 
 }
+Variable declaration() {
+    Token token = ts.get();
+
+    switch (token.kind_of_token) {
+        case const_name:{
+            Variable variable{token.name};
+            if (is_declared(variable.getName())) error("this name also declarative");
+
+            token = ts.get();
+
+            if (token.kind_of_token != '=') error("Symbol '=' expected");
+
+            variable.setValue(expression());
+            return variable;
+
+        }
+        default:
+            error("name expected");
+
+    }
+
+}
+
+double statement() {
+    Token token = ts.get();
+
+    switch (token.kind_of_token) {
+
+        case let: {
+            Variable variable = declaration();
+            var_table.push_back(variable);
+            return variable.getValue();
+        }
+
+
+        default:
+            ts.putback(token);
+            return expression();
+    }
+}
 
 void calculation() {
         Token token{};
@@ -298,7 +436,7 @@ void calculation() {
 
             ts.putback(token);
 
-            result = expression();
+            result = statement();
 
             std::cout << result_prompt << result << std::endl;
 
