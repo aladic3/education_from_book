@@ -3,11 +3,15 @@
 //
 /*
 grammars:
+    calculation:
+        statement
+        print
+        quit
+
     statement:
         expression
         declaration
-        print
-        quit
+
 
     print:
         constexpr char print
@@ -40,6 +44,11 @@ grammars:
         number
         variable
         + - primary
+        parentheses
+        sqrt parentheses
+        pow ( primary , integer )
+
+    parentheses:
         ( expression )
         { expression )
 
@@ -55,12 +64,19 @@ grammars:
 
 const std::string input_prompt = "> ";
 const std::string result_prompt = "= ";
-constexpr char quit = 'q';
-constexpr char print = ';';
-constexpr char number = '8';
-constexpr char let = 'L';
-constexpr char const_name = 'N';
-const std::string declarationKey = "let";
+constexpr char quit_kind = 'q';
+constexpr char print_kind = ';';
+const std::string quit_key = "exit";
+const std::string print_key = "print";
+constexpr char number_kind = '8';
+constexpr char let_kind = 'L';
+constexpr char name_kind = 'N';
+const std::string declarationKey = "#";
+const std::string square_root_key = "sqrt";
+constexpr char square_root_kind = 'R';
+const std::string pow_key = "pow";
+constexpr char pow_kind ='P';
+constexpr char nothing_kind = '0';
 
 class Token {
 public:
@@ -101,13 +117,33 @@ public:
 
 private:
     static bool is_can_be_in_variable_name(char input);
+    static Token translate_keyword_to_token(const std::string& name);
     bool is_full = false;
     Token buffer;
 
 };
 
+Token Token_stream::translate_keyword_to_token(const std::string& name) {
+    if (name == declarationKey)
+        return Token{let_kind};
+
+    if (name == square_root_key)
+        return Token{square_root_kind};
+
+    if (name == pow_key)
+        return Token{pow_kind};
+
+    if (name == print_key)
+        return Token{print_kind};
+
+    if (name == quit_key)
+        return Token{quit_kind};
+
+    return Token{nothing_kind};
+}
+
 void Token_stream::clean_mess() {
-    if (is_full && buffer.kind_of_token == print) {
+    if (is_full && buffer.kind_of_token == print_kind) {
         is_full = false;
         return;
     }
@@ -115,7 +151,8 @@ void Token_stream::clean_mess() {
 
     std::cin.clear();
     char skip = 0;
-    for (; skip != print; std::cin >> skip) {}
+    while (skip != print_kind)
+        std::cin.get(skip);
 
 }
 
@@ -138,6 +175,8 @@ void Token_stream::putback(Token t) {
     is_full = true;
 }
 
+
+
 Token Token_stream::get() {
     if (is_full) {
         is_full = false;
@@ -149,7 +188,7 @@ Token Token_stream::get() {
     if (! (std::cin >> input)) error ("Bad input in Token_stream::get(). std::cin error!");
 
     switch (input) {
-        case print: case quit: // for print and exit
+        case print_kind: case quit_kind: // for print and exit
         case '*':
         case '/':
         case '+':
@@ -159,6 +198,7 @@ Token Token_stream::get() {
         case '!':
         case '%':
         case '=':
+        case ',':
             return Token{input};
 
         case '.': case '0': case '1': case '2': case '3': case '4':
@@ -167,13 +207,18 @@ Token Token_stream::get() {
             double value;
             std::cin >> value;
 
-            return Token{number, value};
+            return Token{number_kind, value};
         }
         default: {
-            if (!std::isalpha(input)) error("Bad input in Token_stream::get()!");
-
             std::string variable_name;
             variable_name += input;
+
+            if (variable_name == declarationKey)
+                return translate_keyword_to_token(variable_name);
+
+            if (!std::isalpha(input)) error("Bad input in Token_stream::get()!");
+
+
 
             while (std::cin.get(input) && is_can_be_in_variable_name(input)) {
                 variable_name += input;
@@ -181,10 +226,13 @@ Token Token_stream::get() {
 
             std::cin.putback(input);
 
-            if (variable_name == declarationKey)
-                return Token{let};
 
-            return Token{variable_name, const_name};
+            Token result_translate = translate_keyword_to_token(variable_name);
+
+            if (result_translate.kind_of_token != nothing_kind)
+                return result_translate;
+
+            return Token{variable_name, name_kind};
         }
 
     }
@@ -283,23 +331,8 @@ unsigned long long factorial(const int value) {
         return result;
 }
 
-
-
-double primary() {
-    Token token = ts.get();
-
+double parentheses(Token& token) {
     switch (token.kind_of_token) {
-        case '-':
-            return -primary();
-        case '+':
-            return primary();
-        case number:
-            return token.value;
-
-        case const_name: {
-            return variable_table.get_value_variable_from_table(token.name);
-        }
-
         case '(': {
             double result = expression();
 
@@ -323,8 +356,79 @@ double primary() {
 
         }
 
+        default:
+            error("Must be ( expression ) or { expression }");
+    }
+}
 
-            default:
+double pow_statement() {
+    // pow (x,i) mean "multiply x with itself i times. i - integer"
+    Token token = ts.get();
+    switch (token.kind_of_token) {
+        case '(': {
+            double x = expression();
+
+            token = ts.get();
+
+            if (token.kind_of_token != ',') error("comma (',') expected");
+
+            token = ts.get();
+
+            if (token.kind_of_token != number_kind) error ("number expected");
+
+            int power = static_cast<int>(token.value);
+
+            token = ts.get();
+
+            if (token.kind_of_token != ')') error("Must be ( expression )!");
+
+            return std::pow(x,power);
+
+            break;
+
+
+        }
+
+        default:
+            error("Must be ( expression ) ");
+    }
+}
+
+double primary() {
+    Token token = ts.get();
+
+    switch (token.kind_of_token) {
+        case '-':
+            return -primary();
+        case '+':
+            return primary();
+        case number_kind:
+            return token.value;
+
+        case name_kind: {
+            return variable_table.get_value_variable_from_table(token.name);
+        }
+
+        case '(': case '{':
+            return parentheses(token);
+
+        case square_root_kind: {
+            token = ts.get(); // need for parentheses function. after sqrt_kind token must be ( expr ).
+            double res_parentheses =  parentheses(token);
+
+            if (res_parentheses < 0)
+                error("Negative can't be in square root operation");
+
+            return std::sqrt(res_parentheses);
+
+        }
+
+        case pow_kind:
+            return pow_statement();
+
+
+
+        default:
             ts.putback(token);
             error("primary expected");
     }
@@ -418,7 +522,7 @@ double declaration() {
     Token token = ts.get();
 
     switch (token.kind_of_token) {
-        case const_name:{
+        case name_kind:{
             const std::string name = token.name;
 
             token = ts.get();
@@ -446,7 +550,7 @@ double statement() {
 
     switch (token.kind_of_token) {
 
-        case let: {
+        case let_kind: {
             return declaration();
         }
 
@@ -477,10 +581,10 @@ void calculation() {
 
             token = ts.get();
 
-            while (token.kind_of_token == print)
+            while (token.kind_of_token == print_kind)
                 token = ts.get();
 
-            if (token.kind_of_token == quit)
+            if (token.kind_of_token == quit_kind)
                 return;
 
             ts.putback(token);
