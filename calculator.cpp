@@ -82,6 +82,7 @@ private:
 
 public:
     Variable(std::string n): name(std::move(n)){}
+    Variable(std::string n, double v): name(std::move(n)), value(v){}
     Variable(){}
 
 
@@ -113,7 +114,9 @@ void Token_stream::clean_mess() {
     is_full = false;
 
     std::cin.clear();
-    for (char skip = 0; skip != print; std::cin >> skip);
+    char skip = 0;
+    for (; skip != print; std::cin >> skip) {}
+
 }
 
 
@@ -188,9 +191,64 @@ Token Token_stream::get() {
 
 }
 
-Token_stream ts; // provides get() and pullback
-std::vector<Variable> var_table;
 
+
+
+
+class VariableTable {
+private:
+    std::vector<Variable> var_table;
+    Variable null_buffer {};
+    Variable& get_var_from_table(const std::string& name);
+
+public:
+    VariableTable(){}
+    bool is_declared(const std::string& name) ;
+    double get_value_variable_from_table(const std::string& name);
+    double add_variable_to_table(const std::string& name, double value) ;
+    double change_variable_in_table(const std::string& name, double value) ;
+
+
+};
+
+double VariableTable::get_value_variable_from_table(const std::string &name) {
+    const Variable& var = get_var_from_table(name);
+    return var.getValue();
+}
+
+
+bool VariableTable::is_declared(const std::string& name) {
+    for (Variable& element: var_table) {
+        if (name == element.getName()) return true;
+    }
+
+    return false;
+}
+
+Variable& VariableTable::get_var_from_table(const std::string& name) {
+    for (Variable& var: var_table) {
+        if (var.getName() == name) return var;
+    }
+
+    error("Not existing var with name: " + name);
+    return null_buffer;
+
+
+}
+
+double VariableTable::add_variable_to_table(const std::string& name, double value) {
+    if (is_declared(name))
+        error("Variable is also declared! You can create with another name!");
+
+    var_table.emplace_back(name,value);
+    return value;
+}
+
+double VariableTable::change_variable_in_table(const std::string& name, double value) {
+    get_var_from_table(name).setValue(value);
+    return value;
+
+}
 
 bool is_multiply_double_max_min_limit(double left, double right) {
     return std::abs(left) > std::numeric_limits<double>::max() / std::abs(right);
@@ -200,22 +258,11 @@ bool is_factorial_ull_limit(unsigned long long left, int right) {
     return left > std::numeric_limits<unsigned long long>::max()/right;
 }
 
-bool is_declared(const std::string& name) {
-    for (Variable& element: var_table) {
-        if (name == element.getName()) return true;
-    }
 
-    return false;
-}
 
-Variable get_var_from_table(const std::string& name) {
-    for (Variable& var: var_table) {
-        if (var.getName() == name) return var;
-    }
 
-    return Variable{};
-}
-
+Token_stream ts; // provides get() and pullback
+VariableTable variable_table;
 
 double expression();
 
@@ -250,10 +297,7 @@ double primary() {
             return token.value;
 
         case const_name: {
-            if (!is_declared(token.name)) error("name not declared");
-
-            Variable var = get_var_from_table(token.name);
-            return var.getValue();
+            return variable_table.get_value_variable_from_table(token.name);
         }
 
         case '(': {
@@ -369,20 +413,25 @@ double expression() { // deal with + and -
 
 
 }
-Variable declaration() {
+
+double declaration() {
     Token token = ts.get();
 
     switch (token.kind_of_token) {
         case const_name:{
-            Variable variable{token.name};
-            if (is_declared(variable.getName())) error("this name also declarative");
+            const std::string name = token.name;
 
             token = ts.get();
 
             if (token.kind_of_token != '=') error("Symbol '=' expected");
 
-            variable.setValue(expression());
-            return variable;
+            double value = expression();
+            if (variable_table.is_declared(name))
+                variable_table.change_variable_in_table(name,value);
+            else
+                variable_table.add_variable_to_table(name,value);
+
+            return value;
 
         }
         default:
@@ -398,9 +447,7 @@ double statement() {
     switch (token.kind_of_token) {
 
         case let: {
-            Variable variable = declaration();
-            var_table.push_back(variable);
-            return variable.getValue();
+            return declaration();
         }
 
 
@@ -411,6 +458,8 @@ double statement() {
 }
 
 void calculation() {
+        variable_table.add_variable_to_table("pi",3.1415926535);
+        variable_table.add_variable_to_table("e",2.7182818284);
         Token token{};
 
         double result = 0;
