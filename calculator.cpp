@@ -5,7 +5,7 @@
 grammars:
     calculation:
         statement
-        print
+        print <-- after this ability to assign will be true in each time
         quit
 
     statement:
@@ -71,12 +71,14 @@ const std::string print_key = "print";
 constexpr char number_kind = '8';
 constexpr char let_kind = 'L';
 constexpr char name_kind = 'N';
-const std::string declarationKey = "#";
+const std::string declarationKey = "let";
 const std::string square_root_key = "sqrt";
 constexpr char square_root_kind = 'R';
 const std::string pow_key = "pow";
 constexpr char pow_kind ='P';
 constexpr char nothing_kind = '0';
+
+double declaration();
 
 class Token {
 public:
@@ -213,8 +215,8 @@ Token Token_stream::get() {
             std::string variable_name;
             variable_name += input;
 
-            if (variable_name == declarationKey)
-                return translate_keyword_to_token(variable_name);
+            if (variable_name == "#")
+                return translate_keyword_to_token(declarationKey);
 
             if (!std::isalpha(input)) error("Bad input in Token_stream::get()!");
 
@@ -245,19 +247,79 @@ Token Token_stream::get() {
 
 class VariableTable {
 private:
-    std::vector<Variable> var_table;
     Variable null_buffer {};
-    Variable& get_var_from_table(const std::string& name);
+    std::vector<Variable> var_table;
+
+    Variable& get_var_from_table(const std::string &name);
+    bool possibility_to_assign;
+
 
 public:
-    VariableTable(){}
+
+    Variable& get_null_variable() ;
+    VariableTable(): possibility_to_assign(true){}
+    void set_unability_to_assign();
+    bool is_can_declaration() const;
+    void set_ability_to_assign();
     bool is_declared(const std::string& name) ;
     double get_value_variable_from_table(const std::string& name);
     double add_variable_to_table(const std::string& name, double value) ;
     double change_variable_in_table(const std::string& name, double value) ;
+    Variable& try_declaration_without_declKey(Token& token, Token_stream& ts);
 
 
 };
+
+Variable& VariableTable::get_null_variable() {
+    return null_buffer;
+}
+
+
+Variable& VariableTable::try_declaration_without_declKey(Token &token, Token_stream& ts) {
+    Variable& result = this->null_buffer; // declaration not success, we return null object
+
+
+        char input;
+        std::cin >> input;
+
+        set_unability_to_assign();
+
+
+        if ( input == '=') {
+            std::cin.putback(input);
+            ts.putback(token);
+
+            declaration();
+
+            result = get_var_from_table(token.name);
+
+        } else
+            std::cin.putback(input);
+
+
+
+    return result;
+}
+
+
+void VariableTable::set_unability_to_assign() {
+    possibility_to_assign = false;
+}
+
+
+bool VariableTable::is_can_declaration() const
+// this function assign possibility_to_assign to false value
+// because assigning value ability must be one time in first part of expression,
+// not anymore
+{
+    return possibility_to_assign;
+}
+
+void VariableTable::set_ability_to_assign() {
+    possibility_to_assign = true;
+}
+
+
 
 double VariableTable::get_value_variable_from_table(const std::string &name) {
     const Variable& var = get_var_from_table(name);
@@ -273,7 +335,7 @@ bool VariableTable::is_declared(const std::string& name) {
     return false;
 }
 
-Variable& VariableTable::get_var_from_table(const std::string& name) {
+Variable& VariableTable::get_var_from_table(const std::string &name) {
     for (Variable& var: var_table) {
         if (var.getName() == name) return var;
     }
@@ -313,6 +375,7 @@ Token_stream ts; // provides get() and pullback
 VariableTable variable_table;
 
 double expression();
+double declaration();
 
 
 unsigned long long factorial(const int value) {
@@ -396,21 +459,40 @@ double pow_statement() {
 
 double primary() {
     Token token = ts.get();
+    double result = 0;
+
+    // assigning can be only if first name_kind and after this name must be '=', another we can't do this
+    if (token.kind_of_token != name_kind && variable_table.is_can_declaration())
+        variable_table.set_unability_to_assign();
 
     switch (token.kind_of_token) {
         case '-':
-            return -primary();
+            result= -primary();
+            break;
         case '+':
-            return primary();
+            result= primary();
+            break;
         case number_kind:
-            return token.value;
+            result= token.value;
+            break;
 
         case name_kind: {
-            return variable_table.get_value_variable_from_table(token.name);
+
+            if (variable_table.is_can_declaration() ) {
+                Variable& result_assigning = variable_table.try_declaration_without_declKey(token,ts);
+
+                if (&result_assigning != &variable_table.get_null_variable()) { // if assigning success
+                    return result_assigning.getValue();
+                }
+            }
+
+            result = variable_table.get_value_variable_from_table(token.name);
+            break;
         }
 
         case '(': case '{':
-            return parentheses(token);
+            result= parentheses(token);
+            break;
 
         case square_root_kind: {
             token = ts.get(); // need for parentheses function. after sqrt_kind token must be ( expr ).
@@ -419,19 +501,26 @@ double primary() {
             if (res_parentheses < 0)
                 error("Negative can't be in square root operation");
 
-            return std::sqrt(res_parentheses);
+            result= std::sqrt(res_parentheses);
+            break;
 
         }
 
         case pow_kind:
-            return pow_statement();
+            result= pow_statement();
+            break;
 
 
 
         default:
             ts.putback(token);
             error("primary expected");
+            break;
     }
+
+
+    return result;
+
 }
 
 double postfix() {
@@ -506,10 +595,13 @@ double expression() { // deal with + and -
                 left-=term();
                 break;
 
-
+            case '=':
+                error("Can't assign here!");
+                break;
 
             default:
                 ts.putback(token);
+
                 return left;
         }
         token = ts.get();
@@ -530,6 +622,7 @@ double declaration() {
             if (token.kind_of_token != '=') error("Symbol '=' expected");
 
             double value = expression();
+
             if (variable_table.is_declared(name))
                 variable_table.change_variable_in_table(name,value);
             else
@@ -580,6 +673,7 @@ void calculation() {
             std::cout << input_prompt;
 
             token = ts.get();
+            variable_table.set_ability_to_assign();
 
             while (token.kind_of_token == print_kind)
                 token = ts.get();
