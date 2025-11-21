@@ -77,6 +77,8 @@ constexpr char square_root_kind = 'R';
 const std::string pow_key = "pow";
 constexpr char pow_kind ='P';
 constexpr char nothing_kind = '0';
+constexpr char space_kind = ' ';
+constexpr char new_line_kind = '\n';
 
 double declaration();
 
@@ -153,7 +155,7 @@ void Token_stream::clean_mess() {
 
     std::cin.clear();
     char skip = 0;
-    while (skip != print_kind)
+    while (skip != print_kind && skip != new_line_kind)
         std::cin.get(skip);
 
 }
@@ -187,7 +189,10 @@ Token Token_stream::get() {
 
     char input = 0;
 
-    if (! (std::cin >> input)) error ("Bad input in Token_stream::get(). std::cin error!");
+    if (! (std::cin.get(input))) error ("Bad input in Token_stream::get(). std::cin error!");
+
+    while (input == space_kind) // omit spaces
+        std::cin.get(input);
 
     switch (input) {
         case print_kind: case quit_kind: // for print and exit
@@ -202,6 +207,9 @@ Token Token_stream::get() {
         case '=':
         case ',':
             return Token{input};
+
+        case new_line_kind: //possibility print after press enter
+            return Token{print_kind};
 
         case '.': case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9': {
@@ -279,8 +287,8 @@ Variable& VariableTable::try_declaration_without_declKey(Token &token, Token_str
     Variable& result = this->null_buffer; // declaration not success, we return null object
 
 
-        char input;
-        std::cin >> input;
+        char input = ts.get().kind_of_token;
+
 
         set_unability_to_assign();
 
