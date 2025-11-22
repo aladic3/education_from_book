@@ -10,18 +10,21 @@ grammars:
 
     statement:
         expression
-        declaration
+        let declaration
+        const declaration
 
 
     print:
         constexpr char print
+        string print_key
 
     quit:
         constexpr char quit
+        string quit_key";
 
     declaration:
-        let variable = expression //initializing
         variable = expression //assert new value
+
 
     variable:
         string name
@@ -42,6 +45,7 @@ grammars:
 
     primary:
         number
+        declaration
         variable
         + - primary
         parentheses
@@ -58,29 +62,37 @@ grammars:
 
 #include <utility>
 
-#include "iostream"
+#include  <iostream>
+#include <vector>
 #include "error.h"
 
 
+class Variable;
 const std::string input_prompt = "> ";
 const std::string result_prompt = "= ";
+
 constexpr char quit_kind = 'q';
 constexpr char print_kind = ';';
-const std::string quit_key = "exit";
-const std::string print_key = "print";
 constexpr char number_kind = '8';
 constexpr char let_kind = 'L';
 constexpr char name_kind = 'N';
-const std::string declarationKey = "let";
-const std::string square_root_key = "sqrt";
 constexpr char square_root_kind = 'R';
-const std::string pow_key = "pow";
 constexpr char pow_kind ='P';
 constexpr char nothing_kind = '0';
 constexpr char space_kind = ' ';
 constexpr char new_line_kind = '\n';
+constexpr char const_kind = 'C';
 
-double declaration();
+const std::string const_key = "const";
+const std::string quit_key = "exit";
+const std::string print_key = "print";
+const std::string declarationKey = "let";
+const std::string square_root_key = "sqrt";
+const std::string pow_key = "pow";
+
+
+double expression();
+Variable& declaration();
 
 class Token {
 public:
@@ -99,18 +111,24 @@ class Variable {
 private:
     std::string name;
     double value;
+    bool is_constant;
 
 public:
-    Variable(std::string n): name(std::move(n)){}
-    Variable(std::string n, double v): name(std::move(n)), value(v){}
+    Variable(std::string n): name(std::move(n)), is_constant(false){}
+    Variable(std::string n, double v): name(std::move(n)), value(v),  is_constant(false){}
+    Variable(std::string n, bool constant): name(std::move(n)), is_constant(constant){}
+    Variable(std::string n, double v, bool constant): name(std::move(n)), value(v),  is_constant(constant){}
     Variable(){}
 
 
-    void setValue(double val){ value = val;}
+
+    Variable& setValue(double val){ if (is_constant) error("this is constant"); value = val; return *this;}
+    Variable& set_constant_type() {this->is_constant = true; return *this; }
     double getValue() const {return value;}
     void setName(std::string n) { name = n;}
     std::string getName() {return name;}
 };
+
 
 
 class Token_stream {
@@ -143,6 +161,9 @@ Token Token_stream::translate_keyword_to_token(const std::string& name) {
     if (name == quit_key)
         return Token{quit_kind};
 
+    if (name == const_key)
+        return Token{const_kind};
+
     return Token{nothing_kind};
 }
 
@@ -164,7 +185,7 @@ void Token_stream::clean_mess() {
 bool Token_stream::is_can_be_in_variable_name(char input)
 // can be char include in variable name?
 {
-    if (!std::isalpha(input) && !std::isdigit(input)) //if not in alphabet or not number
+    if (!std::isalpha(input) && !std::isdigit(input) && input != '_') //if not in alphabet or not number or _
         return  false;
 
     return true;
@@ -223,10 +244,10 @@ Token Token_stream::get() {
             std::string variable_name;
             variable_name += input;
 
-            if (variable_name == "#")
+            if (variable_name == "#") // allow let with this symbol (drill)
                 return translate_keyword_to_token(declarationKey);
 
-            if (!std::isalpha(input)) error("Bad input in Token_stream::get()!");
+            if (!std::isalpha(input) && input != '_') error("Bad input in Token_stream::get()!");
 
 
 
@@ -258,6 +279,7 @@ private:
     Variable null_buffer {};
     std::vector<Variable> var_table;
 
+
     Variable& get_var_from_table(const std::string &name);
     bool possibility_to_assign;
 
@@ -270,9 +292,10 @@ public:
     bool is_can_declaration() const;
     void set_ability_to_assign();
     bool is_declared(const std::string& name) ;
-    double get_value_variable_from_table(const std::string& name);
-    double add_variable_to_table(const std::string& name, double value) ;
-    double change_variable_in_table(const std::string& name, double value) ;
+    double get_value_from_table(const std::string& name);
+    Variable& add_variable_to_table(const std::string& name, double value) ;
+    Variable& add_const_variable_to_table(const std::string& name, double value);
+    Variable& change_variable_in_table(const std::string& name, double value) ;
     Variable& try_declaration_without_declKey(Token& token, Token_stream& ts);
 
 
@@ -284,8 +307,7 @@ Variable& VariableTable::get_null_variable() {
 
 
 Variable& VariableTable::try_declaration_without_declKey(Token &token, Token_stream& ts) {
-    Variable& result = this->null_buffer; // declaration not success, we return null object
-
+        Variable& result = this->null_buffer; // declaration not success, we return null object
 
         char input = ts.get().kind_of_token;
 
@@ -297,16 +319,14 @@ Variable& VariableTable::try_declaration_without_declKey(Token &token, Token_str
             std::cin.putback(input);
             ts.putback(token);
 
-            declaration();
-
-            result = get_var_from_table(token.name);
+            result = declaration();;
 
         } else
             std::cin.putback(input);
 
 
 
-    return result;
+        return result;
 }
 
 
@@ -329,9 +349,8 @@ void VariableTable::set_ability_to_assign() {
 
 
 
-double VariableTable::get_value_variable_from_table(const std::string &name) {
-    const Variable& var = get_var_from_table(name);
-    return var.getValue();
+double VariableTable::get_value_from_table(const std::string &name) {
+    return get_var_from_table(name).getValue();
 }
 
 
@@ -354,18 +373,20 @@ Variable& VariableTable::get_var_from_table(const std::string &name) {
 
 }
 
-double VariableTable::add_variable_to_table(const std::string& name, double value) {
+Variable& VariableTable::add_variable_to_table(const std::string& name, double value) {
     if (is_declared(name))
         error("Variable is also declared! You can create with another name!");
 
-    var_table.emplace_back(name,value);
-    return value;
+    return var_table.emplace_back(name,value);
 }
 
-double VariableTable::change_variable_in_table(const std::string& name, double value) {
-    get_var_from_table(name).setValue(value);
-    return value;
+Variable& VariableTable::add_const_variable_to_table(const std::string &name, double value) {
+    return add_variable_to_table(name,value).set_constant_type();
+}
 
+
+Variable& VariableTable::change_variable_in_table(const std::string& name, double value) {
+    return get_var_from_table(name).setValue(value);
 }
 
 bool is_multiply_double_max_min_limit(double left, double right) {
@@ -382,8 +403,7 @@ bool is_factorial_ull_limit(unsigned long long left, int right) {
 Token_stream ts; // provides get() and pullback
 VariableTable variable_table;
 
-double expression();
-double declaration();
+
 
 
 unsigned long long factorial(const int value) {
@@ -475,13 +495,13 @@ double primary() {
 
     switch (token.kind_of_token) {
         case '-':
-            result= -primary();
+            result = -primary();
             break;
         case '+':
-            result= primary();
+            result = primary();
             break;
         case number_kind:
-            result= token.value;
+            result = token.value;
             break;
 
         case name_kind: {
@@ -494,7 +514,7 @@ double primary() {
                 }
             }
 
-            result = variable_table.get_value_variable_from_table(token.name);
+            result = variable_table.get_value_from_table(token.name);
             break;
         }
 
@@ -618,8 +638,9 @@ double expression() { // deal with + and -
 
 }
 
-double declaration() {
+Variable& declaration() {
     Token token = ts.get();
+    Variable *result = &variable_table.get_null_variable();
 
     switch (token.kind_of_token) {
         case name_kind:{
@@ -632,17 +653,19 @@ double declaration() {
             double value = expression();
 
             if (variable_table.is_declared(name))
-                variable_table.change_variable_in_table(name,value);
+                result = &variable_table.change_variable_in_table(name,value);
             else
-                variable_table.add_variable_to_table(name,value);
+                result = &variable_table.add_variable_to_table(name,value);
 
-            return value;
+            break;
 
         }
         default:
             error("name expected");
 
     }
+
+    return  *result;
 
 }
 
@@ -652,7 +675,11 @@ double statement() {
     switch (token.kind_of_token) {
 
         case let_kind: {
-            return declaration();
+            return declaration().getValue();
+        }
+
+        case const_kind: {
+            return declaration().set_constant_type().getValue();
         }
 
 
@@ -663,8 +690,8 @@ double statement() {
 }
 
 void calculation() {
-        variable_table.add_variable_to_table("pi",3.1415926535);
-        variable_table.add_variable_to_table("e",2.7182818284);
+        variable_table.add_const_variable_to_table("pi",3.1415926535);
+        variable_table.add_const_variable_to_table("e",2.7182818284);
         Token token{};
 
         double result = 0;
@@ -678,7 +705,8 @@ void calculation() {
         while (std::cin)
             try {
 
-            std::cout << input_prompt;
+            //std::cout << input_prompt;
+            std::print("{}",input_prompt);
 
             token = ts.get();
             variable_table.set_ability_to_assign();
