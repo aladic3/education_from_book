@@ -8,6 +8,10 @@ grammars:
         statement
         print <-- after this ability to assign will be true in each time
         quit
+        help
+
+    help:
+        "help"
 
     list_of_statement:
         statement-print-statement-print etc.
@@ -68,6 +72,7 @@ grammars:
 
 #include  <iostream>
 #include <vector>
+#include <istream>
 #include "error.h"
 
 
@@ -86,6 +91,7 @@ constexpr char nothing_kind = '0';
 constexpr char space_kind = ' ';
 constexpr char new_line_kind = '\n';
 constexpr char const_kind = 'C';
+constexpr char help_kind = 'h';
 
 const std::string const_key = "const";
 const std::string quit_key = "exit";
@@ -93,10 +99,22 @@ const std::string print_key = "print";
 const std::string declarationKey = "let";
 const std::string square_root_key = "sqrt";
 const std::string pow_key = "pow";
+const std::string help_key = "help";
+
+const std::string help_prompt = "The program implements an interactive calculator (REPL) that reads expressions\n"
+                                "from std::cin, evaluates them, and prints the result. It supports integer\n"
+                                "numbers, variables (mutable and const), the operations +, -, *, /, % (modulo via \n"
+                                "fmod), the postfix factorial !, the square root sqrt(...), integer exponentiation \n"
+                                "pow(x, i), round and curly brackets (...) and {...}, variable assignment, the \n"
+                                "keywords let and const, an exit command, and result output.\n";
 
 
 double expression();
 Variable& declaration();
+
+bool is_integer(double val) {
+    return (val - static_cast<int>(val)) == 0;
+}
 
 class Token {
 public:
@@ -168,6 +186,9 @@ Token Token_stream::translate_keyword_to_token(const std::string& name) {
     if (name == const_key)
         return Token{const_kind};
 
+    if (name == help_key)
+        return Token{help_kind};
+
     return Token{nothing_kind};
 }
 
@@ -216,11 +237,11 @@ Token Token_stream::get() {
 
     if (! (std::cin.get(input))) error ("Bad input in Token_stream::get(). std::cin error!");
 
-    while (input == space_kind) // omit spaces
+    while (std::isspace(input) && input != new_line_kind) // omit spaces
         std::cin.get(input);
 
     switch (input) {
-        case print_kind: case quit_kind: // for print and exit
+        case print_kind: // for print and exit
         case '*':
         case '/':
         case '+':
@@ -236,11 +257,14 @@ Token Token_stream::get() {
         case new_line_kind: //possibility print after press enter
             return Token{print_kind};
 
-        case '.': case '0': case '1': case '2': case '3': case '4':
+        //case '.': //if double input
+        case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9': {
             std::cin.putback(input);
             double value;
             std::cin >> value;
+
+            if (!is_integer(value)) error("Must be integer");
 
             return Token{number_kind, value};
         }
@@ -410,9 +434,10 @@ VariableTable variable_table;
 
 
 
-unsigned long long factorial(const int value) {
+unsigned long long factorial(const double value) {
         int result = 1;
 
+        if (!is_integer(value)) error("must be integer value!");
         if (value < 0) error("Minus factorial not exist!");
         if (value <= 1) return result;
 
@@ -560,7 +585,7 @@ double postfix() {
     Token token = ts.get();
 
     for (;token.kind_of_token == '!';token = ts.get()) {
-        result = factorial(static_cast<int>(result));
+        result = factorial(result);
     }
 
     ts.putback(token);
@@ -699,9 +724,9 @@ void calculation() {
         Token token{};
 
         double result = 0;
-        std::cout << "Welcome to out simple calculator.\n"
-                    "Please enter expressions using floating-point numbers.\n"
-                "Available operators: =, x, *, /, +, -, (, ), {, }, !." << std::endl;
+        std::cout << "Welcome to simple calculator.\n"
+                    "Please enter expressions using integer numbers.\n"
+                    "For help, enter 'help'." << std::endl;
 
 
 
@@ -718,6 +743,10 @@ void calculation() {
             while (token.kind_of_token == print_kind)
                 token = ts.get();
 
+            if (token.kind_of_token == help_kind) {
+                std::print("{}",help_prompt);
+                continue;
+            }
             if (token.kind_of_token == quit_kind)
                 return;
 
