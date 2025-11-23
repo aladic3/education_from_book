@@ -4,9 +4,13 @@
 /*
 grammars:
     calculation:
+        list_of_statement
         statement
         print <-- after this ability to assign will be true in each time
         quit
+
+    list_of_statement:
+        statement-print-statement-print etc.
 
     statement:
         expression
