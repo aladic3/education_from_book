@@ -3,6 +3,7 @@
 //
 #include <complex>
 #include <iostream>
+#include <vector>
 #include "error.h"
 
 int max(int,int);

@@ -103,7 +103,7 @@ int main() {
 
         //calculator >>>>>>>>>>>>>>
 
-        calculation();
+        calculation(std::cin);
 
         // <<< calculator
 

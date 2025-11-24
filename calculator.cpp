@@ -77,6 +77,7 @@ grammars:
 
 
 class Variable;
+class Token_stream;
 const std::string input_prompt = "> ";
 const std::string result_prompt = "= ";
 
@@ -109,8 +110,8 @@ const std::string help_prompt = "The program implements an interactive calculato
                                 "keywords let and const, an exit command, and result output.\n";
 
 
-double expression();
-Variable& declaration();
+double expression(Token_stream& ts);
+Variable& declaration(Token_stream& ts);
 
 bool is_integer(double val) {
     return (val - static_cast<int>(val)) == 0;
@@ -158,8 +159,10 @@ public:
     void putback(Token t);
     Token get();
     void clean_mess();
+    Token_stream(std::istream& stream) : in(stream) {}
 
 private:
+    std::istream& in;
     static bool is_can_be_in_variable_name(char input);
     static Token translate_keyword_to_token(const std::string& name);
     bool is_full = false;
@@ -199,10 +202,10 @@ void Token_stream::clean_mess() {
     }
     is_full = false;
 
-    std::cin.clear();
+    this->in.clear();
     char skip = 0;
     while (skip != print_kind && skip != new_line_kind)
-        std::cin.get(skip);
+        this->in.get(skip);
 
 }
 
@@ -235,7 +238,7 @@ Token Token_stream::get() {
 
     char input = 0;
 
-    if (! (std::cin.get(input))) error ("Bad input in Token_stream::get(). std::cin error!");
+    if (! (this->in.get(input))) error ("Bad input in Token_stream::get(). std::cin error!");
 
     while (std::isspace(input) && input != new_line_kind) // omit spaces
         std::cin.get(input);
@@ -260,9 +263,9 @@ Token Token_stream::get() {
         //case '.': //if double input
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9': {
-            std::cin.putback(input);
+            this->in.putback(input);
             double value;
-            std::cin >> value;
+            this->in >> value;
 
             if (!is_integer(value)) error("Must be integer");
 
@@ -278,13 +281,11 @@ Token Token_stream::get() {
             if (!std::isalpha(input) && input != '_') error("Bad input in Token_stream::get()!");
 
 
-
-            while (std::cin.get(input) && is_can_be_in_variable_name(input)) {
+            while (this->in.get(input) && is_can_be_in_variable_name(input)) {
                 variable_name += input;
             }
 
-            std::cin.putback(input);
-
+            this->in.putback(input);
 
             Token result_translate = translate_keyword_to_token(variable_name);
 
@@ -347,7 +348,7 @@ Variable& VariableTable::try_declaration_without_declKey(Token &token, Token_str
             std::cin.putback(input);
             ts.putback(token);
 
-            result = declaration();;
+            result = declaration(ts);;
 
         } else
             std::cin.putback(input);
@@ -428,7 +429,7 @@ bool is_factorial_ull_limit(unsigned long long left, int right) {
 
 
 
-Token_stream ts; // provides get() and pullback
+//Token_stream ts(std::cin); // provides get() and pullback
 VariableTable variable_table;
 
 
@@ -451,10 +452,10 @@ unsigned long long factorial(const double value) {
         return result;
 }
 
-double parentheses(Token& token) {
+double parentheses(Token& token, Token_stream& ts) {
     switch (token.kind_of_token) {
         case '(': {
-            double result = expression();
+            double result = expression(ts);
 
             token = ts.get();
             if (token.kind_of_token != ')') error("Must be ( expression )!");
@@ -465,7 +466,7 @@ double parentheses(Token& token) {
 
         }
         case '{': {
-            double result = expression();
+            double result = expression(ts);
 
 
             token = ts.get();
@@ -481,12 +482,12 @@ double parentheses(Token& token) {
     }
 }
 
-double pow_statement() {
+double pow_statement(Token_stream& ts) {
     // pow (x,i) mean "multiply x with itself i times. i - integer"
     Token token = ts.get();
     switch (token.kind_of_token) {
         case '(': {
-            double x = expression();
+            double x = expression(ts);
 
             token = ts.get();
 
@@ -514,7 +515,7 @@ double pow_statement() {
     }
 }
 
-double primary() {
+double primary(Token_stream& ts) {
     Token token = ts.get();
     double result = 0;
 
@@ -524,10 +525,10 @@ double primary() {
 
     switch (token.kind_of_token) {
         case '-':
-            result = -primary();
+            result = -primary(ts);
             break;
         case '+':
-            result = primary();
+            result = primary(ts);
             break;
         case number_kind:
             result = token.value;
@@ -548,12 +549,12 @@ double primary() {
         }
 
         case '(': case '{':
-            result= parentheses(token);
+            result= parentheses(token,ts);
             break;
 
         case square_root_kind: {
             token = ts.get(); // need for parentheses function. after sqrt_kind token must be ( expr ).
-            double res_parentheses =  parentheses(token);
+            double res_parentheses =  parentheses(token,ts);
 
             if (res_parentheses < 0)
                 error("Negative can't be in square root operation");
@@ -564,7 +565,7 @@ double primary() {
         }
 
         case pow_kind:
-            result= pow_statement();
+            result= pow_statement(ts);
             break;
 
 
@@ -580,8 +581,8 @@ double primary() {
 
 }
 
-double postfix() {
-    double result = primary();
+double postfix(Token_stream& ts) {
+    double result = primary(ts);
     Token token = ts.get();
 
     for (;token.kind_of_token == '!';token = ts.get()) {
@@ -594,14 +595,14 @@ double postfix() {
 
 
 
-double term() { // deal with * and /
-    double left = postfix();
+double term(Token_stream& ts) { // deal with * and /
+    double left = postfix(ts);
     Token token = ts.get();
 
     while (true) {
         switch (token.kind_of_token) {
             case '%': {
-                double right = postfix();
+                double right = postfix(ts);
 
                 if (right == 0) error("Divide (%) by zero!");
 
@@ -610,7 +611,7 @@ double term() { // deal with * and /
 
             }
             case '/': {
-                double right = postfix();
+                double right = postfix(ts);
 
                 if (right == 0) error("Divide by zero!");
 
@@ -620,7 +621,7 @@ double term() { // deal with * and /
 
 
             case '*': {
-                double right = postfix();
+                double right = postfix(ts);
 
                 if (is_multiply_double_max_min_limit(left,right))
                   error("Multiplication limit fault.");
@@ -638,18 +639,18 @@ double term() { // deal with * and /
 
 }
 
-double expression() { // deal with + and -
-    double left = term();
+double expression(Token_stream& ts) { // deal with + and -
+    double left = term(ts);
     Token token = ts.get();
 
     while (true) {
         switch (token.kind_of_token) {
             case '+':
-                left+=term();
+                left+=term(ts);
                 break;
 
             case '-':
-                left-=term();
+                left-=term(ts);
                 break;
 
             case '=':
@@ -667,7 +668,7 @@ double expression() { // deal with + and -
 
 }
 
-Variable& declaration() {
+Variable& declaration(Token_stream& ts) {
     Token token = ts.get();
     Variable *result = &variable_table.get_null_variable();
 
@@ -679,7 +680,7 @@ Variable& declaration() {
 
             if (token.kind_of_token != '=') error("Symbol '=' expected");
 
-            double value = expression();
+            double value = expression(ts);
 
             if (variable_table.is_declared(name))
                 result = &variable_table.change_variable_in_table(name,value);
@@ -698,27 +699,29 @@ Variable& declaration() {
 
 }
 
-double statement() {
+double statement(Token_stream& ts) {
     Token token = ts.get();
 
     switch (token.kind_of_token) {
 
         case let_kind: {
-            return declaration().getValue();
+            return declaration(ts).getValue();
         }
 
         case const_kind: {
-            return declaration().set_constant_type().getValue();
+            return declaration(ts).set_constant_type().getValue();
         }
 
 
         default:
             ts.putback(token);
-            return expression();
+            return expression(ts);
     }
 }
 
-void calculation() {
+void calculation(std::istream &input_stream) {
+        Token_stream ts(input_stream);
+
         variable_table.add_const_variable_to_table("pi",3.1415926535);
         variable_table.add_const_variable_to_table("e",2.7182818284);
         Token token{};
@@ -752,7 +755,7 @@ void calculation() {
 
             ts.putback(token);
 
-            result = statement();
+            result = statement(ts);
 
             std::cout << result_prompt << result << std::endl;
 
