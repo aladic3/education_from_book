@@ -10,6 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(hello_world main.cpp
         bitwise_calculator.cpp
+        ex6/fibonacci.cpp
+        ex6/string_to_double.cpp
 
 
 )
