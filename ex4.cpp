@@ -7,8 +7,8 @@
 #include "error.h"
 #include "ex6/string_to_double.cpp"
 
-constexpr double END_OF_INPUT = std::numeric_limits<double>::max();
-constexpr size_t NOT_HAVE_COMMA = std::numeric_limits<size_t>::max();
+//constexpr double END_OF_INPUT = std::numeric_limits<double>::max();
+//constexpr size_t NOT_HAVE_COMMA = std::numeric_limits<size_t>::max();
 
 double celsius_to_kelvin(double celsius)
 // converts celsius to kelvin

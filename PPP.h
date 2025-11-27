@@ -3,6 +3,7 @@
 #pragma once
 #include "try4.cpp"
 #include "drills_3.cpp"
+#include "ex6/fibonacci.cpp"
 #include "ex5.cpp"
 #include "ex3.cpp"
 #include "drill4.cpp"

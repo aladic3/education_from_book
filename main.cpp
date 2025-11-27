@@ -100,7 +100,8 @@ int main() {
 
         //game_bulls_cows();
         //day_of_weeks();
-        find_largest_fibonacci();
+        //find_largest_fibonacci();
+        sum_first_doubles();
         //calculator >>>>>>>>>>>>>>
 
         //calculation(std::cin);
