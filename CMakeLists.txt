@@ -12,7 +12,21 @@ add_executable(hello_world main.cpp
         bitwise_calculator.cpp
         ex6/fibonacci.cpp
         ex6/string_to_double.cpp
+        drill7/drill7.ixx
+        error.cpp
+        drill7/test.cpp
+        drill7/x.cpp
+        drill7/test_second.cpp
 
+
+)
+
+
+target_sources(hello_world
+        PUBLIC
+        FILE_SET cxx_modules TYPE CXX_MODULES
+        FILES
+        drill7/drill7.ixx
 
 )
 

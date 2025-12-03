@@ -3,13 +3,7 @@
 //
 #include <iostream>
 
-class Bad_area {
-};
 
-int error(std::string msg) {
-    throw std::runtime_error(msg + '\n');
-    return -1;
-}
 
 int area(int length, int width) {
 

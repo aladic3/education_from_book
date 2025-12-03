@@ -1,21 +1,26 @@
 // Placeholder header for "Programming: Principles and Practice Using C++" utilities.
 // If you plan to add helpers/types from the book, you can place them here.
 #pragma once
-#include "try4.cpp"
-#include "drills_3.cpp"
-#include "ex6/fibonacci.cpp"
-#include "ex5.cpp"
-#include "ex3.cpp"
-#include "drill4.cpp"
-#include "ex4.cpp"
-#include "calculator.cpp"
-#include "bitwise_calculator.cpp"
 
-int error(std::string msg);
+#include "ex6/fibonacci.h"
+#include "ex6/string_to_double.h"
+#include "error.h"
+#include "bitwise_calculator.h"
+#include "drill7/drill7.h"
+
+
+
 
 // Currently empty on purpose.
 
 /*
+*#include "ex5.cpp"
+#include "ex3.cpp"
+#include "drill4.cpp"
+#include "ex4.cpp"
+#include "calculator.cpp"
+#include "try4.cpp"
+#include "drills_3.cpp"
 /------- random numbers ------
 
     PPP_EXPORT std::default_random_engine& get_rand()

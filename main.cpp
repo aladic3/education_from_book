@@ -1,10 +1,12 @@
-#include <iostream>
+import drill7;
+
 
 // Forward declarations (optional): add prototypes here if you want to call functions
 // implemented in the other source files from main.cpp.
 
 #include "PPP.h"
 int square(int);
+
 
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -101,7 +103,7 @@ int main() {
         //game_bulls_cows();
         //day_of_weeks();
         //find_largest_fibonacci();
-        sum_first_doubles();
+        //sum_first_doubles();
         //calculator >>>>>>>>>>>>>>
 
         //calculation(std::cin);
@@ -141,6 +143,10 @@ int main() {
         //combination_and_permutation();
 
         //sum_first_integers();
+        //test_drill();
+        //Drill7::test_drill();
+
+        test_second_drill_ex();
         return 0;
 
     }

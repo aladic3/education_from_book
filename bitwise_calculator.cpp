@@ -4,27 +4,9 @@
 //
 // Created by Dmytrenko Kyrylo on 30.10.2025.
 //
-#pragma once
-#include "iostream"
-#include "error.h"
+#include "bitwise_calculator.h"
 
-class Bitwise_token {
-public:
-    char kind_of_token; // can be: q, ;, (, ), {, }, +, -, /, *, 8 (number)
-    int value;
 
-};
-
-class Token_stream_bitwise {
-public:
-    void putback(Bitwise_token t);
-    Bitwise_token get();
-
-private:
-    bool is_full = false;
-    Bitwise_token buffer{};
-
-};
 
 void Token_stream_bitwise::putback(Bitwise_token t) {
     if (is_full) error("Buffer is full!");

@@ -1,9 +1,7 @@
 //
 // Created by Dmytrenko Kyrylo on 26.11.2025.
 //
-#include  <iostream>
-#include <map>
-#include "../error.h"
+#include "string_to_double.h"
 
 constexpr int end_of_input_int = -1;
 constexpr char end_of_input_char = '|';

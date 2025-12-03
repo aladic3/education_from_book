@@ -6,7 +6,7 @@
 #define HELLO_WORLD_ERROR_H
 #include <string>
 
-int error(std::string msg);
+void error(std::string msg);
 
 
 #endif //HELLO_WORLD_ERROR_H

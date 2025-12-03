@@ -1,9 +1,9 @@
 //
 // Created by Dmytrenko Kyrylo on 26.11.2025.
 //
+#include "fibonacci.h"
 #include <vector>
-#include <iostream>
-#include "../error.h"
+
 
 constexpr unsigned long long init_value= 1;
 const std::string prompt = "Enter count (N) values of the Fibonacci series, which you want find: ";
