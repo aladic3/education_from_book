@@ -17,6 +17,8 @@ add_executable(hello_world main.cpp
         drill7/test.cpp
         drill7/x.cpp
         drill7/test_second.cpp
+        drill7/foo1.ixx
+        drill7/test_third.cpp
 
 
 )
@@ -27,7 +29,7 @@ target_sources(hello_world
         FILE_SET cxx_modules TYPE CXX_MODULES
         FILES
         drill7/drill7.ixx
-
+        drill7/foo1.ixx
 )
 
 # Только для MSVC

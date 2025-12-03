@@ -1,6 +1,7 @@
 import drill7;
 
 
+
 // Forward declarations (optional): add prototypes here if you want to call functions
 // implemented in the other source files from main.cpp.
 
@@ -146,7 +147,9 @@ int main() {
         //test_drill();
         //Drill7::test_drill();
 
-        test_second_drill_ex();
+        //test_second_drill_ex();
+
+        test_third_drill_ex();
         return 0;
 
     }
