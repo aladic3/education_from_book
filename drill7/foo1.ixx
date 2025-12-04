@@ -3,6 +3,7 @@
 //
 module;
 #include <iostream>
+
 export module foo1;
 
 int foo = 0;

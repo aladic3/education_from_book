@@ -19,6 +19,8 @@ add_executable(hello_world main.cpp
         drill7/test_second.cpp
         drill7/foo1.ixx
         drill7/test_third.cpp
+        drill7/foo.h
+        drill7/foo.cpp
 
 
 )

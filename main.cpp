@@ -4,7 +4,7 @@ import drill7;
 
 // Forward declarations (optional): add prototypes here if you want to call functions
 // implemented in the other source files from main.cpp.
-
+#include "drill7/foo.h"
 #include "PPP.h"
 int square(int);
 
@@ -149,7 +149,14 @@ int main() {
 
         //test_second_drill_ex();
 
-        test_third_drill_ex();
+        //test_third_drill_ex();
+        //Try7::dangerously_ugly_code::X f;
+        //f.main();
+        print_foo();
+        print(12);
+        foo = 4;
+        print_foo();
+
         return 0;
 
     }
