@@ -160,7 +160,7 @@ int main() {
         //Try7::converting::test();
         //calculation(std::cin);
         //exercises::ex2::test();
-        exercises::ex3::test();
+        exercises::ex5_6::test();
 
 
         return 0;

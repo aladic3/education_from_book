@@ -26,6 +26,7 @@ add_executable(hello_world main.cpp
         ex7/exercises7.ixx
         ex7/ex2.cpp
         ex7/ex3.cpp
+        ex7/ex5_6.cpp
 
 
 )
