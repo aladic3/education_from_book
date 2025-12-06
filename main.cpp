@@ -152,10 +152,13 @@ int main() {
         //test_third_drill_ex();
         //Try7::dangerously_ugly_code::X f;
         //f.main();
-        print_foo();
-        print(12);
-        foo = 4;
-        print_foo();
+        //print_foo();
+        //print(12);
+        //foo = 4;
+        //print_foo();
+
+        //Try7::converting::test();
+        calculation(std::cin);
 
         return 0;
 

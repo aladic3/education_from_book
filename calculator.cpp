@@ -68,13 +68,7 @@ grammars:
         float
  */
 
-#include <utility>
-
-#include  <iostream>
-#include <vector>
-#include <istream>
-#include "error.h"
-
+#include "calculator.h"
 
 class Variable;
 class Token_stream;

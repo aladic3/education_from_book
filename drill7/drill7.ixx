@@ -38,6 +38,30 @@ namespace Try7::dangerously_ugly_code {
     };
 }
 
+namespace Try7::converting {
+    void conv1(double y) {
+        int x = static_cast<int>(y); //checked conversion
+        std::cout << "conv1 " << x << std::endl;
+    }
+
+    void conv2(double y) {
+        int x = round(y); // 4/5 rounding
+        std::cout << "conv2 " << x << std::endl;
+    }
+
+    void conv3(int x, int y) {
+        double z = double(x)/y;
+
+        std::cout << "conv3 " << z << std::endl;
+    }
+
+    export void test() {
+        conv1(1001); conv1(7.7); conv1('x');
+        conv2(1001); conv2(7.7); conv2('x');
+        conv3(1001,1); conv3(7.7, 2); conv3('x', 3);
+    }
+}
+
 namespace Drill7 {
 
 

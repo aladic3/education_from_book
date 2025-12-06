@@ -7,6 +7,7 @@
 #include "error.h"
 #include "bitwise_calculator.h"
 #include "drill7/drill7.h"
+#include "calculator.h"
 
 
 
