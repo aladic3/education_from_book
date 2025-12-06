@@ -1,5 +1,5 @@
 import drill7;
-
+import exercises7;
 
 
 // Forward declarations (optional): add prototypes here if you want to call functions
@@ -158,7 +158,10 @@ int main() {
         //print_foo();
 
         //Try7::converting::test();
-        calculation(std::cin);
+        //calculation(std::cin);
+        //exercises::ex2::test();
+        exercises::ex3::test();
+
 
         return 0;
 

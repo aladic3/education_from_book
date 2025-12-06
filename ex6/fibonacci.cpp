@@ -20,8 +20,27 @@ void print_fibonacci(const std::vector<unsigned long long>& fibonacci) {
     std::cout << std::endl;
 }
 
+void print_fibonacci(const std::vector<int>& fibonacci) {
+    std::cout << "Fibonacci:\n";
+
+    for (auto el: fibonacci) {
+        std::cout << el << " ";
+    }
+
+    std::cout << "Largest: " << fibonacci[fibonacci.size() -1] << std::endl;
+    std::cout << std::endl;
+}
+
 void test_on_overflow_ull_value(std::vector<unsigned long long>& fibonacci_vec,
     const unsigned long long & next_element_of_fibonacci) {
+    if (next_element_of_fibonacci < 0) {
+        print_fibonacci(fibonacci_vec);
+        error("N so big. Integer overflow!\n");
+    }
+}
+
+void test_on_overflow_ull_value(std::vector<int>& fibonacci_vec,
+    const int & next_element_of_fibonacci) {
     if (next_element_of_fibonacci < 0) {
         print_fibonacci(fibonacci_vec);
         error("N so big. Integer overflow!\n");
@@ -31,6 +50,18 @@ void test_on_overflow_ull_value(std::vector<unsigned long long>& fibonacci_vec,
 std::vector<unsigned long long> &calculate_fibonacci_vector(std::vector<unsigned long long>& fibonacci_vec,
     const unsigned long long& N) {
     unsigned long long next_element_of_fibonacci;
+    for (auto i = 1; i < N - 1; ++i) { // count of elements vector is N-1
+        next_element_of_fibonacci = fibonacci_vec[i] + fibonacci_vec[i - 1];
+        test_on_overflow_ull_value(fibonacci_vec, next_element_of_fibonacci);
+        fibonacci_vec.push_back(next_element_of_fibonacci);
+    }
+
+    return fibonacci_vec;
+}
+
+std::vector<int> &calculate_fibonacci_vector(std::vector<int>& fibonacci_vec,
+    const int& N) {
+    int next_element_of_fibonacci;
     for (auto i = 1; i < N - 1; ++i) { // count of elements vector is N-1
         next_element_of_fibonacci = fibonacci_vec[i] + fibonacci_vec[i - 1];
         test_on_overflow_ull_value(fibonacci_vec, next_element_of_fibonacci);

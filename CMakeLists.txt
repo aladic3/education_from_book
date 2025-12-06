@@ -23,6 +23,9 @@ add_executable(hello_world main.cpp
         drill7/foo.cpp
         calculator.h
         calculator.cpp
+        ex7/exercises7.ixx
+        ex7/ex2.cpp
+        ex7/ex3.cpp
 
 
 )
@@ -34,6 +37,7 @@ target_sources(hello_world
         FILES
         drill7/drill7.ixx
         drill7/foo1.ixx
+        ex7/exercises7.ixx
 
 
 )

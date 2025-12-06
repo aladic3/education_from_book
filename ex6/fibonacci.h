@@ -17,6 +17,9 @@ void test_on_overflow_ull_value(std::vector<unsigned long long>& fibonacci_vec,
 std::vector<unsigned long long> &calculate_fibonacci_vector(std::vector<unsigned long long>& fibonacci_vec,
     const unsigned long long& N);
 
+std::vector<int> &calculate_fibonacci_vector(std::vector<int>& fibonacci_vec,
+    const int& N);
+
 unsigned long long find_largest_fibonacci();
 
 
