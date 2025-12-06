@@ -161,7 +161,8 @@ int main() {
         //calculation(std::cin);
         //exercises::ex2::test();
         //exercises::ex5_6::test();
-        exercises7::ex7_8::test();
+        //exercises7::ex7_8::test();
+        exercises7::ex9::test();
 
         return 0;
 

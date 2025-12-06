@@ -23,6 +23,14 @@ namespace exercises7::ex2 {
         std::cout << std::endl;
     }
 
+    void print(const std::string& output_label, const std::vector<double>& vector) {
+        for (auto& el: vector) {
+            std::cout << el << output_label;
+        }
+
+        std::cout << std::endl;
+    }
+
 
 
     void print_v2(const std::string& output_label, const std::vector<int>& vector) {
@@ -36,7 +44,8 @@ namespace exercises7::ex2 {
 
 
     void test() {
-        print(":", {1,3,4,5,212,32,0});
+        std::vector<int> input = {1,3,4,5,212,32,0};
+        ex2::print(":", input);
 
         ex2::print("? ", std::vector<int>(1000,1));
 

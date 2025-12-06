@@ -3,11 +3,13 @@
 //
 module;
 #include <iostream>
+#include <vector>
 export module exercises7;
 
 namespace exercises7::ex2 {
     export void print(const std::string&, const std::vector<int>&);
     export void print(const std::string&, const std::vector<std::string>&);
+    export void print(const std::string&, const std::vector<double>&);
 
     export void test();
 }
@@ -33,5 +35,10 @@ namespace exercises7::ex5_6 {
 namespace exercises7::ex7_8 {
     export void sort_ref(std::vector<std::string>& names, std::vector<double>& ages);
     export void print (const std::vector<std::string>& names, const std::vector<double>& ages);
+    export void test();
+}
+
+namespace exercises7::ex9 {
+    export std::vector<double> sum(const std::vector<double> & price, const std::vector<double> & weight);
     export void test();
 }
