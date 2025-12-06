@@ -6,7 +6,7 @@ module;
 #include <iostream>
 module exercises7;
 
-namespace exercises::ex5_6 {
+namespace exercises7::ex5_6 {
     std::vector<int> reverse_const(const std::vector<int>& input_vec) {
         auto result = std::vector<int>{};
 

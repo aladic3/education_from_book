@@ -6,7 +6,7 @@ module;
 #include <vector>
 module exercises7;
 
-namespace exercises::ex2 {
+namespace exercises7::ex2 {
     void print(const std::string& output_label, const std::vector<int>& vector) {
         for (auto& el: vector) {
             std::cout << el << output_label;

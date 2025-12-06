@@ -8,7 +8,7 @@ module;
 #include "../error.h"
 module exercises7;
 
-namespace exercises::ex3 {
+namespace exercises7::ex3 {
     bool is_empty(const std::vector<int>& vec) {
         return vec.empty();
     }
