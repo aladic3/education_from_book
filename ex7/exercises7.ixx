@@ -42,3 +42,18 @@ namespace exercises7::ex9 {
     export std::vector<double> sum(const std::vector<double> & price, const std::vector<double> & weight);
     export void test();
 }
+
+namespace exercises7::ex10_11 {
+    export struct Properties_of_vector {
+        double median;
+        int max_value;
+        int min_value;
+        double mean;
+    };
+
+    export int maxv(const std::vector<int>&);
+
+    export Properties_of_vector calculate_properties_of_vector(const std::vector<int>&);
+
+    export void test();
+}

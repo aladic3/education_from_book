@@ -351,15 +351,15 @@ void find_primes_sieve() {
             << "Size of vector = " << is_primes.size();
 }
 
-int find_mode_int (std::vector<int> input) {
+int find_mode_int (const std::vector<int> &input) {
     int result = 0;
     int count_res = 0;
 
-    for (int el: input) {
-        int possible_result = el;
+    for (const int &el: input) {
+        const int &possible_result = el;
         int count = 0;
 
-        for (int element: input) {
+        for (const int &element: input) {
             if (possible_result == element)
                 ++count;
         }
