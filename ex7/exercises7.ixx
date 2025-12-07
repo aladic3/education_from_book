@@ -80,3 +80,22 @@ namespace exercises7::ex13 {
 
     export void test();
 }
+
+namespace exercises7::ex14 {
+
+    export constexpr int f(const int x) {
+        //--x;
+        return x+1;
+    }
+    export int f_ref( const int & x) {
+        //--x;
+        return x+1;
+    }
+
+    export auto test() -> void {
+        auto x = f(12);
+        f_ref(x);
+
+
+    }
+}
