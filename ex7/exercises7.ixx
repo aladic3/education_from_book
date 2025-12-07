@@ -57,3 +57,26 @@ namespace exercises7::ex10_11 {
 
     export void test();
 }
+
+namespace exercises7::ex12 {
+    export void print_until_s(const std::vector<std::string>&, const std::string& quit);
+
+    //doing also how it's doing first version, but exit after second quit reached
+    export void print_until_ss(const std::vector<std::string>&, const std::string& quit);
+
+    export void test();
+}
+
+namespace exercises7::ex13 {
+    export struct strings_details{
+        std::string longest_str;
+        std::string shortest_str;
+        std::string lexicographically_first;
+        std::string lexicographically_last;
+    };
+
+    export std::vector<int> get_sizes(const std::vector<std::string>&);
+    export strings_details get_details_vec_str(const std::vector<std::string>&);
+
+    export void test();
+}

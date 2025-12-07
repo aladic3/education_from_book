@@ -73,10 +73,10 @@ namespace exercises7::ex10_11{
           Properties_of_vector pr2 = calculate_properties_of_vector({1,2,343,0,3,-32,2});
 
           std::cout << "pr1: max " << pr1.max_value << " min " << pr1.min_value
-               << " mean " << pr1.mean << " median " << pr1.median;
+               << " mean " << pr1.mean << " median " << pr1.median << std::endl;
 
 
           std::cout << "pr1: max " << pr2.max_value << " min " << pr2.min_value
-               << " mean " << pr2.mean << " median " << pr2.median;
+               << " mean " << pr2.mean << " median " << pr2.median << std::endl;
      }
 }

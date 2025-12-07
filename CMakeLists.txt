@@ -30,6 +30,8 @@ add_executable(hello_world main.cpp
         ex7/ex7_8.cpp
         ex7/ex9.cpp
         ex7/ex10_11.cpp
+        ex7/ex12.cpp
+        ex7/ex13.cpp
 
 
 )
