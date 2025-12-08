@@ -32,6 +32,7 @@ add_executable(hello_world main.cpp
         ex7/ex10_11.cpp
         ex7/ex12.cpp
         ex7/ex13.cpp
+        chapter8/try/try8.ixx
 
 
 )
@@ -44,6 +45,7 @@ target_sources(hello_world
         drill7/drill7.ixx
         drill7/foo1.ixx
         ex7/exercises7.ixx
+        chapter8/try/try8.ixx
 
 
 )

@@ -1,5 +1,6 @@
 import drill7;
 import exercises7;
+import try8;
 
 
 // Forward declarations (optional): add prototypes here if you want to call functions
@@ -162,7 +163,10 @@ int main() {
         //exercises::ex2::test();
         //exercises::ex5_6::test();
         //exercises7::ex7_8::test();
-        exercises7::ex14::test();
+        //exercises7::ex14::test();
+
+        ch8::try1::Date date{2032,12,31};
+        std::cout << date;
 
         return 0;
 
