@@ -4,36 +4,75 @@
 module;
 #include <iostream>
 #include <ostream>
+#include <vector>
 #include "../../error.h"
 export module try8;
 
-export namespace ch8::try1 {
-    class Date {
-    public:
-        Date(int yy,int mm,int dd):year(yy),month(mm), day(dd) {
-            if ( is_bad_month() || is_bad_day()|| is_bad_year())
-                error("bad input");
-        }
+namespace ch8::try_drill {
+    export class Date;
+    export struct Year;
+    export struct Day;
+    export enum class Month;
 
-        [[nodiscard]]  int get_year() const{ return year;}
-        [[nodiscard]]  int get_month() const{ return month;}
-        [[nodiscard]]  int get_day() const{ return day;}
+    const std::vector<std::string> vector_month_tdl = {
+        "no exist", // zeroth id is redundant
+        "January", "February",
+        "March", "April", "May",
+        "June", "Jul", "August",
+        "September", "October", "November",
+        "December"
+        };
+
+    bool is_day(int);
+    bool is_month(Month);
+    bool is_year(int);
+    bool is_date(Year yy, Month mm, Day dd);
+
+    export  std::ostream& operator<<( std::ostream& os, Month month);
+    export std::ostream& operator<<(std::ostream& os, const Date& d);
+    export Month& operator++(Month& month);
+
+    inline int month_to_int(Month mm) {
+        return static_cast<int>(mm);
+    }
+
+    inline const std::string& month_to_str(Month mm) {
+        return vector_month_tdl[month_to_int(mm)];
+    }
 
 
 
+    enum class Month {
+        jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec // start with 1
+    };
 
-    private:
-        [[nodiscard]] bool is_bad_month() const{return month > 12 || month < 1;}
-        [[nodiscard]] bool is_bad_year() const{return year < 0;}
-        [[nodiscard]] bool is_bad_day() const{return day > 31 || day < 1; }
+    struct Day {
+        int d;
+        explicit Day(int dd):d(dd) {}
+    };
 
-        int year;
-        int month;
-        int day;
+    struct Year {
+        int y;
+        explicit Year(int yy): y(yy){}
     };
 
 
-    std::ostream& operator<<(std::ostream& os, const Date& d)  {
-        return os << d.get_year() << '/' << d.get_month() << '/' << d.get_day();
-    }
+
+    class Date {
+    public:
+        Date(Year yy, Month mm, Day dd):year(yy),month(mm), day(dd) {
+            if (!is_date(yy, mm,dd))
+                error("bad date");
+        }
+
+        [[nodiscard]]  Year get_year() const{ return year;}
+        [[nodiscard]]  Month get_month() const{ return month;}
+        [[nodiscard]]  Day get_day() const{ return day;}
+    private:
+        Year year;
+        Month month;
+        Day day;
+    };
+
+
 }

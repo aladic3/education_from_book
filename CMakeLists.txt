@@ -33,6 +33,7 @@ add_executable(hello_world main.cpp
         ex7/ex12.cpp
         ex7/ex13.cpp
         chapter8/try/try8.ixx
+        chapter8/try/try8_drill8.cpp
 
 
 )

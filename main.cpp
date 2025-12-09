@@ -165,8 +165,13 @@ int main() {
         //exercises7::ex7_8::test();
         //exercises7::ex14::test();
 
-        ch8::try1::Date date{2032,12,31};
-        std::cout << date;
+        using namespace ch8::try_drill;
+        Date date{Year(2032),Month{3},Day{31}};
+
+        std::cout << date << std::endl;
+
+        Month month {Month::dec};
+        std::cout << ++month;
 
         return 0;
 
