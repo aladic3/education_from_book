@@ -4,7 +4,10 @@
 
 #ifndef HELLO_WORLD_FIBONACCI_H
 #define HELLO_WORLD_FIBONACCI_H
-//#include <vector>
+//
+#pragma once
+
+#include <vector>
 #include <iostream>
 #include "../error.h"
 

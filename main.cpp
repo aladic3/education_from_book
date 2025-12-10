@@ -1,12 +1,14 @@
-import drill7;
-import exercises7;
-import try8;
+//import drill7;
+//import exercises7;
+import chapter8;
 
 
 // Forward declarations (optional): add prototypes here if you want to call functions
 // implemented in the other source files from main.cpp.
-#include "drill7/foo.h"
-#include "PPP.h"
+//#include "drill7/foo.h"
+//#include "PPP.h"
+#include <iostream>
+
 int square(int);
 
 
@@ -164,14 +166,21 @@ int main() {
         //exercises::ex5_6::test();
         //exercises7::ex7_8::test();
         //exercises7::ex14::test();
+        {
+            using namespace ch8::try_drill_ex;
+            Date today;
+            Date tomorrow = today;
+            tomorrow.add_days(1);
+            auto date = (Year(2012)/Month{12}/Day{31}).add_days(372);
 
-        using namespace ch8::try_drill;
-        Date date{Year(2032),Month{3},Day{31}};
+            std::cout << today << std::endl
+                << tomorrow << std::endl
+                << today << std::endl
+                << date << std::endl;
 
-        std::cout << date << std::endl;
-
-        Month month {Month::dec};
-        std::cout << ++month;
+            Month month {Month::dec};
+            std::cout << ++month;
+        }
 
         return 0;
 

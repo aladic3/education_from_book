@@ -1,14 +1,15 @@
 // Placeholder header for "Programming: Principles and Practice Using C++" utilities.
 // If you plan to add helpers/types from the book, you can place them here.
-#pragma once
 
+/*
+ *#pragma once
 #include "ex6/fibonacci.h"
 #include "ex6/string_to_double.h"
 #include "error.h"
 #include "bitwise_calculator.h"
 #include "drill7/drill7.h"
 #include "calculator.h"
-
+*/
 
 
 

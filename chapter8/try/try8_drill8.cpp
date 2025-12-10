@@ -6,9 +6,9 @@ module;
 #include <iostream>
 #include <ostream>
 #include "../../error.h"
-module try8;
+module chapter8;
 
-namespace ch8:: try_drill {
+namespace ch8::try_drill_ex {
     bool is_day(const int dd) {
         return dd > 0 && dd < 32;
     }
@@ -28,6 +28,58 @@ namespace ch8:: try_drill {
         return false;
     }
 
+    Date& Date::add_one_day() {
+        if (this->day.d == 31) {
+            this->day.d = 1; //set day to default with this condition
+
+            //increment year
+            if (this->month == Month::dec) // if 31/12
+                ++this->year.y;
+
+            ++this->month; //increment month
+        } else
+            ++this->day.d; //increment day
+
+        return *this;
+    }
+
+    Date& Date::add_days(int count) {
+        if (count < 1)
+            error("bad incrementing count");
+
+        for (int i = 0; i < count; ++i) {
+            add_one_day();
+        }
+
+        return *this;
+    }
+
+    Date &Date::set_day(Day day){
+        if (is_day(day.d))
+            this->day = day;
+        else
+            error("u have a bad day");
+
+        return *this;
+    }
+
+    Date& Date::set_month(Month month) {
+        if (is_month(month))
+            this->month = month;
+        else
+            error("u have a bad month");
+
+        return *this;
+    }
+    Date& Date::set_year(Year year) {
+        if (is_year(year.y))
+            this->year = year;
+        else
+            error("u have a bad year");
+
+        return *this;
+    }
+
 
 
 
@@ -43,5 +95,16 @@ namespace ch8:: try_drill {
         month == Month::dec ? month = Month::jan
                             : month = Month{static_cast<int>(month) + 1};
         return month;
+    }
+
+
+
+    Date operator/(Date date, Day day) {
+        return date.set_day(day);
+    }
+
+    Date operator/(Year year, Month month) {
+
+        return {month,year};
     }
 }
