@@ -166,7 +166,7 @@ int main() {
         //exercises::ex5_6::test();
         //exercises7::ex7_8::test();
         //exercises7::ex14::test();
-        {
+        /*{
             using namespace ch8::try_drill_ex;
             Date today;
             Date tomorrow = today;
@@ -180,7 +180,17 @@ int main() {
 
             Month month {Month::dec};
             std::cout << ++month;
+        }*/
+
+        {
+            ch8::ex2_4::Name_pairs::test();
+            /*using namespace ch8::ex2_4;
+            Name_pairs name_pairs;
+            name_pairs.read_names();
+            name_pairs.read_ages();
+            std::cout << name_pairs;*/
         }
+
 
         return 0;
 

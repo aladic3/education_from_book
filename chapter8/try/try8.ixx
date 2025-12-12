@@ -106,3 +106,54 @@ namespace ch8::try_drill_ex {
 
 
 }
+
+namespace ch8::ex2_4 {
+    struct Name_pair;
+    export class Name_pairs {
+    public:
+        Name_pairs(): input_stream(std::cin) {}
+        explicit Name_pairs(std::istream& is): input_stream(is){}
+
+        void read_ages();
+        void read_names();
+        void print() const;
+        void sort();
+        [[nodiscard]] const std::vector<std::string>& get_names() const{ return this->names;}
+        [[nodiscard]] const std::vector<double>& get_ages() const {return this->ages;}
+
+        static void test();
+    private:
+        void reorganize_ages(const std::vector<std::string> & copy_names,
+                const std::vector<double>& copy_ages);
+
+        int find_index(const std::string& element, const std::vector<std::string>& vector);
+        bool is_valid_age(double age);
+        char skip_spaces() const;
+        void clear_ages_names();
+
+        std::istream& input_stream;
+        std::vector<std::string> names;
+        std::vector<double> ages;
+    };
+
+
+    export class Name_pairs_v2:Name_pairs {
+        Name_pairs_v2(): input_stream(std::cin) {}
+        explicit Name_pairs_v2(std::istream& is): input_stream(is){}
+
+
+    private:
+        std::istream& input_stream;
+        std::vector<Name_pair> name_ages;
+
+    };
+
+    struct  Name_pair {
+        std::string name;
+        std::string age;
+    };
+
+    export std::ostream& operator<<(std::ostream& os, const Name_pairs& n_p);
+    export bool operator==(const Name_pairs& n_p1, const Name_pairs& n_p2);
+    export bool operator!=(const Name_pairs& n_p1, const Name_pairs& n_p2);
+}

@@ -235,7 +235,7 @@ Token Token_stream::get() {
     if (! (this->in.get(input))) error ("Bad input in Token_stream::get(). std::cin error!");
 
     while (std::isspace(input) && input != new_line_kind) // omit spaces
-        std::cin.get(input);
+        in.get(input);
 
     switch (input) {
         case print_kind: // for print and exit

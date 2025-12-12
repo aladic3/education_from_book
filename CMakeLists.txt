@@ -34,6 +34,7 @@ add_executable(hello_world main.cpp
         error.cpp
         chapter8/try/try8.ixx
         chapter8/try/try8_drill8.cpp
+        chapter8/try/ex2_4.cpp
 
 
 )
