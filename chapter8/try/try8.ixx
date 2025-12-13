@@ -5,6 +5,7 @@ module;
 
 #include <iostream>
 #include <ostream>
+#include <utility>
 #include <vector>
 #include "../../error.h"
 export module chapter8;
@@ -109,6 +110,7 @@ namespace ch8::try_drill_ex {
 
 namespace ch8::ex2_4 {
     struct Name_pair;
+
     export class Name_pairs {
     public:
         Name_pairs(): input_stream(std::cin) {}
@@ -136,24 +138,55 @@ namespace ch8::ex2_4 {
         std::vector<double> ages;
     };
 
+    struct  Name_pair {
+        explicit Name_pair(std::string str): name(std::move(str)){};
 
-    export class Name_pairs_v2:Name_pairs {
+        void set_name(const std::string &name) { this->name = name;}
+        void set_age(double age) { this->age = age;  }
+
+
+        [[nodiscard]] const std::string& get_name()const {  return name; }
+        [[nodiscard]] double get_age()const { return age; }
+
+    private:
+        std::string name;
+        double age = 0;
+    };
+
+    export class Name_pairs_v2 {
+    public:
         Name_pairs_v2(): input_stream(std::cin) {}
         explicit Name_pairs_v2(std::istream& is): input_stream(is){}
 
+        void read_ages();
+        void read_names();
+        [[nodiscard]] const std::vector<Name_pair>& get_pairs()const {return name_ages;}
+        [[nodiscard]] size_t size()const{return name_ages.size();}
+        void print(std::ostream&) const;
+        void sort();
+        static void test();
 
     private:
+        [[nodiscard]] std::vector<std::string> get_vector_names() const;
+        [[nodiscard]] std::vector<double> get_vector_ages() const;
+        int get_str_iterator(const std::string& a_name, const std::string & b_name);
+        bool is_valid_age(double age);
+        [[nodiscard]] char skip_spaces() const;
+        void clear_name_pairs();
+
         std::istream& input_stream;
         std::vector<Name_pair> name_ages;
 
     };
 
-    struct  Name_pair {
-        std::string name;
-        std::string age;
-    };
-
+    bool is_equals(const Name_pairs_v2& sorted1, const Name_pairs_v2& sorted2);
+    bool comparison(const Name_pairs& sorted_first, const Name_pairs& sorted_second);
+    bool comparison(Name_pairs_v2 n_p1, Name_pairs_v2 n_p2);
     export std::ostream& operator<<(std::ostream& os, const Name_pairs& n_p);
+    export std::ostream& operator<<(std::ostream& os, const Name_pairs_v2& n_p);
+    export bool operator==(const Name_pairs_v2& n_p1, const Name_pairs_v2& n_p2);
+    export bool operator!=(const Name_pairs_v2& n_p1, const Name_pairs_v2& n_p2);
     export bool operator==(const Name_pairs& n_p1, const Name_pairs& n_p2);
     export bool operator!=(const Name_pairs& n_p1, const Name_pairs& n_p2);
+
 }
