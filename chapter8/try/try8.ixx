@@ -190,3 +190,48 @@ namespace ch8::ex2_4 {
     export bool operator!=(const Name_pairs& n_p1, const Name_pairs& n_p2);
 
 }
+
+
+namespace ch8::ex5_9 {
+
+    export class Book {
+    public:
+        [[nodiscard]] const std::string & get_isbn() const {
+            return isbn;
+        }
+
+        void set_isbn(const std::string &isbn);
+
+        [[nodiscard]] const std::string & get_author() const {
+            return author;
+        }
+
+        void set_author(const std::string &author) {
+            this->author = author;
+        }
+
+        [[nodiscard]] const std::string & get_title() const {
+            return title;
+        }
+
+        void set_title(const std::string &title) {
+            this->title = title;
+        }
+
+        [[nodiscard]] const try_drill_ex::Date & get_copyright_date() const {
+            return copyright_date;
+        }
+
+        void set_copyright_date(const try_drill_ex::Date &copyright_date) {
+            this->copyright_date = copyright_date;
+        }
+
+        static void test();
+
+    private:
+        std::string isbn;
+        std::string author;
+        std::string title;
+        try_drill_ex::Date copyright_date;
+    };
+}

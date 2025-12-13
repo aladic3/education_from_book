@@ -183,7 +183,7 @@ int main() {
         }*/
 
         {
-            ch8::ex2_4::Name_pairs_v2::test();
+            ch8::ex5_9::Book::test();
             /*using namespace ch8::ex2_4;
             Name_pairs name_pairs;
             name_pairs.read_names();
