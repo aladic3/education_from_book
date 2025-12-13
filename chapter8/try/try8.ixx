@@ -55,12 +55,12 @@ namespace ch8::try_drill_ex {
 
     struct Day {
         int d;
-        explicit Day(int dd):d(dd) {}
+        Day(int dd):d(dd) {}
     };
 
     struct Year {
         int y;
-        explicit Year(int yy): y(yy){}
+        Year(int yy): y(yy){}
     };
 
 
@@ -194,18 +194,31 @@ namespace ch8::ex2_4 {
 
 namespace ch8::ex5_9 {
     export class Book;
+    export enum class Genre {
+        first, fiction, periodical, nonfiction, biography, children, last
+    };
 
+    export std::ostream& operator<<(std::ostream& os, const Book& b);
+    std::ostream& operator<<(std::ostream& os, Genre g);
 
     class Book {
     public:
-        bool operator==( const Book& b2) const {
-            return isbn == b2.get_isbn();
-        }
 
-        bool operator!=( const Book& b2) const {
-            return isbn != b2.get_isbn();
-        }
+        Book()= default;
+        /*std::string isbn;
+        std::string author;
+        std::string title;
+        try_drill_ex::Date copyright_date;
+        Genre genre = Genre::children;*/
+        Book(const std::string& isbn,const std::string& author,
+                const std::string& title, const try_drill_ex::Date& copyright_date, Genre genre) {
+            set_genre(genre);
+            set_isbn(isbn);
+            set_author(author);
+            set_title(title);
+            set_copyright_date(copyright_date);
 
+        }
 
 
         [[nodiscard]] const std::string & get_isbn() const {
@@ -238,22 +251,26 @@ namespace ch8::ex5_9 {
             this->copyright_date = copyright_date;
         }
 
+        [[nodiscard]] Genre get_genre() const {return genre;}
+        void set_genre(Genre genre);
         static void test();
 
+        bool operator==( const Book& b2) const {
+            return isbn == b2.get_isbn();
+        }
+
+        bool operator!=( const Book& b2) const {
+            return isbn != b2.get_isbn();
+        }
+
     private:
-        std::string isbn;
-        std::string author;
-        std::string title;
+        std::string isbn {"1-1-1-1"};
+        std::string author {"Anonym"};
+        std::string title {"Enigma"};
         try_drill_ex::Date copyright_date;
+        Genre genre = Genre::fiction;
     };
 
 
-    export std::ostream& operator<<(std::ostream& os, const Book& b) {
-        os << "Title: " << b.get_title() << std::endl
-            << "Author: " << b.get_author() << std::endl
-            << "ISBN: " << b.get_isbn() << std::endl
-            << "Date: " << b.get_copyright_date() << std::endl;
-        return os;
-    }
 
 }

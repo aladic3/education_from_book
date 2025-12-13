@@ -12,6 +12,23 @@ module chapter8;
 
 namespace ch8::ex5_9 {
     constexpr int COUNT_N = 3;
+    std::vector<std::string> vec_genre_str{"first",
+        "fiction", "periodical", "nonfiction", "biography", "children", "last"};
+
+    std::ostream& operator<<(std::ostream& os, Genre g) {
+        auto pointer = static_cast<int>(g);
+        os << vec_genre_str[pointer];
+        return os;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const Book& b) {
+        os << "Title: " << b.get_title() << std::endl
+            << "Author: " << b.get_author() << std::endl
+            << "ISBN: " << b.get_isbn() << std::endl
+            << "Date: " << b.get_copyright_date() << std::endl
+            << "Genre: " << b.get_genre() << std::endl;
+        return os;
+    }
 
     //return position of last separator
     [[nodiscard]]int validate_first_part_isbn(const std::string& isbn) {
@@ -68,6 +85,18 @@ namespace ch8::ex5_9 {
         this->isbn = isbn;
 
     }
+    void Book::set_genre(Genre genre) {
+        auto n = static_cast<int> (genre);
+
+        auto min = static_cast<int> (Genre::first);
+        auto max = static_cast<int> (Genre::last);
+
+        if (n <= min  || n >= max )
+            error("Genre must be valid");
+
+        this->genre = genre;
+    }
+
 
     void Book::test() {
         using namespace try_drill_ex;
@@ -77,6 +106,7 @@ namespace ch8::ex5_9 {
         b.set_title("Line of life");
         b.set_isbn("213-23-34-0");
         b.set_isbn("2-232323-3224-a");
+        b.set_genre(Genre{1});
 
         const std::vector<std::string> bad_variants{"213-23-34-as","213-23-34-;","213-23-34-",
         "213-23--1", "-2-3-#", "#-1-2-3", "1-2-3-#"};
@@ -87,15 +117,19 @@ namespace ch8::ex5_9 {
         } catch (std::exception& ex) {
             std::cout << ex.what();
         }
-        Book b2; Book b3;
-        b3.set_isbn("2-232323-3224-b");
-        b2.set_isbn("2-232323-3224-a");
+        Book b2;
+        Book b3("2-232323-3224-a", "Martin", "Noob",
+            {2004/Month::aug/27}, Genre::fiction);
+
+        // b2.set_isbn("2-232323-3224-a");
 
         std::cout << b
         << (b==b2) << std::endl
         << (b==b3) << std::endl
         << (b!=b2) << std::endl
-        << (b!=b3);
+        << (b!=b3) << std::endl
+        << b3
+        << b2;
 
 
     }
