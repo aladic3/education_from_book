@@ -87,6 +87,16 @@ namespace ch8::ex5_9 {
         } catch (std::exception& ex) {
             std::cout << ex.what();
         }
+        Book b2; Book b3;
+        b3.set_isbn("2-232323-3224-b");
+        b2.set_isbn("2-232323-3224-a");
+
+        std::cout << b
+        << (b==b2) << std::endl
+        << (b==b3) << std::endl
+        << (b!=b2) << std::endl
+        << (b!=b3);
+
 
     }
 

@@ -193,9 +193,21 @@ namespace ch8::ex2_4 {
 
 
 namespace ch8::ex5_9 {
+    export class Book;
 
-    export class Book {
+
+    class Book {
     public:
+        bool operator==( const Book& b2) const {
+            return isbn == b2.get_isbn();
+        }
+
+        bool operator!=( const Book& b2) const {
+            return isbn != b2.get_isbn();
+        }
+
+
+
         [[nodiscard]] const std::string & get_isbn() const {
             return isbn;
         }
@@ -234,4 +246,14 @@ namespace ch8::ex5_9 {
         std::string title;
         try_drill_ex::Date copyright_date;
     };
+
+
+    export std::ostream& operator<<(std::ostream& os, const Book& b) {
+        os << "Title: " << b.get_title() << std::endl
+            << "Author: " << b.get_author() << std::endl
+            << "ISBN: " << b.get_isbn() << std::endl
+            << "Date: " << b.get_copyright_date() << std::endl;
+        return os;
+    }
+
 }
