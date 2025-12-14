@@ -5,6 +5,7 @@ module;
 #include <iostream>
 #include <ostream>
 #include "../../error.h"
+#include <chrono>
 module chapter8;
 
 // isbn: n-n-n-x ; n-int, x-letter or digital
@@ -133,5 +134,125 @@ namespace ch8::ex5_9 {
 
 
     }
+
+    struct Library::Transaction{
+        Book book;
+        int patron_card_number;
+        try_drill_ex::Date date;
+    };
+
+    void Library::check_book_repetition(const std::string& isbn) const{
+        for (const auto& el: books_) {
+            if (el.get_isbn() == isbn)
+                error("cant add book with existed isbn");
+        }
+    }
+
+    void Library::check_patron_repetition(const std::string& user_name) const{
+        for (const auto& el: patrons_) {
+            if (el.get_user_name() == user_name)
+                error("cant add patron with existed name");
+        }
+    }
+
+
+    void Library::add_book(const std::string& isbn,const std::string& author,
+              const std::string& title, const try_drill_ex::Date& copyright_date, Genre genre) {
+        check_book_repetition(isbn);
+        books_.emplace_back(isbn,author, title, copyright_date, genre);
+    }
+
+    void Library::delete_book_from_library(const Book& book) {
+        // Erase all even numbers
+        for (auto it = books_.begin(); it != books_.end();)
+        {
+            if (*it == book) {
+                books_.erase(it);
+                return;
+            }
+
+            ++it;
+        }
+
+        error("book not found. get_position_book_in_library");
+    }
+
+    void Library::check_out_book(const std::string& isbn, const std::string & user_name) {
+        const auto& book = get_book_from_library(isbn);
+        auto& patron = get_patron_from_library(user_name);
+
+        if (patron.owes_fee())
+            error("this user can't do transaction");
+
+        create_and_register_transaction(book,patron);
+
+
+
+    }
+
+    void Library::create_and_register_patron(const std::string & user_name) {
+        check_patron_repetition(user_name);
+        patrons_.emplace_back(user_name,generate_library_card_number());
+    }
+
+    std::vector<std::string> Library::get_names_patrons_with_fee() const {
+        std::vector<std::string> owes_fee;
+        for (const auto& el: this->patrons_) {
+            if (el.owes_fee())
+                owes_fee.emplace_back(el.get_user_name());
+        }
+
+        return  owes_fee;
+    }
+
+    int Library::generate_library_card_number() {
+        return this->next_card_number_++;
+    }
+
+    try_drill_ex::Date get_date_now() {
+        const std::chrono::time_point now{std::chrono::system_clock::now()};
+        const std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now)};
+
+        return try_drill_ex::Date{static_cast<int>(ymd.year()),
+            try_drill_ex::Month{static_cast<unsigned>(ymd.month())},
+            static_cast<unsigned>(ymd.day())};
+    }
+
+    auto Library::get_book_from_library(const std::string& isbn) const -> const Book& {
+        for (const auto& book: this->books_) {
+            if (book.get_isbn() == isbn)
+                return book;
+        }
+        // error throws
+        error("book not exist");
+
+    }
+
+    auto Library::get_patron_from_library(const std::string &user_name)  -> Patron&  {
+        for (auto& patron: this->patrons_) {
+            if (patron.get_user_name() == user_name)
+                return patron;
+        }
+        // error throws
+        error("patron not exist");
+
+
+    }
+
+
+    void Library::create_and_register_transaction(const Book& book,  Patron& patron) {
+        try_drill_ex::Date date_now = get_date_now();
+        // this book go out, copy to transaction, then delete
+        Transaction transaction {book, patron.get_library_card_number(), date_now};
+
+        //after complete save book and patron, delete book from library
+        this->transactions_.push_back(std::move(transaction));
+        // delete book from library
+        delete_book_from_library(book);
+        // and set fee to user
+        patron.increment_fee();
+    }
+
+
 
 }

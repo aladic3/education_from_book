@@ -193,6 +193,9 @@ namespace ch8::ex2_4 {
 
 
 namespace ch8::ex5_9 {
+    class Patron;
+    export class Library;
+
     export class Book;
     export enum class Genre {
         first, fiction, periodical, nonfiction, biography, children, last
@@ -205,11 +208,6 @@ namespace ch8::ex5_9 {
     public:
 
         Book()= default;
-        /*std::string isbn;
-        std::string author;
-        std::string title;
-        try_drill_ex::Date copyright_date;
-        Genre genre = Genre::children;*/
         Book(const std::string& isbn,const std::string& author,
                 const std::string& title, const try_drill_ex::Date& copyright_date, Genre genre) {
             set_genre(genre);
@@ -272,5 +270,79 @@ namespace ch8::ex5_9 {
     };
 
 
+
+
+
+    class Library {
+        struct Transaction;
+    public:
+        void add_book(const std::string& isbn,const std::string& author,
+                const std::string& title, const try_drill_ex::Date& copyright_date, Genre genre);
+        //void add_patron(const Patron&);
+        void check_out_book(const std::string& isbn, const std::string & user_name);
+        void create_and_register_patron(const std::string&);
+        [[nodiscard]] std::vector<std::string> get_names_patrons_with_fee() const;
+
+
+    private:
+        void check_patron_repetition(const std::string& user_name) const;
+        void check_book_repetition(const std::string& isbn) const;
+        [[nodiscard]] int generate_library_card_number();
+        [[nodiscard]] const Book& get_book_from_library(const std::string& isbn) const;
+        [[nodiscard]] Patron&get_patron_from_library(const std::string &user_name);
+        void delete_book_from_library(const Book&);
+        void create_and_register_transaction(const Book &, Patron &patron);
+
+
+        std::vector<Book> books_;
+        std::vector<Patron> patrons_;
+        std::vector<Transaction> transactions_;
+        int next_card_number_ = 0;
+
+    };
+
+    // not exported, private
+    class Patron {
+    public:
+        Patron():user_name("undefined"){}
+        Patron(std::string username, int library_card_number): user_name(std::move(username)),
+        library_card_number(library_card_number){}
+
+        bool operator==(const Patron & p) const {
+            return user_name == p.get_user_name()
+                && library_card_number == p.get_library_card_number();
+        }
+
+        [[nodiscard]] const std::string & get_user_name() const {
+            return user_name;
+        }
+
+
+
+        [[nodiscard]] int get_library_card_number() const {
+            return library_card_number;
+        }
+
+
+
+        [[nodiscard]] int get_library_fee() const {
+            return library_fee;
+        }
+
+        void increment_fee() {
+            ++library_fee;
+        }
+
+        [[nodiscard]] bool owes_fee() const {
+            return library_fee != 0;
+        }
+
+
+
+    private:
+        std::string user_name;
+        int library_card_number = 0;
+        int library_fee = 0;
+    };
 
 }
