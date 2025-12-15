@@ -9,19 +9,26 @@ module;
 module chapter8;
 
 namespace ch8::try_drill_ex {
-    bool is_day(const int dd) {
-        return dd > 0 && dd < 32;
+    bool Date::is_day(const int dd) const {
+        if (month == Month::feb ) {
+            if (is_leapyear(year.y)) {
+                return dd >= 1 && dd <= 29;
+            }
+
+            return dd >= 1 && dd <= 28;
+        }
+        return dd >= 1 && dd <= 31;
     }
 
-    bool is_month(const Month mm) {
+    bool Date::is_month(const Month mm) {
         return month_to_int(mm) >= 1 && month_to_int(mm) <= 12;
     }
 
-    bool is_year(const int yy) {
+    bool Date::is_year(const int yy) {
         return yy > 0;
     }
 
-    bool is_date(Year yy, Month mm, Day dd) {
+    bool Date::is_date(Year yy, Month mm, Day dd) {
         if (is_month(mm) && is_year(yy.y) && is_day(dd.d))
             return true;
 
@@ -78,6 +85,20 @@ namespace ch8::try_drill_ex {
             error("u have a bad year");
 
         return *this;
+    }
+
+    bool Date::is_leapyear(int year) {
+        if (year%100 == 0) {
+            if (year%400 == 0)
+                return true;
+
+            return false;
+        }
+
+        if (year%4 == 0 )
+            return true;
+
+        return false;
     }
 
 

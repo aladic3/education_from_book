@@ -166,12 +166,12 @@ int main() {
         //exercises::ex5_6::test();
         //exercises7::ex7_8::test();
         //exercises7::ex14::test();
-        /*{
+        {
             using namespace ch8::try_drill_ex;
             Date today;
             Date tomorrow = today;
             tomorrow.add_days(1);
-            auto date = (Year(2012)/Month{12}/Day{31}).add_days(372);
+            auto date = (Year(2024)/Month{2}/Day{29}).add_days(372);
 
             std::cout << today << std::endl
                 << tomorrow << std::endl
@@ -179,11 +179,14 @@ int main() {
                 << date << std::endl;
 
             Month month {Month::dec};
-            std::cout << ++month;
-        }*/
+            std::cout << Date::is_leapyear(2000)
+                << Date::is_leapyear(1900)
+                << Date::is_leapyear(2024)
+                << Date::is_leapyear(2001);
+        }
 
         {
-            ch8::ex5_9::Book::test();
+            //ch8::ex5_9::Library::test();
             /*using namespace ch8::ex2_4;
             Name_pairs name_pairs;
             name_pairs.read_names();

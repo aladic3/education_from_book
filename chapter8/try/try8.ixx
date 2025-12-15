@@ -25,10 +25,7 @@ namespace ch8::try_drill_ex {
         "December"
         };
 
-    bool is_day(int);
-    bool is_month(Month);
-    bool is_year(int);
-    bool is_date(Year yy, Month mm, Day dd);
+
 
 
     export  std::ostream& operator<<( std::ostream& os, Month month);
@@ -96,10 +93,16 @@ namespace ch8::try_drill_ex {
         Date& set_month(Month month);
         Date& set_year(Year year);
 
+        static bool is_leapyear(int);
         [[nodiscard]]  Year get_year() const{ return year;}
         [[nodiscard]]  Month get_month() const{ return month;}
         [[nodiscard]]  Day get_day() const{ return day;}
     private:
+        bool is_day(int) const;
+        bool is_month(Month);
+        bool is_year(int);
+        bool is_date(Year yy, Month mm, Day dd);
+
         Year year;
         Month month;
         Day day;
@@ -208,6 +211,13 @@ namespace ch8::ex5_9 {
     public:
 
         Book()= default;
+        explicit Book(const std::string& isbn) {
+            set_isbn(isbn);
+            set_genre(Genre::fiction);
+            set_author("Anonym");
+            set_title("Nothing");
+            set_copyright_date(try_drill_ex::Date{});
+        }
         Book(const std::string& isbn,const std::string& author,
                 const std::string& title, const try_drill_ex::Date& copyright_date, Genre genre) {
             set_genre(genre);
@@ -278,10 +288,12 @@ namespace ch8::ex5_9 {
     public:
         void add_book(const std::string& isbn,const std::string& author,
                 const std::string& title, const try_drill_ex::Date& copyright_date, Genre genre);
+        void add_book(const Book& book);
         //void add_patron(const Patron&);
         void check_out_book(const std::string& isbn, const std::string & user_name);
         void create_and_register_patron(const std::string&);
         [[nodiscard]] std::vector<std::string> get_names_patrons_with_fee() const;
+        static void test();
 
 
     private:

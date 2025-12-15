@@ -6,6 +6,7 @@ module;
 #include <ostream>
 #include "../../error.h"
 #include <chrono>
+#include <functional>
 module chapter8;
 
 // isbn: n-n-n-x ; n-int, x-letter or digital
@@ -13,7 +14,10 @@ module chapter8;
 
 namespace ch8::ex5_9 {
     constexpr int COUNT_N = 3;
-    std::vector<std::string> vec_genre_str{"first",
+    constexpr  std::string NAME_PROMPT = "user";
+    const std::vector<std::string> book_isbn_good_variants{"213-23-34-a","213-23-34-1","213-23-34-b",
+     "213-23-2-1", "1-2-3-4", "1-1-2-3", "1-2-3-0"};
+    const std::vector<std::string> vec_genre_str{"first",
         "fiction", "periodical", "nonfiction", "biography", "children", "last"};
 
     std::ostream& operator<<(std::ostream& os, Genre g) {
@@ -99,41 +103,7 @@ namespace ch8::ex5_9 {
     }
 
 
-    void Book::test() {
-        using namespace try_drill_ex;
-        Book b;
-        b.set_author("And");
-        b.set_copyright_date(Year(1230)/Month{3}/Day{23});
-        b.set_title("Line of life");
-        b.set_isbn("213-23-34-0");
-        b.set_isbn("2-232323-3224-a");
-        b.set_genre(Genre{1});
 
-        const std::vector<std::string> bad_variants{"213-23-34-as","213-23-34-;","213-23-34-",
-        "213-23--1", "-2-3-#", "#-1-2-3", "1-2-3-#"};
-
-        for (const auto & bad_variant : bad_variants)
-        try {
-            b.set_isbn(bad_variant);
-        } catch (std::exception& ex) {
-            std::cout << ex.what();
-        }
-        Book b2;
-        Book b3("2-232323-3224-a", "Martin", "Noob",
-            {2004/Month::aug/27}, Genre::fiction);
-
-        // b2.set_isbn("2-232323-3224-a");
-
-        std::cout << b
-        << (b==b2) << std::endl
-        << (b==b3) << std::endl
-        << (b!=b2) << std::endl
-        << (b!=b3) << std::endl
-        << b3
-        << b2;
-
-
-    }
 
     struct Library::Transaction{
         Book book;
@@ -161,17 +131,18 @@ namespace ch8::ex5_9 {
         check_book_repetition(isbn);
         books_.emplace_back(isbn,author, title, copyright_date, genre);
     }
+    void Library::add_book(const Book& book) {
+        check_book_repetition(book.get_isbn());
+        books_.push_back(book);
+    }
 
     void Library::delete_book_from_library(const Book& book) {
-        // Erase all even numbers
-        for (auto it = books_.begin(); it != books_.end();)
+        for (auto it = books_.begin(); it != books_.end(); ++it)
         {
             if (*it == book) {
                 books_.erase(it);
                 return;
             }
-
-            ++it;
         }
 
         error("book not found. get_position_book_in_library");
@@ -214,7 +185,7 @@ namespace ch8::ex5_9 {
         const std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now)};
 
         return try_drill_ex::Date{static_cast<int>(ymd.year()),
-            try_drill_ex::Month{static_cast<unsigned>(ymd.month())},
+            try_drill_ex::Month{static_cast<int>(static_cast<unsigned>(ymd.month()))},
             static_cast<unsigned>(ymd.day())};
     }
 
@@ -253,6 +224,107 @@ namespace ch8::ex5_9 {
         patron.increment_fee();
     }
 
+    void Book::test() {
+        using namespace try_drill_ex;
+        Book b;
+        b.set_author("And");
+        b.set_copyright_date(Year(1230)/Month{3}/Day{23});
+        b.set_title("Line of life");
+        b.set_isbn("213-23-34-0");
+        b.set_isbn("2-232323-3224-a");
+        b.set_genre(Genre{1});
 
+        const std::vector<std::string> bad_variants{"213-23-34-as","213-23-34-;","213-23-34-",
+        "213-23--1", "-2-3-#", "#-1-2-3", "1-2-3-#"};
+
+        for (const auto & bad_variant : bad_variants)
+            try {
+                b.set_isbn(bad_variant);
+            } catch (std::exception& ex) {
+                std::cout << ex.what();
+            }
+        Book b2;
+        Book b3("2-232323-3224-a", "Martin", "Noob",
+            {2004/Month::aug/27}, Genre::fiction);
+
+        // b2.set_isbn("2-232323-3224-a");
+
+        std::cout << b
+        << (b==b2) << std::endl
+        << (b==b3) << std::endl
+        << (b!=b2) << std::endl
+        << (b!=b3) << std::endl
+        << b3
+        << b2;
+
+
+    }
+
+
+
+    void Library::test() {
+        Library test_library;
+
+        // create and register books and patrons
+        for (int i = 0; i < book_isbn_good_variants.size(); ++i) {
+            std::string user_name {NAME_PROMPT+std::to_string(i)};
+            Book b {book_isbn_good_variants[i]};
+            test_library.add_book(b);
+            test_library.create_and_register_patron(user_name);
+        }
+
+        // check out prev books by prev users
+        for (int i = 0; i < book_isbn_good_variants.size(); ++i) {
+            std::string user_name {NAME_PROMPT+std::to_string(i)};
+
+            test_library.check_out_book(book_isbn_good_variants[i],user_name);
+
+        }
+
+        auto patrons_with_fee = test_library.get_names_patrons_with_fee();
+        std::cout << "patrons with fee:\n";
+        for (const auto& with_fee: patrons_with_fee) {
+            std::cout << with_fee << ' ';
+
+        }
+        std::cout << std::endl;
+
+        // must can't create patrons, but create books successfully
+        for (int i = 0; i < book_isbn_good_variants.size(); ++i) try{
+            std::string user_name {NAME_PROMPT+std::to_string(i)};
+            Book b {book_isbn_good_variants[i]};
+            test_library.add_book(b);
+            test_library.create_and_register_patron(user_name);
+        } catch (std::exception& ex) {
+            std::cerr << ex.what();
+        }
+
+        // must can't create books
+        for (int i = 0; i < book_isbn_good_variants.size(); ++i) try{
+            std::string user_name {NAME_PROMPT+std::to_string(i+book_isbn_good_variants.size())};
+            test_library.create_and_register_patron(user_name);
+            Book b {book_isbn_good_variants[i]};
+            test_library.add_book(b);
+
+        } catch (std::exception& ex) {
+            std::cerr << ex.what();
+        }
+
+        //must can't check out, because this user's owes fee
+        for (int i = 0; i < book_isbn_good_variants.size(); ++i) try{
+            std::string user_name {NAME_PROMPT+std::to_string(i)};
+            test_library.check_out_book(book_isbn_good_variants[i],user_name);
+        } catch (std::exception& ex) {
+            std::cerr << ex.what();
+        }
+
+        //must can check out
+        for (int i = 0; i < book_isbn_good_variants.size(); ++i) {
+            std::string user_name {NAME_PROMPT+std::to_string(i+book_isbn_good_variants.size())};
+            test_library.check_out_book(book_isbn_good_variants[i],user_name);
+        }
+        std::cout <<std::endl;
+
+    }
 
 }
