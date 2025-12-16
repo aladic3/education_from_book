@@ -168,21 +168,29 @@ int main() {
         //exercises7::ex14::test();
         {
             using namespace ch8::try_drill_ex;
+            auto date = (Year(2025)/Month{11}/30).add_days(1);
             Date today;
-            Date tomorrow = today;
+            Date tomorrow = today.add_days(4);
             tomorrow.add_days(1);
-            auto date = (Year(2024)/Month{2}/Day{29}).add_days(372);
+
 
             std::cout << today << std::endl
                 << tomorrow << std::endl
-                << today << std::endl
                 << date << std::endl;
 
             Month month {Month::dec};
-            std::cout << Date::is_leapyear(2000)
+            std::cout /*<< Date::is_leapyear(2000)
                 << Date::is_leapyear(1900)
                 << Date::is_leapyear(2024)
-                << Date::is_leapyear(2001);
+                << Date::is_leapyear(2001) << std::endl*/
+                << "test of next_workday func:\n"
+                << today.next_workday() << std::endl
+                << tomorrow.next_workday() << std::endl
+                << date.next_workday() << std::endl
+                << "test weeks of year: " << std::endl
+                << today.week_of_year()
+                << " " << tomorrow.week_of_year()
+                << " " << date.week_of_year();
         }
 
         {

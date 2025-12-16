@@ -186,7 +186,7 @@ namespace ch8::ex5_9 {
 
         return try_drill_ex::Date{static_cast<int>(ymd.year()),
             try_drill_ex::Month{static_cast<int>(static_cast<unsigned>(ymd.month()))},
-            static_cast<unsigned>(ymd.day())};
+            static_cast<int>(static_cast<unsigned>(ymd.day()))};
     }
 
     auto Library::get_book_from_library(const std::string& isbn) const -> const Book& {
@@ -228,7 +228,7 @@ namespace ch8::ex5_9 {
         using namespace try_drill_ex;
         Book b;
         b.set_author("And");
-        b.set_copyright_date(Year(1230)/Month{3}/Day{23});
+        b.set_copyright_date(Year(1230)/Month{3}/23);
         b.set_title("Line of life");
         b.set_isbn("213-23-34-0");
         b.set_isbn("2-232323-3224-a");

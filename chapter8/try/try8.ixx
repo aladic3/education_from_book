@@ -11,6 +11,7 @@ module;
 export module chapter8;
 
 namespace ch8::try_drill_ex {
+    export enum class Weekday;
     export class Date;
     export struct Year;
     export struct Day;
@@ -27,13 +28,13 @@ namespace ch8::try_drill_ex {
 
 
 
-
+    export  std::ostream& operator<< (std::ostream& os, Weekday w);
     export  std::ostream& operator<<( std::ostream& os, Month month);
     export std::ostream& operator<<(std::ostream& os, const Date& d);
     export Month& operator++(Month& month);
 
 
-    export Date operator/(Date date, Day day);
+    export Date operator/(Date date, int day);
     export Date operator/(Year year, Month month);
 
     inline int month_to_int(Month mm) {
@@ -50,9 +51,31 @@ namespace ch8::try_drill_ex {
         jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec // start with 1
     };
 
+    enum class Weekday {
+        sat, sun, mon, tue, wed, thu,fri
+    };
+
     struct Day {
-        int d;
-        Day(int dd):d(dd) {}
+        int month_day;
+        Weekday weekday;
+        Day(int md, int yy, Month mm):month_day(md) {
+            auto m = static_cast<int>(mm);
+            if (m == 1 || m == 2) {
+                m+= 12;
+                yy-=1;
+            }
+
+            auto K = yy%100;
+            auto J = yy/100;
+            auto q = md;
+
+            auto wd = ((q + (13*(m+1))/5) + K + (K/4)+(J/4) - 2*J) % 7;
+
+            if (wd >= 0 && wd <=6)
+                weekday = Weekday{wd};
+            else
+                error("Bad week day");
+        }
     };
 
     struct Year {
@@ -64,40 +87,47 @@ namespace ch8::try_drill_ex {
 
     class Date {
     public:
-        Date(Year yy, Month mm, Day dd):year(yy),month(mm), day(dd) {
-            if (!is_date(yy, mm,dd))
+        Date(Year yy, Month mm, int dd):year(yy),month(mm), day(dd,yy.y,mm) {
+            if (!is_date(year, month,day))
                 error("bad date");
         }
 
-        explicit Date(Year yy):year(yy), month(Month::jan), day(1) {
+        explicit Date(Year yy):year(yy), month(Month::jan), day(1,year.y,month) {
             if (!is_date(yy, month, day))
                 error("bad date");
 
         }
 
-        Date(Month mm, Day dd): year(2001), month(mm), day(dd) {
+        Date(Month mm, Day dd): year(2001), month(mm), day(dd.month_day, year.y,month) {
             if (!is_date(year, mm,dd))
                 error("bad date");
         }
-        Date(Month mm, Year yy): year(yy), month(mm), day(1) {
+        Date(Month mm, Year yy): year(yy), month(mm), day(1,yy.y,mm) {
             if (!is_date(yy, mm,day))
                 error("bad date");
         }
 
-        Date():year(2001), month(Month::jan), day(1){}
+        Date():year(2001), month(Month::jan), day(1,year.y,month){}
 
         Date& add_days(int);
         Date& add_one_day();
 
-        Date& set_day(Day day);
+        Date& set_day(int day);
         Date& set_month(Month month);
         Date& set_year(Year year);
+        [[nodiscard]] Weekday get_weekday() const;
+        Date next_workday() const;
+        int week_of_year();
 
         static bool is_leapyear(int);
         [[nodiscard]]  Year get_year() const{ return year;}
         [[nodiscard]]  Month get_month() const{ return month;}
         [[nodiscard]]  Day get_day() const{ return day;}
     private:
+        int calculate_day_of_year(); // in year 365 or 366 days
+        void increment_30_day_month_edge();
+        void increment_31_day_month_edge();
+        void increment_standard_day_of_month();
         bool is_day(int) const;
         bool is_month(Month);
         bool is_year(int);
