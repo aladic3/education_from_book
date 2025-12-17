@@ -11,6 +11,8 @@ module chapter8;
 
 namespace ch8::try_drill_ex {
     const std::vector months_with_30_days {Month::apr, Month::jun, Month::sep, Month::nov};
+    constexpr int UX_EPOCH = 1970;
+
     bool is_30_day(Month m) {
         for ( auto el: months_with_30_days) {
             if (m == el)
@@ -18,9 +20,75 @@ namespace ch8::try_drill_ex {
         }
         return false;
     }
-    bool Date::is_day(const int dd) const {
+
+    long int Day::calculate_days_from_unix_epoch(int md, int yy, Month mm) {
+        if (yy < UX_EPOCH)
+            error("date can't be less 1970");
+
+        long int sum = 0;
+        //calc years
+        for (int i = UX_EPOCH; i < yy; ++i) {
+            if (Date::is_leapyear(i))
+                sum+=366;
+            else
+                sum+=365;
+        }
+
+        // calc month
+        for (auto i = Month::jan; i < mm;++i) {
+            switch (i) {
+                case Month::feb:
+                    if (Date::is_leapyear(yy))
+                        sum+=29;
+                    else
+                        sum+=28;
+                    break;
+
+                case Month::apr: case Month::jun: //30 days
+                case Month::sep: case Month::nov:
+                    sum+=30;
+                    break;
+
+                default:
+                    sum+=31;
+
+            }
+        }
+
+        // calc days
+        sum += md;
+
+        return sum;
+    }
+
+    void Day::day_init_from_all_date(int md, int yy, Month mm) {
+        {
+                auto m = static_cast<int>(mm);
+                if (m == 1 || m == 2) {
+                    m+= 12;
+                    yy-=1;
+                }
+
+                auto K = yy%100;
+                auto J = yy/100;
+                auto q = md;
+
+                auto wd = ((q + (13*(m+1))/5) + K + (K/4)+(J/4) - 2*J) % 7;
+
+                if (wd >= 0 && wd <=6)
+                    weekday = Weekday{wd};
+                else
+                    error("Bad week day");
+            }
+
+
+    }
+
+
+
+    bool Date::is_day(const int dd, Month month, int year) {
         if (month == Month::feb ) {
-            if (is_leapyear(year.y)) {
+            if (is_leapyear(year)) {
                 return dd >= 1 && dd <= 29;
             }
 
@@ -42,41 +110,35 @@ namespace ch8::try_drill_ex {
     }
 
     bool Date::is_date(Year yy, Month mm, Day dd) {
-        if (is_month(mm) && is_year(yy.y) && is_day(dd.month_day))
+        if (is_month(mm) && is_year(yy.y) &&
+            is_day(dd.month_day, mm,yy.y))
             return true;
 
         return false;
     }
 
-    void Date::increment_30_day_month_edge() {
-        ++this->month; //increment month
-        //set day to default with this condition
-        day = Day{1, year.y,month}; //increment day
+    int days_in_month(int yy, Month mm) {
+        if (mm == Month::feb)
+          return 28 + Date::is_leapyear(yy);
+
+        if (is_30_day(mm))
+            return 30;
+
+        return 31;
     }
 
-    void Date::increment_31_day_month_edge() {
-        //increment year
-        if (this->month == Month::dec) // if 31/12
-            ++this->year.y;
-        ++this->month; //increment month
-
-        //set day to default with this condition
-        day = Day{1, year.y,month}; //increment day
-    }
-
-    void Date::increment_standard_day_of_month() {
-        this->day = Day{day.month_day+1, year.y,month}; //increment day
-    }
     Date& Date::add_one_day() {
-        if (this->day.month_day == 30 && is_30_day(month)) {
-            increment_30_day_month_edge();
-        } else if (this->day.month_day == 31) {
-            increment_31_day_month_edge();
+        auto limit = days_in_month(year.y,month);
+        this->day.add_Day(limit);
+
+        if (day.month_day == 1) {
+            ++month;
+            if (month == Month::jan) //new year
+                year.y++;
         }
-        else
-            increment_standard_day_of_month();
 
         return *this;
+
     }
 
     Date& Date::add_days(int count) {
@@ -91,7 +153,7 @@ namespace ch8::try_drill_ex {
     }
 
     Date &Date::set_day(int day){
-        if (is_day(day))
+        if (is_day(day,month,year.y))
             this->day = Day{day,year.y,month};
         else
             error("u have a bad day");
@@ -100,7 +162,7 @@ namespace ch8::try_drill_ex {
     }
 
     Date& Date::set_month(Month month) {
-        if (is_month(month)) {
+        if (is_month(month) && is_day(day.month_day,month,year.y)) {
             this->month = month;
             day = Day{day.month_day,year.y,month};
         }
@@ -110,8 +172,9 @@ namespace ch8::try_drill_ex {
         return *this;
     }
     Date& Date::set_year(Year year) {
-        if (is_year(year.y)) {
+        if (is_year(year.y) && is_day(day.month_day,month,year.y)) {
             this->year = year;
+
             day = Day{day.month_day,year.y,month};
         }
         else
@@ -209,6 +272,13 @@ namespace ch8::try_drill_ex {
         month == Month::dec ? month = Month::jan
                             : month = Month{static_cast<int>(month) + 1};
         return month;
+    }
+
+    Weekday& operator++(Weekday& weekday) {
+        weekday == Weekday::fri ? weekday = Weekday::sat
+                                : weekday = Weekday{static_cast<int>(weekday) + 1};
+
+        return weekday;
     }
 
 

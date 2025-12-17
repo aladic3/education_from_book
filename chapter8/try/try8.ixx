@@ -32,6 +32,7 @@ namespace ch8::try_drill_ex {
     export  std::ostream& operator<<( std::ostream& os, Month month);
     export std::ostream& operator<<(std::ostream& os, const Date& d);
     export Month& operator++(Month& month);
+    export Weekday& operator++(Weekday& weekday);
 
 
     export Date operator/(Date date, int day);
@@ -55,27 +56,29 @@ namespace ch8::try_drill_ex {
         sat, sun, mon, tue, wed, thu,fri
     };
 
+
+
     struct Day {
         int month_day;
         Weekday weekday;
+        long int days_from_1970; // 1 jan 1970 is Thu
+
         Day(int md, int yy, Month mm):month_day(md) {
-            auto m = static_cast<int>(mm);
-            if (m == 1 || m == 2) {
-                m+= 12;
-                yy-=1;
-            }
-
-            auto K = yy%100;
-            auto J = yy/100;
-            auto q = md;
-
-            auto wd = ((q + (13*(m+1))/5) + K + (K/4)+(J/4) - 2*J) % 7;
-
-            if (wd >= 0 && wd <=6)
-                weekday = Weekday{wd};
-            else
-                error("Bad week day");
+            day_init_from_all_date(md,yy,mm);
+            days_from_1970 = calculate_days_from_unix_epoch(md,yy,mm);
         }
+
+        void add_Day(int limit) {
+            ++month_day;
+            ++weekday;
+            ++days_from_1970;
+
+            if (month_day > limit)
+                month_day = 1;
+        }
+    private:
+        static long int calculate_days_from_unix_epoch(int md, int yy, Month mm);
+        void day_init_from_all_date(int md,int yy,Month mm);
     };
 
     struct Year {
@@ -125,10 +128,7 @@ namespace ch8::try_drill_ex {
         [[nodiscard]]  Day get_day() const{ return day;}
     private:
         int calculate_day_of_year(); // in year 365 or 366 days
-        void increment_30_day_month_edge();
-        void increment_31_day_month_edge();
-        void increment_standard_day_of_month();
-        bool is_day(int) const;
+        static bool is_day(int,Month month, int year) ;
         bool is_month(Month);
         bool is_year(int);
         bool is_date(Year yy, Month mm, Day dd);

@@ -168,7 +168,7 @@ int main() {
         //exercises7::ex14::test();
         {
             using namespace ch8::try_drill_ex;
-            auto date = (Year(2025)/Month{11}/30).add_days(1);
+            auto date = (Year(2025)/Month{11}/30).add_days(365);
             Date today;
             Date tomorrow = today.add_days(4);
             tomorrow.add_days(1);
