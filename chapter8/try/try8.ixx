@@ -396,80 +396,44 @@ namespace ch8::ex13 {
 
     class Rational {
     public:
-        Rational();
+        Rational() = default;
         Rational(int num, int den): numerator(num), denominator(den) {
             if (den == 0)
                 error("Denominator can't be 0");
         }
 
-        [[nodiscard]] int get_numerator() const {
-            return numerator;
-        }
+        [[nodiscard]] int get_numerator() const { return numerator; }
 
-        [[nodiscard]] int get_denominator() const {
-            return denominator;
-        }
+        [[nodiscard]] int get_denominator() const { return denominator; }
 
-        bool operator==(const Rational & l) const {
-            if (numerator == l.get_numerator() && denominator == l.get_denominator())
-                return true;
+        Rational& simplify_rational();
 
-            return false;
-        }
-        bool operator!=(const Rational & l) const {
-            return !operator==(l);
-        }
-        Rational& operator=(int integer) {
-            numerator=integer;
-            denominator = 1;
-            return *this;
-        }
+        bool operator==(const Rational & l) const ;
+        bool operator!=(const Rational & l) const ;
+        Rational& operator=(int integer) ;
+        Rational& operator=(double non_integer) ;
 
         void multiply_rational_by_int(int multiplier){numerator*=multiplier; denominator*=multiplier;}
         [[nodiscard]] double get_double() const {return static_cast<double>(numerator)/denominator;}
 
     private:
+        void reduce_rational_by(int value);
         int numerator = 0;
         int denominator = 1;
     };
 
-    export Rational operator+(Rational r, Rational l) {
-        if (r.get_denominator() == l.get_denominator())
-            return Rational{r.get_numerator()+l.get_numerator(), r.get_denominator()};
+    export Rational operator+(Rational r, Rational l);
 
-        r.multiply_rational_by_int(l.get_denominator());
-        l.multiply_rational_by_int(r.get_denominator());
+    export Rational operator-(Rational r, Rational l) ;
 
-        return r+l;
-    }
+    export Rational operator*(const Rational& r, const Rational& l);
 
-    export Rational operator-(Rational r, Rational l) {
-        if (r.get_denominator() == l.get_denominator())
-            return Rational{r.get_numerator()-l.get_numerator(), r.get_denominator()};
-
-        r.multiply_rational_by_int(l.get_denominator());
-        l.multiply_rational_by_int(r.get_denominator());
-
-        return r-l;
-    }
-
-    export Rational operator*(const Rational& r, const Rational& l) {
-        return Rational{r.get_numerator()*l.get_numerator(),
-                r.get_denominator()*l.get_denominator()};
-    }
-
-    export Rational operator/(const Rational& r, const Rational& l) {
-         return Rational{r.get_numerator()*l.get_denominator(),
-             r.get_denominator() * l.get_numerator()};
-    }
+    export Rational operator/(const Rational& r, const Rational& l) ;
 
 
 
 
-    void test() {
-
-
-    }
+    void test() ;
 
 
 }

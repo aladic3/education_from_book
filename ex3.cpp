@@ -212,11 +212,11 @@ void rock_paper_scissors() {
     }
 
 
-    for (int choice: num_choices) {
+    for (const int& choice1: num_choices) {
         std::cout << "Enter \"rock, paper or scissors\": ";
         std::cin >> human_choice;
 
-        switch (computer_choice[choice][0]) {
+        switch (computer_choice[choice1][0]) {
             case 'r':
                 switch (human_choice[0]) {
                     case 'r':
