@@ -439,3 +439,21 @@ namespace ch8::ex13 {
 
 
 }
+
+
+namespace ch8::ex14_15 {
+    export class Money;
+
+    class  Money {
+    public:
+
+        Money(const double& dollars);
+        [[nodiscard]] double get_dollars_amount() const;
+
+    private:
+        long int _monetary_amount = 0;
+    };
+
+
+    export void test();
+}
