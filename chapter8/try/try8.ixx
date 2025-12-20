@@ -397,14 +397,15 @@ namespace ch8::ex13 {
     class Rational {
     public:
         Rational() = default;
-        Rational(int num, int den): numerator(num), denominator(den) {
-            if (den == 0)
-                error("Denominator can't be 0");
-        }
+        Rational(int integer){ operator=(integer);}
+        Rational(double non_integer){ operator=(non_integer);}
+        Rational(long long int num, long long int den): numerator(num), denominator(den) { validate_denominator(denominator);}
 
-        [[nodiscard]] int get_numerator() const { return numerator; }
+        static void validate_denominator(long long int);
 
-        [[nodiscard]] int get_denominator() const { return denominator; }
+        [[nodiscard]] long long int get_numerator() const { return numerator; }
+
+        [[nodiscard]] long long int get_denominator() const { return denominator; }
 
         Rational& simplify_rational();
 
@@ -413,13 +414,14 @@ namespace ch8::ex13 {
         Rational& operator=(int integer) ;
         Rational& operator=(double non_integer) ;
 
-        void multiply_rational_by_int(int multiplier){numerator*=multiplier; denominator*=multiplier;}
-        [[nodiscard]] double get_double() const {return static_cast<double>(numerator)/denominator;}
+        void multiply_rational_by_long_long_int(long long int multiplier){numerator*=multiplier; denominator*=multiplier;}
+        [[nodiscard]] double get_double() const {return static_cast<double>(numerator)/static_cast<double>(denominator);}
 
     private:
-        void reduce_rational_by(int value);
-        int numerator = 0;
-        int denominator = 1;
+
+        void reduce_rational_by(long long int value);
+        long long int numerator = 0;
+        long long int denominator = 1;
     };
 
     export Rational operator+(Rational r, Rational l);
@@ -433,7 +435,7 @@ namespace ch8::ex13 {
 
 
 
-    void test() ;
+    export void test();
 
 
 }

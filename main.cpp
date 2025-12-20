@@ -166,7 +166,7 @@ int main() {
         //exercises::ex5_6::test();
         //exercises7::ex7_8::test();
         //exercises7::ex14::test();
-        {
+        /*{
             using namespace ch8::try_drill_ex;
             auto date = (Year(2025)/Month{11}/30).add_days(365);
             Date today;
@@ -182,7 +182,7 @@ int main() {
             std::cout /*<< Date::is_leapyear(2000)
                 << Date::is_leapyear(1900)
                 << Date::is_leapyear(2024)
-                << Date::is_leapyear(2001) << std::endl*/
+                << Date::is_leapyear(2001) << std::endl
                 << "test of next_workday func:\n"
                 << today.next_workday() << std::endl
                 << tomorrow.next_workday() << std::endl
@@ -192,7 +192,7 @@ int main() {
                 << " " << tomorrow.week_of_year()
                 << " " << date.week_of_year();
         }
-
+*/
         {
             //ch8::ex5_9::Library::test();
             /*using namespace ch8::ex2_4;
@@ -201,6 +201,8 @@ int main() {
             name_pairs.read_ages();
             std::cout << name_pairs;*/
         }
+
+        ch8::ex13::test();
 
 
         return 0;
