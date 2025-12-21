@@ -442,6 +442,8 @@ namespace ch8::ex13 {
 
 
 namespace ch8::ex14_15 {
+    const  std::vector<std::string> _currency_prompt {"", "USD", "DKK", "UAH", "" };
+
     export class Money;
 
     export enum class Currency {
@@ -455,12 +457,12 @@ namespace ch8::ex14_15 {
         Money(const double& amount_currency, Currency crr);
 
 
-        std::string get_currency_prompt() const { return _currency_prompt[static_cast<int>(_currency)];};
+        [[nodiscard]] std::string get_currency_prompt() const { return _currency_prompt[static_cast<int>(_currency)];};
         void set_currency(Currency crr);
         void set_monetary_amount(double amount_currency);
         void conversion_this_to_dollars();
         [[nodiscard]] long int get_cents() const {return _monetary_amount;}
-        [[nodiscard]] double set_and_get_dollars_amount() ;
+        [[nodiscard]] double get_and_set_dollars_amount() ;
         [[nodiscard]] double get_currency_amount() const ;
         [[nodiscard]] double get_dollars_amount() const ;
 
@@ -470,16 +472,19 @@ namespace ch8::ex14_15 {
         Currency _currency = Currency::USD;
 
         const std::vector<double> _conversion_factors {-1., 1., 0.5, 40., -1 }; // {begin, ..., end}
-        const std::vector<std::string> _currency_prompt {"", "USD", "DKK", "UAH", "" };
+
 
 
         [[nodiscard]] long int get_monetary_amount_in_dollars() const;
         [[nodiscard]] static double monetary_to_currency(long int monetary_amount) ;
     };
 
+    [[nodiscard]]Currency get_currency_from_string(std::string&); // throw error
+
     export std::ostream& operator<<(std::ostream& os, const Money& money);
+    export std::istream& operator>>(std::istream& is, Money& money);
     export Money operator+(const Money& m1, const Money& m2);
     export Money operator-(const Money& m1, const Money& m2);
     export void test();
-    export std::istream& operator>>(std::istream& is, Currency currency, double d);
+
 }
