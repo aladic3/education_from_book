@@ -38,6 +38,8 @@ add_executable(hello_world main.cpp
         chapter8/try/ex5_9.cpp
         chapter8/try/ex13.cpp
         chapter8/try/ex14_.cpp
+        chapter9/try_drill.ixx
+        chapter9/try_s.cpp
 
 
 )
@@ -50,7 +52,8 @@ target_sources(hello_world
         #drill7/drill7.ixx
         #drill7/foo1.ixx
         #ex7/exercises7.ixx
-      chapter8/try/try8.ixx
+        chapter8/try/try8.ixx
+        chapter9/try_drill.ixx
 
 
 )

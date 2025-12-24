@@ -1,7 +1,7 @@
 //import drill7;
 //import exercises7;
-import chapter8;
-
+//import chapter8;
+import try_drill;
 
 // Forward declarations (optional): add prototypes here if you want to call functions
 // implemented in the other source files from main.cpp.
@@ -202,7 +202,9 @@ int main() {
             std::cout << name_pairs;*/
         }
 
-        ch8::ex14_15::test();
+        // ch8::ex14_15::test();
+
+        ch9::try_s::print_birthyear();
 
 
         return 0;
