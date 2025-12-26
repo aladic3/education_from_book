@@ -21,7 +21,8 @@ namespace ch9::try_s {
 
     void test_format() {
         double d = 1234.56789;
-        std::cout <<  std::format("-{:13}-{:10.3f}-{:30.20e}-\n", d,d,d);
+        int i = 256;
+        std::cout <<  std::format("-{:13a}-{:10.3f}-{:30.20e}-{:12b}\n", d,d,d, i);
     }
 
 }
