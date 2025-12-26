@@ -204,7 +204,7 @@ int main() {
 
         // ch8::ex14_15::test();
 
-        ch9::try_s::print_birthyear();
+        ch9::try_s::test_format();
 
 
         return 0;
