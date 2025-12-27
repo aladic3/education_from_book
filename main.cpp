@@ -204,7 +204,8 @@ int main() {
 
         // ch8::ex14_15::test();
 
-        ch9::try_s::test_format();
+        ch9::drill::print_birthyear();
+        ch9::drill::try_reading_different_bases();
 
 
         return 0;
