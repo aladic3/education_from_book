@@ -2,12 +2,15 @@
 //import exercises7;
 //import chapter8;
 import try_drill;
+//#include <iostream>
+
+//#include <iostream>
 
 // Forward declarations (optional): add prototypes here if you want to call functions
 // implemented in the other source files from main.cpp.
 //#include "drill7/foo.h"
 //#include "PPP.h"
-#include <iostream>
+
 
 int square(int);
 
@@ -204,8 +207,10 @@ int main() {
 
         // ch8::ex14_15::test();
 
-        ch9::drill::print_birthyear();
-        ch9::drill::try_reading_different_bases();
+        //ch9::drill::print_birthyear();
+        //ch9::drill::try_reading_different_bases();
+
+        ch9::drill11::test();
 
 
         return 0;
@@ -219,12 +224,12 @@ int main() {
     //     std::cerr << "\nstd::runtime_error\n" << er.what();
     //     return -1;
     // }
-    catch (std::exception& ex) {
-        std::cerr << "\nerror: " << ex.what();
-        return 1;
-    }
+    //catch (std::exception& ex) {
+    //    std::cerr << "\nerror: " << ex.what();
+    //    return 1;
+    //}
     catch (...) {
-        std::cerr << "\n ..." << "Something went wrong!\n";
+        //std::cerr << "\n ..." << "Something went wrong!\n";
         return 2;
     }
     //error("hmm");
