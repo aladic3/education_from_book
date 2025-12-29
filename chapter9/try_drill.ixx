@@ -54,7 +54,7 @@ namespace  ch9::drill11 {
 
     export std::vector<Point> read_points_from_file(const std::string& file_name);
     export  void write_points_to_file(const std::string& file_name, const std::vector<Point>& points);
-    export void write_points_to_file_with_prompt(const std::string& file_name);
+    export std::vector<Point> write_points_to_file_with_prompt(const std::string& file_name);
     std::vector<Point> read_from_prompt();
     std::ofstream& write_points_to_filestream(std::ofstream& ofs, const std::vector<Point>& points);
     void print_points(const std::vector<Point>& points_v);

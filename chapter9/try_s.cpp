@@ -152,15 +152,17 @@ namespace  ch9::drill11 {
          return p_vector;
     }
 
-    void write_points_to_file_with_prompt(const std::string& file_name) {
+    std::vector<Point> write_points_to_file_with_prompt(const std::string& file_name) {
          std::ofstream ofs {file_name};
 
          if (!ofs)
              error("Can't open output file");
 
-         std::vector<Point> p_vector = read_from_prompt();
+         std::vector<Point> original_points = read_from_prompt();
 
-         write_points_to_filestream(ofs,p_vector);
+         write_points_to_filestream(ofs,original_points);
+
+         return original_points;
 
      }
 
@@ -171,14 +173,19 @@ namespace  ch9::drill11 {
      }
 
     void test() {
-         const std::string filename = "test1.txt";
-         write_points_to_file(filename,{Point{1,2}, Point{4,5}});
+         const std::string filename = "mydata.txt";
+         //write_points_to_file(filename,{Point{1,2}, Point{4,5}});
+         //print_points(read_points_from_file(filename));
 
-         print_points(read_points_from_file(filename));
+         auto original_points = write_points_to_file_with_prompt(filename);
+         auto processed_points = read_points_from_file(filename);
 
-         write_points_to_file_with_prompt(filename);
+         if (original_points.size() != processed_points.size())
+             error("bad comparing");
 
-         print_points(read_points_from_file(filename));
+         print_points(original_points);
+         std::cout << std::endl;
+         print_points(processed_points);
 
      }
 
