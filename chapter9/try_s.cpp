@@ -6,13 +6,74 @@ module;
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 #include "../error.h"
+
 
 //import chapter8;
 
 module try_drill;
 
+
+namespace ch9::ex1 {
+    std::ifstream open_input_stream(const std::string& file_name) {
+        std::ifstream ifs {file_name};
+        if (!ifs)
+            error("can't open file");
+
+        return ifs;
+    }
+    std::ofstream open_output_stream(const std::string& file_name) {
+        std::ofstream ofs {file_name};
+        if (!ofs)
+            error("can't open file");
+
+        return ofs;
+    }
+
+    std::vector<std::string> read_file(const std::string& file_name) {
+        std::vector<std::string> result;
+        auto ifs = open_input_stream(file_name);
+
+        while (ifs) {
+            std::string input;
+            std::getline(ifs,input);
+            result.push_back(input);
+        }
+
+        return  result;
+    }
+    void write_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
+        auto ofs = open_output_stream(file_name);
+
+        for (const auto& el: vec)
+            ofs << el << std::endl;
+
+
+    }
+    std::string& str_tolower(std::string& s) //from cpprefference
+    {
+        std::transform(s.begin(), s.end(), s.begin(),
+                    // static_cast<int(*)(int)>(std::tolower)         // wrong
+                    // [](int c){ return std::tolower(c); }           // wrong
+                    // [](char c){ return std::tolower(c); }          // wrong
+                       [](unsigned char c){ return std::tolower(c); } // correct
+                      );
+        return s;
+    }
+    std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines) {
+        for (auto& line:input_lines)
+            str_tolower(line);
+
+        return input_lines;
+    }
+
+    void test() {
+
+    }
+
+}
 
 //using namespace ch8::try_drill_ex;
 namespace ch9::drill {

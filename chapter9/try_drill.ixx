@@ -10,7 +10,14 @@ module;
 
 export module try_drill;
 
+namespace ch9::ex1 {
+    std::vector<std::string> read_file(const std::string& file_name);
+    void write_to_file(const std::string& file_name);
+    std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines);
 
+    void test();
+
+}
 
 namespace ch9::drill {
     export void print_birthyear();
