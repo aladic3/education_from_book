@@ -25,6 +25,16 @@ namespace ch9::ex3 {
 
 }
 
+namespace ch9::ex4 {
+    std::vector<std::string> read_std_cin(char terminator);
+    std::vector<int> convert_to_decimal(const std::vector<std::string>& wet_integers); // if one of them non int - error
+    bool is_octal(const std::string& wet_integer);
+    bool is_hex(const std::string& wet_integer);
+    bool is_decimal(const std::string& wet_integer);
+
+
+}
+
 namespace ch9::ex1 {
     export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
     export [[nodiscard]] std::vector<std::string>read_line_file(const std::string& file_name);

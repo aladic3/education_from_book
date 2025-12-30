@@ -6,6 +6,7 @@ module;
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <strstream>
 #include <string>
 
@@ -15,6 +16,61 @@ module;
 //import chapter8;
 
 module try_drill;
+
+namespace ch9::ex4 {
+    std::vector<std::string> read_std_cin(char terminator) {
+        std::vector<std::string> result;
+
+        while (std::cin) {
+            std::string input;
+
+            std::cin >> input;
+
+            if (input[0] == terminator || input.empty())
+                break;
+
+            result.push_back(input);
+        }
+
+        return  result;
+    }
+
+    bool is_octal(const std::string& wet_integer) {
+        std::istringstream is {wet_integer};
+        char ch;
+        is.get(ch);
+
+        if (ch != '0')
+            return false;
+
+        while (is.get(ch)) {
+            auto n = ch - '0';
+
+            if (!(n >= 0 && n <=7))
+                return false;
+
+        }
+
+        return true;
+    }
+    bool is_hex(const std::string& wet_integer) {
+
+        if (wet_integer.substr(0,2) != "0x")
+            return false;
+
+        for (auto ch: wet_integer.substr(2,wet_integer.size())){
+            if (!isxdigit(ch))
+                return false;
+
+        }
+
+        return true;
+    }
+    bool is_decimal(std::string wet_integer);
+
+
+
+}
 
 namespace ch9::ex3 {
     [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name) {
@@ -73,6 +129,8 @@ namespace ch9::ex3 {
 
 }
 
+
+
 namespace ch9::ex1 {
     std::ifstream open_input_stream(const std::string& file_name) {
         std::ifstream ifs {file_name};
@@ -91,6 +149,7 @@ namespace ch9::ex1 {
     std::vector<std::string> read_file(const std::string& file_name) {
         std::vector<std::string> result;
         auto ifs = open_input_stream(file_name);
+
 
         while (ifs) {
             std::string input;
