@@ -11,18 +11,31 @@ module;
 export module try_drill;
 
 namespace ch9::ex3 {
+    // using func for reading  ch9::ex1::read_file
+
+    const std::vector<char> vowels {'a', 'e', 'i', 'o', 'u', 'y'};
+
+    export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
+    export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
+    export void remove_vowels_from_vector(std::vector<std::string>& vec);
+    void remove_vowels_from_word(std::string& word);
+    bool is_vowel_letter( char letter);
+
+    export void test();
 
 }
 
 namespace ch9::ex1 {
     export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
-    export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
+    export [[nodiscard]] std::vector<std::string>read_line_file(const std::string& file_name);
+    export void write_line_to_file(const std::string& file_name, const std::vector<std::string>& vec);
     export  std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines);
 
     std::ifstream open_input_stream(const std::string& file_name);
     std::ofstream open_output_stream(const std::string& file_name);
 
-    void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os);
+    export void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os);
+    export void print_vec_with_line_num(const std::vector<std::string>& str_v, std::ostream& os);
 
     std::string& str_tolower(std::string& s);
 

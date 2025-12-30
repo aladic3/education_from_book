@@ -16,6 +16,62 @@ module;
 
 module try_drill;
 
+namespace ch9::ex3 {
+    [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name) {
+       return ex1::read_file(file_name);
+    }
+    void write_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
+        auto ofs = ex1::open_output_stream(file_name);
+        for (const auto& el: vec) {
+            ofs << el << ' ';
+        }
+    }
+    void remove_vowels_from_vector(std::vector<std::string>& vec) {
+        for (auto& el: vec) {
+            remove_vowels_from_word(el);
+        }
+    }
+    void remove_vowels_from_word(std::string& word) {
+        for (auto it = word.begin(); it != word.end(); ++it) {
+            if (is_vowel_letter(*it)) {
+                word.erase(it);
+                --it;
+            }
+
+        }
+    }
+    bool is_vowel_letter( char letter) {
+        if (!std::isalpha(letter))
+            return false;
+
+        for (auto vowel: vowels)
+            if (static_cast<int>(vowel) == std::tolower(letter))
+                return true;
+
+
+        return false;
+    }
+
+    void test() {
+
+            const std::string filename = "disemvowels.txt";
+            std::vector<std::string> letter {"Hello", "my", "little", "friend.", "How", "ARE", "YOU?"};
+
+            write_to_file(filename,letter);
+            auto from_file_vec = read_file(filename);
+
+        try {
+            remove_vowels_from_vector(from_file_vec);
+
+            ex1::print_vec_with_line_num(from_file_vec,std::cout);
+        } catch (std::exception& ex) {
+            std::cerr << ex.what();
+
+        }
+    }
+
+
+}
 
 namespace ch9::ex1 {
     std::ifstream open_input_stream(const std::string& file_name) {
@@ -25,14 +81,13 @@ namespace ch9::ex1 {
 
         return ifs;
     }
-    std::ofstream open_output_stream(const std::string& file_name) {
+    [[nodiscard]]std::ofstream open_output_stream(const std::string& file_name) {
         std::ofstream ofs {file_name};
         if (!ofs)
             error("can't open file");
 
         return ofs;
     }
-
     std::vector<std::string> read_file(const std::string& file_name) {
         std::vector<std::string> result;
         auto ifs = open_input_stream(file_name);
@@ -50,7 +105,25 @@ namespace ch9::ex1 {
 
         return  result;
     }
-    void write_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
+
+    std::vector<std::string> read_line_file(const std::string& file_name) {
+        std::vector<std::string> result;
+        auto ifs = open_input_stream(file_name);
+
+        while (ifs) {
+            std::string input;
+
+            std::getline(ifs,input);
+
+            if (input.empty())
+                continue;
+
+            result.push_back(input);
+        }
+
+        return  result;
+    }
+    void write_line_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
         auto ofs = open_output_stream(file_name);
         print_str_vec(vec,ofs);
 
@@ -68,7 +141,7 @@ namespace ch9::ex1 {
     }
     std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines) {
         for (auto& line:input_lines)
-            str_tolower(line);
+           str_tolower(line);
 
         return input_lines;
     }
@@ -86,7 +159,7 @@ namespace ch9::ex1 {
     void test() {
         const std::string file_name = "test.txt";
         std::vector<std::string> test_v {"SDFaaw", "fdfEWWE", "SDFwerewr"};
-        write_to_file(file_name,test_v);
+        write_line_to_file(file_name,test_v);
         auto from_file = read_file(file_name);
         print_str_vec(convert_to_lower(from_file), std::cout);
         print_vec_with_line_num(from_file,std::cout);
