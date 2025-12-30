@@ -10,12 +10,23 @@ module;
 
 export module try_drill;
 
-namespace ch9::ex1 {
-    std::vector<std::string> read_file(const std::string& file_name);
-    void write_to_file(const std::string& file_name);
-    std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines);
+namespace ch9::ex3 {
 
-    void test();
+}
+
+namespace ch9::ex1 {
+    export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
+    export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
+    export  std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines);
+
+    std::ifstream open_input_stream(const std::string& file_name);
+    std::ofstream open_output_stream(const std::string& file_name);
+
+    void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os);
+
+    std::string& str_tolower(std::string& s);
+
+    export void test();
 
 }
 
@@ -48,6 +59,7 @@ namespace ch9::drill {
     std::ostream& print_table_vector(std::ostream& os, const std::vector<UserInfo>& table_vec);
     export std::ostream& operator<<(std::ostream& os, const UserInfoTable& table);
     export  std::ostream& operator<<(std::ostream& os, const UserInfo& row);
+    std::vector<UserInfo> test_create_vector_table();
     export  void test_table();
 }
 
@@ -62,9 +74,12 @@ namespace  ch9::drill11 {
     export std::vector<Point> read_points_from_file(const std::string& file_name);
     export  void write_points_to_file(const std::string& file_name, const std::vector<Point>& points);
     export std::vector<Point> write_points_to_file_with_prompt(const std::string& file_name);
+
+    std::vector<Point> read_points_count_times(const int count_points, std::istream& is);
     std::vector<Point> read_from_prompt();
     std::ofstream& write_points_to_filestream(std::ofstream& ofs, const std::vector<Point>& points);
     void print_points(const std::vector<Point>& points_v);
+
     export  void test();
 
     export std::istream& operator>>(std::istream& is,  Point& p);

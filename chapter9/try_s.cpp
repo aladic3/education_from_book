@@ -6,6 +6,7 @@ module;
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <strstream>
 #include <string>
 
 #include "../error.h"
@@ -38,7 +39,12 @@ namespace ch9::ex1 {
 
         while (ifs) {
             std::string input;
-            std::getline(ifs,input);
+
+            ifs >> input;
+
+            if (input.empty())
+                continue;
+
             result.push_back(input);
         }
 
@@ -46,9 +52,7 @@ namespace ch9::ex1 {
     }
     void write_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
         auto ofs = open_output_stream(file_name);
-
-        for (const auto& el: vec)
-            ofs << el << std::endl;
+        print_str_vec(vec,ofs);
 
 
     }
@@ -69,7 +73,24 @@ namespace ch9::ex1 {
         return input_lines;
     }
 
+    void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os) {
+        for (const auto& el: str_v)
+            os << el << std::endl;
+    }
+
+    void print_vec_with_line_num(const std::vector<std::string>& str_v, std::ostream& os) {
+        for (int i = 0; i<str_v.size(); ++i)
+            os << str_v[i] << '\t'<< i << std::endl;
+    }
+
     void test() {
+        const std::string file_name = "test.txt";
+        std::vector<std::string> test_v {"SDFaaw", "fdfEWWE", "SDFwerewr"};
+        write_to_file(file_name,test_v);
+        auto from_file = read_file(file_name);
+        print_str_vec(convert_to_lower(from_file), std::cout);
+        print_vec_with_line_num(from_file,std::cout);
+
 
     }
 
@@ -164,12 +185,10 @@ namespace ch9::drill {
 
 namespace  ch9::drill11 {
      std::vector<Point> read_points_from_file(const std::string& file_name) {
-         std::ifstream ifs {file_name};
+         std::ifstream ifs = ex1::open_input_stream(file_name);
+
          std::vector<Point> points;
          Point p{};
-
-         if (!ifs)
-             error("Can't open input file");
 
          while (ifs >> p)
              points.push_back(p);
@@ -184,40 +203,37 @@ namespace  ch9::drill11 {
          return ofs;
      }
      void write_points_to_file(const std::string& file_name, const std::vector<Point>& points) {
-         std::ofstream ofs {file_name};
-
-         if (!ofs)
-             error("can't  open output file");
-
-         !write_points_to_filestream(ofs,points);
-
+         std::ofstream ofs = ex1::open_output_stream(file_name);
+         write_points_to_filestream(ofs,points);
 
      }
 
-    std::vector<Point> read_from_prompt(){
+    std::vector<Point> read_points_count_times(const int count_points, std::istream& is){
         std::vector<Point> p_vector;
-        constexpr int count_points = 7;
-        std::cout << std::format("Enter {} points: ", count_points);
-
-        for (int i = 0; i < count_points && std::cin; ++i) {
+        for (int i = 0; i < count_points && is; ++i) {
             Point p{};
-            std::cin >> p;
+            is >> p;
 
-            if (!std::cin)
+            if (!is)
                 error("Bad input");
 
             p_vector.push_back(p);
 
         }
+        return p_vector;
+    }
+
+    std::vector<Point> read_from_prompt(){
+        constexpr int count_points = 7;
+        std::cout << std::format("Enter {} points: ", count_points);
+        auto p_vector = read_points_count_times(count_points,std::cin);
+
 
          return p_vector;
     }
 
     std::vector<Point> write_points_to_file_with_prompt(const std::string& file_name) {
-         std::ofstream ofs {file_name};
-
-         if (!ofs)
-             error("Can't open output file");
+         std::ofstream ofs = ex1::open_output_stream(file_name);
 
          std::vector<Point> original_points = read_from_prompt();
 
