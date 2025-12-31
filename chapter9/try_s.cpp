@@ -17,6 +17,60 @@ module;
 
 module try_drill;
 
+namespace ch9::ex5 {
+    void print(const std::vector<std::pair<char,std::string>>& classifications, const std::string& word) {
+        std::cout <<"\"\"\"" << word << "\"\"\":\n";
+        for (const auto& pair: classifications)
+            std::cout << std::format("'{}': {}\n",pair.first,pair.second);
+
+    }
+    std::vector<std::string> read_std_cin(char terminator) {
+        return  ex4::read_std_cin(terminator);
+    }
+    std::vector<std::pair<char,std::string>> get_all_characters_classifications(const std::string& word) {
+        std::vector<std::pair<char,std::string>> result;
+        result.reserve(word.size());
+
+        for (auto ch: word) {
+            result.push_back(get_pair_one_character_classifications(ch));
+        }
+
+        return result;
+    }
+
+    std::string get_str_from_vec_classifications(const std::vector<std::pair<bool,std::string>>& classifications) {
+        std::string result;
+        for (const auto& el: classifications) {
+            result+=el.first?std::format("{};",el.second):"";
+        }
+        return result;
+    }
+    std::pair<char,std::string> get_pair_one_character_classifications(const char ch) {
+        std::vector<std::pair<bool,std::string>> classifications{
+            {std::isalpha(ch),"letter"},
+            {std::isspace(ch),"whitespace"},
+            {std::isdigit(ch),"decimal digit"},
+            {std::isxdigit(ch),"hexadecimal digit"},
+            {std::isupper(ch),"uppercase letter"},
+            {std::islower(ch),"lowercase letter"},
+            {std::iscntrl(ch),"control character"},
+            {std::ispunct(ch),"punct"},
+            {std::isprint(ch),"printable"},
+            {std::isgraph(ch),"grahp"},
+            {std::isalnum(ch),"alphanumeric"}
+        };
+
+        return std::pair {ch,get_str_from_vec_classifications(classifications)};
+
+    }
+
+    void test() {
+        std::string word = "0x73\t is hexadecimal!\n";
+        print(get_all_characters_classifications(word),word);
+    }
+
+}
+
 namespace ch9::ex6 {
 
     bool is_punct(char ch) {

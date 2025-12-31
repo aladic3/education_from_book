@@ -10,6 +10,16 @@ module;
 
 export module try_drill;
 
+namespace ch9::ex5 {
+    export std::vector<std::string> read_std_cin(char terminator);
+    export void print(const std::vector<std::pair<char,std::string>>&, const std::string& );
+    export std::vector<std::pair<char,std::string>> get_all_characters_classifications(const std::string& word);
+    std::pair<char,std::string>  get_pair_one_character_classifications(const char ch);
+
+    export void test();
+
+}
+
 namespace ch9::ex3 {
     // using func for reading  ch9::ex1::read_file
 
