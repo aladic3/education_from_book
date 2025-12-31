@@ -17,6 +17,41 @@ module;
 
 module try_drill;
 
+namespace ch9::ex6 {
+
+    bool is_punct(char ch) {
+        for (auto punct: punctuations)
+            if (ch == punct)
+                return true;
+
+        return false;
+    }
+
+    std::string replace_punctuation_with_whitespace(const std::string& str) {
+        auto copy_str = str;
+        for (auto it = copy_str.begin(); it != copy_str.end(); ++it) {
+            if (*it == '"') //inside double quotes not changes
+            {
+                ++it;
+                while (*it != '"' && it!=str.end())
+                    ++it;
+            }
+
+
+            if (is_punct(*it))
+                *it = ' ';
+        }
+
+        return copy_str;
+    }
+
+    void test() {
+        std::cout << replace_punctuation_with_whitespace("Did\"n't\" s,o cu!ete \"pl?s!\"?");
+
+    }
+}
+
+
 namespace ch9::ex4 {
     std::vector<std::string> read_std_cin(char terminator) {
         std::vector<std::string> result;

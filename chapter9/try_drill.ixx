@@ -40,6 +40,14 @@ namespace ch9::ex4 {
 
 }
 
+namespace ch9::ex6 {
+    const std::vector<char> punctuations {'.', ';',':', ',','?','-','!','\''};
+
+    export std::string replace_punctuation_with_whitespace(const std::string& str);
+
+    export void test();
+}
+
 namespace ch9::ex1 {
     export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
     export [[nodiscard]] std::vector<std::string>read_line_file(const std::string& file_name);
