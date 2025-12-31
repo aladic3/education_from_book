@@ -26,11 +26,16 @@ namespace ch9::ex3 {
 }
 
 namespace ch9::ex4 {
-    std::vector<std::string> read_std_cin(char terminator);
-    std::vector<int> convert_to_decimal(const std::vector<std::string>& wet_integers); // if one of them non int - error
+    export std::vector<std::string> read_std_cin(char terminator);
+    export std::vector<int> convert_to_decimal(const std::vector<std::string>& wet_integers); // if one of them non int - error
     bool is_octal(const std::string& wet_integer);
     bool is_hex(const std::string& wet_integer);
     bool is_decimal(const std::string& wet_integer);
+    int get_integer(const std::string& wet_integer);
+    std::vector<std::string> prepare_wet_str_to_print(const std::vector<std::string>& wet_integers);
+    export void print(const std::vector<std::string>& wet_integers, const std::vector<int>& integers);
+
+    export void test();
 
 
 }

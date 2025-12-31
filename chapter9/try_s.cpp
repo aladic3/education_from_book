@@ -20,6 +20,8 @@ module try_drill;
 namespace ch9::ex4 {
     std::vector<std::string> read_std_cin(char terminator) {
         std::vector<std::string> result;
+        std::cout << std::format("Input integers in hex/oct or decimal"
+                                 " format. Use {} for stop inputting: ",terminator);
 
         while (std::cin) {
             std::string input;
@@ -59,14 +61,85 @@ namespace ch9::ex4 {
             return false;
 
         for (auto ch: wet_integer.substr(2,wet_integer.size())){
-            if (!isxdigit(ch))
+            if (!std::isxdigit(ch))
                 return false;
 
         }
 
         return true;
     }
-    bool is_decimal(std::string wet_integer);
+    bool is_decimal(const std::string& wet_integer) {
+        for (auto ch: wet_integer) {
+            if (!std::isdigit(ch))
+                return false;
+        }
+
+        return true;
+    }
+
+    int get_integer(const std::string& wet_integer) {
+        std::istringstream is {wet_integer};
+        int result = 0;
+
+        if (is_hex(wet_integer))
+            is >> std::hex >> result;
+        else if (is_octal(wet_integer))
+            is >> std::oct >> result;
+        else if (is_decimal(wet_integer))
+            is >> std::dec >> result;
+
+        else
+            error("bad input");
+
+        return result;
+
+    }
+
+    std::vector<int> convert_to_decimal(const std::vector<std::string>& wet_integers) {
+        std::vector<int> result;
+        result.reserve(wet_integers.size());
+
+        for (const auto& wet_integer: wet_integers) {
+            result.push_back(get_integer(wet_integer));
+        }
+
+        return result;
+    }
+
+    std::vector<std::string> prepare_wet_str_to_print(const std::vector<std::string>& wet_integers) {
+        auto ws_copy = wet_integers;
+
+        for (auto& wet_integer: ws_copy) {
+            if (is_hex(wet_integer))
+                wet_integer = std::format("{:10}\thexadecimal",wet_integer);
+            else if (is_octal(wet_integer))
+                wet_integer = std::format("{:10}\toctal",wet_integer);
+            else if (is_decimal(wet_integer))
+                wet_integer = std::format("{:10}\tdecimal",wet_integer);
+
+        }
+
+        return ws_copy;
+
+    }
+
+    void print(const std::vector<std::string>& wet_integers, const std::vector<int>& integers) {
+        auto formatted_strings = prepare_wet_str_to_print(wet_integers);
+
+        for (int i = 0; i < formatted_strings.size(); i++) {
+            std::cout
+                << std::format("{:30}\tconverts to{:10}\tdecimal\n",formatted_strings[i],integers[i]);
+        }
+    }
+
+    void test() {
+        auto wet_int = read_std_cin('|');
+        auto integer = convert_to_decimal(wet_int);
+
+        print(wet_int,integer);
+    }
+
+
 
 
 
