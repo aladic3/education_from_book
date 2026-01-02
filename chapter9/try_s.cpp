@@ -3,6 +3,7 @@
 //
 module;
 
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -73,13 +74,101 @@ namespace ch9::ex5 {
 
 namespace ch9::ex6 {
 
-    bool is_punct(char ch) {
+    /*bool is_punct(char ch) {
         for (auto punct: punctuations)
             if (ch == punct)
                 return true;
 
         return false;
+    }*/
+
+    void print_vec_of_strings(const std::vector<std::string>& vec) {
+        for (const auto& el: vec ) {
+            std::cout << el << std::endl;
+        }
     }
+
+    std::string get_from_dictionary(const std::string& word) { // return init word if not finded
+        std::string result = word;
+        ex1::str_tolower(result);
+        for (const auto& el: nt_dictionary) {
+            if (result == el.first)
+                return el.second;
+        }
+
+        return word;
+    }
+
+    std::string split_word_and_symbols( std::string& word) {
+        std::string symbols_after_word;
+
+        while (!word.empty() && std::ispunct(word.back())) {
+            symbols_after_word += word.back();
+            word.pop_back();
+        }
+
+        return symbols_after_word;
+    }
+    void add_word_separately_symbols_to_vector(const std::string& word, const std::string& symbols,
+        std::vector<std::string>& vector)
+    {
+        if (!word.empty())
+            vector.push_back(word);
+
+        if (!symbols.empty())
+            vector.push_back(symbols);
+    }
+
+    std::vector<std::string> get_formatted_words_from_line(const std::string& line) {
+        std::istringstream isn{line};
+        std::vector<std::string> result = get_formatted_words_from_stream(isn);
+        return result;
+    }
+
+    void sort_strings(std::vector<std::string>& str_vec) {
+        std::ranges::sort(str_vec.begin(), str_vec.end());
+    }
+
+    std::vector<std::string> get_formatted_words_from_stream(std::istream& is) {
+        std::string word;
+        std::vector<std::string> result;
+
+        while (is >> word) {
+            auto symbols_after_word = split_word_and_symbols(word);
+            word = get_from_dictionary(word);
+            add_word_separately_symbols_to_vector(word,symbols_after_word,result);
+        }
+
+        return result;
+    }
+
+    std::vector<std::string> get_sorted_and_formatted_words_from_file(const std::string& filename) {
+        auto isf = ex1::open_input_stream(filename);
+        std::vector<std::string> result = get_formatted_words_from_stream(isf);
+        sort_strings(result);
+
+        return result;
+    }
+
+    std::string get_formatted_line_from_words(const std::vector<std::string>& words) {
+        std::string result;
+
+        for (const auto& word: words) {
+
+            result+= std::ispunct(word.front())
+                ?word //symbol
+                :std::format(" {}",word);//just word
+        }
+
+        return result.substr(1,result.size()-1); //first spase
+    }
+
+    std::string get_line_of_formatted_string(const std::string& line) { //start point
+        auto words = get_formatted_words_from_line(line);
+        auto result = get_formatted_line_from_words(words);
+        return result;
+    }
+
 
     std::string replace_punctuation_with_whitespace(const std::string& str) {
         auto copy_str = str;
@@ -87,12 +176,14 @@ namespace ch9::ex6 {
             if (*it == '"') //inside double quotes not changes
             {
                 ++it;
-                while (*it != '"' && it!=str.end())
+                while (*it != '"' && it!=copy_str.end())
                     ++it;
             }
 
+            if (it == copy_str.end())
+                break;
 
-            if (is_punct(*it))
+            if (std::ispunct(*it))
                 *it = ' ';
         }
 
@@ -100,7 +191,16 @@ namespace ch9::ex6 {
     }
 
     void test() {
-        std::cout << replace_punctuation_with_whitespace("Did\"n't\" s,o cu!ete \"pl?s!\"?");
+        std::string original {"Didn't\" -- S,o cu!ete \"pl?s!\"?\nAren't\" you haven't a problem?"};
+        const std::string filename {"readme.txt"};
+        try {
+
+            std::cout << replace_punctuation_with_whitespace(original) << std::endl;
+            std::cout << get_line_of_formatted_string(original) << std::endl;
+            print_vec_of_strings(get_sorted_and_formatted_words_from_file(filename));
+        } catch (std::exception& ex) {
+            std::cerr << ex.what();
+        }
 
     }
 }

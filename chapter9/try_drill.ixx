@@ -51,7 +51,36 @@ namespace ch9::ex4 {
 }
 
 namespace ch9::ex6 {
-    const std::vector<char> punctuations {'.', ';',':', ',','?','-','!','\''};
+
+    const std::vector<std::pair<std::string,std::string>> nt_dictionary {
+        {"don't","do not"},
+        {"can't","cannot"},
+        {"haven't","have not"},
+        {"didn't","did not"},
+        {"aren't", "are not"},
+        {"you’re", "you are"}
+    };
+
+    export std::string get_line_of_formatted_string(const std::string& line); //start point
+    export std::vector<std::string> get_sorted_and_formatted_words_from_file(const std::string& filename); //start point
+
+    std::vector<std::string> get_formatted_words_from_stream(std::istream& is) ;  //essential part
+
+    std::string get_from_dictionary(const std::string& word);
+    std::string split_word_and_symbols( std::string& word);
+    void sort_strings(std::vector<std::string>& str_vec) ;
+    void add_word_separately_symbols_to_vector(const std::string& word, const std::string& symbols,
+        std::vector<std::string>& vector);
+
+    std::vector<std::string> get_formatted_words_from_line(const std::string& line); //essential part
+
+    std::string get_formatted_line_from_words(const std::vector<std::string>& words); // for print
+
+
+
+
+
+
 
     export std::string replace_punctuation_with_whitespace(const std::string& str);
 
