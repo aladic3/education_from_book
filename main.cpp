@@ -210,7 +210,7 @@ int main() {
         //ch9::drill::print_birthyear();
         //ch9::drill::try_reading_different_bases();
 
-        ch9::ex6::test();
+        ch9::ex9_10::test();
 
 
         return 0;

@@ -18,6 +18,60 @@ module;
 
 module try_drill;
 
+namespace ch9::ex9_10 {
+    std::vector<std::string> get_separated_words_from_stream(std::istream& is) {
+        std::vector<std::string> vec;
+        std::string str;
+
+        while (is >> str) {
+            vec.push_back(str);
+        }
+
+        return vec;
+    }
+    std::vector<std::string> get_separated_words_from_string(const std::string& s, const std::string& w) {
+        std::vector<std::string> vec;
+        std::string str;
+
+        for (auto ch: s) {
+
+            if (w.contains(ch) && str.empty())
+                continue;
+
+            if (w.contains(ch)) {
+                vec.push_back(str);
+                str.erase();
+                continue;
+            }
+
+            str.push_back(ch);
+        }
+
+        if (!str.empty())
+            vec.push_back(str);
+
+
+        return vec;
+    }
+      std::vector<std::string> split(const std::string& s) {
+          std::istringstream isn{s};
+          return get_separated_words_from_stream(isn);
+      }
+      std::vector<std::string> split(const std::string& s, const std::string& w) {//w is characters
+            auto copy_w = w + ' '; //space also separating ch
+            return get_separated_words_from_string(s,copy_w);
+        }
+      void test() {
+        std::string line = "0xx73\t is hex,adeci!mal!\n";
+        std::cout << "original: " << line << std::endl;
+        std::cout << "split_v1:\n";
+        print_vec_of_strings(split(line));
+        std::cout << "split_v2:\n";
+        print_vec_of_strings(split(line,"x,!"));
+
+    }
+}
+
 namespace ch9::ex5 {
     void print(const std::vector<std::pair<char,std::string>>& classifications, const std::string& word) {
         std::cout <<"\"\"\"" << word << "\"\"\":\n";
@@ -72,21 +126,17 @@ namespace ch9::ex5 {
 
 }
 
-namespace ch9::ex6 {
-
-    /*bool is_punct(char ch) {
-        for (auto punct: punctuations)
-            if (ch == punct)
-                return true;
-
-        return false;
-    }*/
-
+namespace ch9 {
     void print_vec_of_strings(const std::vector<std::string>& vec) {
         for (const auto& el: vec ) {
             std::cout << el << std::endl;
         }
     }
+}
+
+namespace ch9::ex6 {
+
+
 
     std::string get_from_dictionary(const std::string& word) { // return init word if not finded
         std::string result = word;

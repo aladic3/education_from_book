@@ -10,6 +10,20 @@ module;
 
 export module try_drill;
 
+namespace ch9 {
+    void print_vec_of_strings(const std::vector<std::string>& vec);
+}
+
+namespace ch9::ex9_10 {
+    export std::vector<std::string> split(const std::string& s);
+    export std::vector<std::string> split(const std::string& s, const std::string& w); //w is characters
+
+    std::vector<std::string> get_separated_words_from_stream(std::istream& is);
+    std::vector<std::string> get_separated_words_from_string(const std::string& s, const std::string& w);
+
+    export void test();
+}
+
 namespace ch9::ex5 {
     export std::vector<std::string> read_std_cin(char terminator);
     export void print(const std::vector<std::pair<char,std::string>>&, const std::string& );
