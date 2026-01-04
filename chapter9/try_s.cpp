@@ -8,7 +8,6 @@ module;
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <strstream>
 #include <string>
 
 #include "../error.h"
@@ -18,7 +17,74 @@ module;
 
 module try_drill;
 
-namespace ch9::ex9_10 {
+namespace ch9 {
+    std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word) {
+        std::string symbols_after_word;
+        std::string symbols_before_word;
+
+        while (!word.empty() && std::ispunct(word.back())) {
+            symbols_after_word += word.back();
+            word.pop_back();
+        }
+
+        while (!word.empty() && std::ispunct(word.front())) {
+            symbols_before_word += word.front();
+            word.erase(0,1);
+        }
+
+        return std::pair{symbols_before_word, symbols_after_word};
+    }
+    void write_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
+        auto ofs = open_output_stream(file_name);
+        for (const auto& el: vec) {
+            ofs << el << ' ';
+        }
+    }
+    std::vector<std::string> read_words_from_stream(std::istream& is) {
+        std::string word;
+        std::vector<std::string> result;
+
+        while (is >> word) {
+            auto symbols_after_and_before_word = split_after_and_before_word_and_symbols(word);
+            ex6::add_word_separately_symbols_to_vector(word,symbols_after_and_before_word,result);
+        }
+
+        return result;
+    }
+    void print_vec_of_strings(const std::vector<std::string>& vec) {
+        for (const auto& el: vec ) {
+            std::cout << el << std::endl;
+        }
+    }
+
+    std::ifstream open_input_stream(const std::string& file_name) {
+        std::ifstream ifs {file_name};
+        if (!ifs)
+            error("can't open file");
+
+        return ifs;
+    }
+    [[nodiscard]]std::ofstream open_output_stream(const std::string& file_name) {
+        std::ofstream ofs {file_name};
+        if (!ofs)
+            error("can't open file");
+
+        return ofs;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const std::vector<char>& file) {
+        for (auto& ch: file) {
+            os.put(ch);
+        }
+        return os;
+    }
+
+    std::istream& operator>>(std::istream& is, std::vector<char>& file) {
+        char ch;
+        while (is.get(ch))
+            file.push_back(ch);
+        return  is;
+    }
     std::vector<std::string> get_separated_words_from_stream(std::istream& is) {
         std::vector<std::string> vec;
         std::string str;
@@ -29,6 +95,73 @@ namespace ch9::ex9_10 {
 
         return vec;
     }
+}
+
+namespace  ch9::ex11 {
+    std::vector<char> read_file_to_char_vector(const std::string& filename) {
+        auto is = open_input_stream(filename);
+        std::vector<char> file;
+        is >> file;
+
+        return file;
+
+    }
+
+    std::vector<std::string> read_file_to_str_vector(const std::string& filename) {
+        auto is = open_input_stream(filename);
+        std::vector<std::string> file = read_words_from_stream(is);
+
+        return file;
+
+    }
+    void reverse_order_of_characters(std::vector<char>& file) {
+        std::vector<char> reversed_file;
+        reversed_file.reserve(file.size());
+        const int size = static_cast<int>(file.size());
+
+        for (int i = size-1; i>=0; --i)
+            reversed_file.push_back(file[i]);
+
+
+        file = reversed_file;
+    }
+
+    void reverse_order_of_words(std::vector<std::string>& file) {
+        const auto file_size = file.size();
+        for (int i = 0; i*2 < file_size;++i) {
+            const auto left = i;
+            const auto right = file_size - (i + 1);
+
+            if (left == right) break;
+
+            std::swap(file[left],file[right]);
+        }
+    }
+
+
+    void test() {
+        constexpr std::string filename_in {"readme.txt"};
+        auto file  = read_file_to_char_vector(filename_in);
+        reverse_order_of_characters(file);
+
+        constexpr std::string filename_out {"readme_out.txt"};
+        auto os  = open_output_stream(filename_out);
+        os << file;
+        os.close();
+
+        constexpr std::string filename_out2 {"readme_out2.txt"};
+        auto file2 = read_file_to_str_vector(filename_in);
+        reverse_order_of_words(file2);
+        write_to_file(filename_out2,file2);
+
+
+    }
+
+
+}
+
+namespace ch9::ex9_10 {
+
     std::vector<std::string> get_separated_words_from_string(const std::string& s, const std::string& w) {
         std::vector<std::string> vec;
         std::string str;
@@ -53,14 +186,22 @@ namespace ch9::ex9_10 {
 
         return vec;
     }
+
+
       std::vector<std::string> split(const std::string& s) {
           std::istringstream isn{s};
           return get_separated_words_from_stream(isn);
       }
+
+
+
       std::vector<std::string> split(const std::string& s, const std::string& w) {//w is characters
             auto copy_w = w + ' '; //space also separating ch
             return get_separated_words_from_string(s,copy_w);
         }
+
+
+
       void test() {
         std::string line = "0xx73\t is hex,adeci!mal!\n";
         std::cout << "original: " << line << std::endl;
@@ -100,7 +241,7 @@ namespace ch9::ex5 {
         }
         return result;
     }
-    std::pair<char,std::string> get_pair_one_character_classifications(const char ch) {
+    std::pair<char,std::string> get_pair_one_character_classifications( char ch) {
         std::vector<std::pair<bool,std::string>> classifications{
             {std::isalpha(ch),"letter"},
             {std::isspace(ch),"whitespace"},
@@ -126,47 +267,37 @@ namespace ch9::ex5 {
 
 }
 
-namespace ch9 {
-    void print_vec_of_strings(const std::vector<std::string>& vec) {
-        for (const auto& el: vec ) {
-            std::cout << el << std::endl;
-        }
-    }
-}
+
 
 namespace ch9::ex6 {
 
 
 
-    std::string get_from_dictionary(const std::string& word) { // return init word if not finded
-        std::string result = word;
-        ex1::str_tolower(result);
+    void format_by_dictionary( std::string& word) { // return init word if not found
+        std::string temp = word;
+        ex1::str_tolower(temp);
         for (const auto& el: nt_dictionary) {
-            if (result == el.first)
-                return el.second;
+            if (temp == el.first) {
+                word = el.second;
+                return;
+            }
         }
 
-        return word;
     }
 
-    std::string split_word_and_symbols( std::string& word) {
-        std::string symbols_after_word;
 
-        while (!word.empty() && std::ispunct(word.back())) {
-            symbols_after_word += word.back();
-            word.pop_back();
-        }
-
-        return symbols_after_word;
-    }
-    void add_word_separately_symbols_to_vector(const std::string& word, const std::string& symbols,
+    void add_word_separately_symbols_to_vector(const std::string& word,
+        const std::pair<std::string,std::string>& symbols,
         std::vector<std::string>& vector)
     {
+        if (!symbols.first.empty())
+            vector.push_back(symbols.first);
+
         if (!word.empty())
             vector.push_back(word);
 
-        if (!symbols.empty())
-            vector.push_back(symbols);
+        if (!symbols.second.empty())
+            vector.push_back(symbols.second);
     }
 
     std::vector<std::string> get_formatted_words_from_line(const std::string& line) {
@@ -179,21 +310,19 @@ namespace ch9::ex6 {
         std::ranges::sort(str_vec.begin(), str_vec.end());
     }
 
-    std::vector<std::string> get_formatted_words_from_stream(std::istream& is) {
-        std::string word;
-        std::vector<std::string> result;
 
-        while (is >> word) {
-            auto symbols_after_word = split_word_and_symbols(word);
-            word = get_from_dictionary(word);
-            add_word_separately_symbols_to_vector(word,symbols_after_word,result);
-        }
+
+    std::vector<std::string> get_formatted_words_from_stream(std::istream& is) {
+        std::vector<std::string> result = read_words_from_stream(is);
+
+        for (auto& word: result)
+            format_by_dictionary(word);
 
         return result;
     }
 
     std::vector<std::string> get_sorted_and_formatted_words_from_file(const std::string& filename) {
-        auto isf = ex1::open_input_stream(filename);
+        auto isf = open_input_stream(filename);
         std::vector<std::string> result = get_formatted_words_from_stream(isf);
         sort_strings(result);
 
@@ -388,12 +517,7 @@ namespace ch9::ex3 {
     [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name) {
        return ex1::read_file(file_name);
     }
-    void write_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
-        auto ofs = ex1::open_output_stream(file_name);
-        for (const auto& el: vec) {
-            ofs << el << ' ';
-        }
-    }
+
     void remove_vowels_from_vector(std::vector<std::string>& vec) {
         for (auto& el: vec) {
             remove_vowels_from_word(el);
@@ -444,20 +568,7 @@ namespace ch9::ex3 {
 
 
 namespace ch9::ex1 {
-    std::ifstream open_input_stream(const std::string& file_name) {
-        std::ifstream ifs {file_name};
-        if (!ifs)
-            error("can't open file");
 
-        return ifs;
-    }
-    [[nodiscard]]std::ofstream open_output_stream(const std::string& file_name) {
-        std::ofstream ofs {file_name};
-        if (!ofs)
-            error("can't open file");
-
-        return ofs;
-    }
     std::vector<std::string> read_file(const std::string& file_name) {
         std::vector<std::string> result;
         auto ifs = open_input_stream(file_name);
@@ -576,10 +687,7 @@ namespace ch9::drill {
          int width = 40;
          return os <<  std::format("|{:>20}\t|{:>20}\t|{:>40}\t|{:>15}\t|\n",
              row.first_name,row.last_name,row.email,row.t_number);
-         /*<< std::setw(width) <<  row.first_name << '|'
-            << std::setw(width) << row.last_name << '|'
-            << std::setw(width) << row.email << '|'
-            << std::setw(width) << row.t_number << '\n';*/
+
 
     }
 
@@ -629,7 +737,7 @@ namespace ch9::drill {
 
 namespace  ch9::drill11 {
      std::vector<Point> read_points_from_file(const std::string& file_name) {
-         std::ifstream ifs = ex1::open_input_stream(file_name);
+         std::ifstream ifs = open_input_stream(file_name);
 
          std::vector<Point> points;
          Point p{};
@@ -647,7 +755,7 @@ namespace  ch9::drill11 {
          return ofs;
      }
      void write_points_to_file(const std::string& file_name, const std::vector<Point>& points) {
-         std::ofstream ofs = ex1::open_output_stream(file_name);
+         std::ofstream ofs = open_output_stream(file_name);
          write_points_to_filestream(ofs,points);
 
      }
@@ -677,7 +785,7 @@ namespace  ch9::drill11 {
     }
 
     std::vector<Point> write_points_to_file_with_prompt(const std::string& file_name) {
-         std::ofstream ofs = ex1::open_output_stream(file_name);
+         std::ofstream ofs = open_output_stream(file_name);
 
          std::vector<Point> original_points = read_from_prompt();
 
@@ -695,8 +803,6 @@ namespace  ch9::drill11 {
 
     void test() {
          const std::string filename = "mydata.txt";
-         //write_points_to_file(filename,{Point{1,2}, Point{4,5}});
-         //print_points(read_points_from_file(filename));
 
          auto original_points = write_points_to_file_with_prompt(filename);
          auto processed_points = read_points_from_file(filename);

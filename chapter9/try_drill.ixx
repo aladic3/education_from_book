@@ -11,14 +11,33 @@ module;
 export module try_drill;
 
 namespace ch9 {
-    void print_vec_of_strings(const std::vector<std::string>& vec);
+
+    export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
+    std::vector<std::string> read_words_from_stream(std::istream& is); //symbols after word is separated
+    export void print_vec_of_strings(const std::vector<std::string>& vec);
+    export std::ostream& operator<<(std::ostream& os, const std::vector<char>& file); //print file
+    export std::istream& operator>>(std::istream& is,  std::vector<char>& file); //read from stream
+    std::ifstream open_input_stream(const std::string& file_name);
+    std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word);
+    std::ofstream open_output_stream(const std::string& file_name);
+    std::vector<std::string> get_separated_words_from_stream(std::istream& is);
+}
+
+namespace  ch9::ex11 {
+    export std::vector<char> read_file_to_char_vector(const std::string& filename);
+    export std::vector<std::string> read_file_to_str_vector(const std::string& filename);
+    export void reverse_order_of_characters( std::vector<char>& file);
+    export void reverse_order_of_words(std::vector<std::string>& file);
+
+    export void test();
+
 }
 
 namespace ch9::ex9_10 {
     export std::vector<std::string> split(const std::string& s);
     export std::vector<std::string> split(const std::string& s, const std::string& w); //w is characters
 
-    std::vector<std::string> get_separated_words_from_stream(std::istream& is);
+
     std::vector<std::string> get_separated_words_from_string(const std::string& s, const std::string& w);
 
     export void test();
@@ -28,7 +47,7 @@ namespace ch9::ex5 {
     export std::vector<std::string> read_std_cin(char terminator);
     export void print(const std::vector<std::pair<char,std::string>>&, const std::string& );
     export std::vector<std::pair<char,std::string>> get_all_characters_classifications(const std::string& word);
-    std::pair<char,std::string>  get_pair_one_character_classifications(const char ch);
+    std::pair<char,std::string>  get_pair_one_character_classifications( char ch);
 
     export void test();
 
@@ -40,7 +59,7 @@ namespace ch9::ex3 {
     const std::vector<char> vowels {'a', 'e', 'i', 'o', 'u', 'y'};
 
     export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
-    export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
+
     export void remove_vowels_from_vector(std::vector<std::string>& vec);
     void remove_vowels_from_word(std::string& word);
     bool is_vowel_letter( char letter);
@@ -80,10 +99,10 @@ namespace ch9::ex6 {
 
     std::vector<std::string> get_formatted_words_from_stream(std::istream& is) ;  //essential part
 
-    std::string get_from_dictionary(const std::string& word);
-    std::string split_word_and_symbols( std::string& word);
+    void format_by_dictionary(std::string& word);
     void sort_strings(std::vector<std::string>& str_vec) ;
-    void add_word_separately_symbols_to_vector(const std::string& word, const std::string& symbols,
+    void add_word_separately_symbols_to_vector(const std::string& word,
+        const  std::pair<std::string,std::string>& symbols,
         std::vector<std::string>& vector);
 
     std::vector<std::string> get_formatted_words_from_line(const std::string& line); //essential part
@@ -107,8 +126,7 @@ namespace ch9::ex1 {
     export void write_line_to_file(const std::string& file_name, const std::vector<std::string>& vec);
     export  std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines);
 
-    std::ifstream open_input_stream(const std::string& file_name);
-    std::ofstream open_output_stream(const std::string& file_name);
+
 
     export void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os);
     export void print_vec_with_line_num(const std::vector<std::string>& str_v, std::ostream& os);
