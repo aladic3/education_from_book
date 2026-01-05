@@ -23,6 +23,34 @@ namespace ch9 {
     std::vector<std::string> get_separated_words_from_stream(std::istream& is);
 }
 
+namespace ch9::ex13 {
+    export struct Classifications {
+        Classifications() = default;
+
+        int letter = 0;
+        int whitespace = 0;
+        int decimal = 0;
+        int hexadecimal = 0;
+        int uppercase = 0;
+        int lowercase = 0;
+        int control = 0;
+        int punct = 0;
+        int printable = 0;
+        int grahp = 0;
+        int alphanumeric = 0;
+
+        int generous_count_char = 0;
+
+    };
+
+
+    export Classifications read_and_get_classifications(const std::string& filename);
+    void classification_single_char(Classifications& classifications, char ch);
+
+    export void test();
+
+}
+
 namespace  ch9::ex11 {
     export std::vector<char> read_file_to_char_vector(const std::string& filename);
     export std::vector<std::string> read_file_to_str_vector(const std::string& filename);

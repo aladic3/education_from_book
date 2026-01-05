@@ -9,7 +9,9 @@ module;
 #include <iostream>
 #include <sstream>
 #include <string>
-
+#include <functional>
+#include <vector>
+#include <utility>
 #include "../error.h"
 
 
@@ -96,6 +98,52 @@ namespace ch9 {
         return vec;
     }
 }
+
+
+namespace ch9::ex13 {
+    Classifications read_and_get_classifications(const std::string& filename) {
+        Classifications result;
+        char ch;
+        auto is = open_input_stream(filename);
+
+        while (is.get(ch))
+            classification_single_char(result,ch);
+
+        return result;
+
+    }
+    void classification_single_char(Classifications& classifications, char ch) {
+        std::vector<std::pair<bool, std::function<void()>>> classificating{
+                {std::isalpha(ch),[&classifications] {classifications.letter++;}},
+                {std::isspace(ch),[&classifications] {classifications.whitespace++;}},
+                {std::isdigit(ch),[&classifications] {classifications.decimal++;}},
+                {std::isxdigit(ch),[&classifications] {classifications.hexadecimal++;}},
+                {std::isupper(ch),[&classifications] {classifications.uppercase++;}},
+                {std::islower(ch),[&classifications] {classifications.lowercase++;}},
+                {std::iscntrl(ch),[&classifications] {classifications.control++;}},
+                {std::ispunct(ch),[&classifications] {classifications.punct++;}},
+                {std::isprint(ch),[&classifications] {classifications.printable++;}},
+                {std::isgraph(ch),[&classifications] {classifications.grahp++;}},
+                {std::isalnum(ch),[&classifications] {classifications.alphanumeric++;}},
+                {true,[&classifications] {classifications.generous_count_char++;}}
+        };
+
+        for (auto& [condition, action]: classificating)
+            if (condition)
+                action();
+
+
+
+    }
+
+    void test() {
+        const std::string filename {"readme.txt"};
+        auto classifications = read_and_get_classifications(filename);
+
+    }
+
+}
+
 
 namespace  ch9::ex11 {
     std::vector<char> read_file_to_char_vector(const std::string& filename) {
