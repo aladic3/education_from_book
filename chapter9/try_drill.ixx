@@ -13,21 +13,34 @@ export module try_drill;
 
 namespace ch9 {
     export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
-    std::vector<std::string> read_words_from_stream(std::istream& is); //symbols after word is separated
     export void print_vec_of_strings(const std::vector<std::string>& vec);
     export std::ostream& operator<<(std::ostream& os, const std::vector<char>& file); //print file
     export std::istream& operator>>(std::istream& is,  std::vector<char>& file); //read from stream
+    export std::vector<double> read_doubles_from_file(const std::string& filename, char terminator = '|');
+    export std::vector<int> read_ints_from_file(const std::string& filename, char terminator = '|');
+
     std::ifstream open_input_stream(const std::string& file_name);
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word);
     std::ofstream open_output_stream(const std::string& file_name);
     std::vector<std::string> get_separated_words_from_stream(std::istream& is);
-    export std::vector<double> read_numbers_from_file(const std::string& filename, char terminator = '|');
+    std::vector<std::string> read_words_from_stream(std::istream& is); //symbols after word is separated
+
+    void read_double(std::istream& is, std::vector<double>& vec);
+    void read_ints(std::istream& is, std::vector<int>& vec);
+    void try_recover_from_fail_bit(std::istream& is, char terminator);
 }
 
-namespace ch9::ex14 {
-    export std::vector<double> read_numbers_from_file(const std::string& filename, char terminator = '|');
+namespace ch9::ex14_15 {
+    export std::vector<double> read_doubles_from_file(const std::string& filename, char terminator = '|');
+    export std::vector<int> read_ints_from_file(const std::string& filename, char terminator = '|');
 
-    export void write_formatted_to_file(const std::string& filename, const std::vector<int>& vec);
+    void increase_count_of_value(std::vector<std::pair<int,int>>& value_counts, int value);
+
+    export void write_formatted_doubles_to_file(const std::string& filename, const std::vector<double>& vec);
+    export void write_formatted_pairs_to_file(const std::string& filename, const std::vector<std::pair<int,int>>& vec);
+    export std::vector<std::pair<int,int>> calculate_count_each_integer_in_vector(const std::vector<int>& vec);
+
+    void sort_pairs(std::vector<std::pair<int,int>>& vec);
 
     export void test();
 }

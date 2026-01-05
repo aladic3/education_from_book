@@ -20,6 +20,8 @@ module;
 module try_drill;
 
 namespace ch9 {
+
+
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word) {
         std::string symbols_after_word;
         std::string symbols_before_word;
@@ -97,45 +99,70 @@ namespace ch9 {
 
         return vec;
     }
-    void read_number(std::istream& is, std::vector<double>& vec) {
+    void read_double(std::istream& is, std::vector<double>& vec) {
         double input;
         while (is >> input) {
             vec.push_back(input);
         }
     }
 
-    void try_recover(std::istream& is, char terminator) {
+    void read_ints(std::istream& is, std::vector<int>& vec) {
+        int input;
+        while (is >> input) {
+            vec.push_back(input);
+        }
+    }
+
+    void try_recover_from_fail_bit(std::istream& is, char terminator) {
         char ch;
-        is.unget();
-        is.get(ch);
+
+        if (is.eof())
+            return;
+
+        is.clear();
+        is >> ch;
 
 
-        if (ch == terminator)
-            is.clear();
+        if (ch != terminator)
+            error("must be terminator");
 
     }
 
-    std::vector<double> read_numbers_from_file(const std::string& filename, char terminator) {
+    std::vector<double> read_doubles_from_file(const std::string& filename, char terminator) {
         std::vector<double> result;
         auto is = open_input_stream(filename);
 
-        read_number(is,result);
+        read_double(is,result);
 
         if (is.bad())
             error("Bad bit");
         if (is.fail())
-            try_recover(is,terminator);
+            try_recover_from_fail_bit(is,terminator);
+
+        return result;
+    }
+
+    std::vector<int> read_ints_from_file(const std::string& filename, char terminator) {
+        std::vector<int> result;
+        auto is = open_input_stream(filename);
+
+        read_ints(is,result);
+
+        if (is.bad())
+            error("Bad bit");
+        if (is.fail())
+            try_recover_from_fail_bit(is,terminator);
 
         return result;
     }
 }
 
-namespace ch9::ex14 {
-    std::vector<double> read_numbers_from_file(const std::string& filename, char terminator) {
-        return ch9::read_numbers_from_file(filename,terminator);
+namespace ch9::ex14_15 {
+    std::vector<double> read_doubles_from_file(const std::string& filename, char terminator) {
+        return ch9::read_doubles_from_file(filename,terminator);
     }
 
-    void write_formatted_to_file(const std::string& filename, const std::vector<double>& vec) {
+    void write_formatted_doubles_to_file(const std::string& filename, const std::vector<double>& vec) {
         auto os = open_output_stream(filename);
         os << std::scientific;
 
@@ -155,12 +182,73 @@ namespace ch9::ex14 {
 
     }
 
-    void test() {
-        constexpr std::string file_in {"double.txt"};
-        constexpr std::string file_out {"out.txt"};
+    std::vector<int> read_ints_from_file(const std::string& filename, char terminator) {
+        return ch9::read_ints_from_file(filename,terminator);
+    }
 
-        auto vec = read_numbers_from_file(file_in);
-        write_formatted_to_file(file_out, vec);
+    void increase_count_of_value(std::vector<std::pair<int,int>>& value_counts, int value) {
+        for (auto& pair: value_counts) {
+            if (pair.first == value) {
+                ++pair.second;
+                return;
+            }
+        }
+
+        value_counts.emplace_back(value,1);
+
+    }
+
+    std::vector<std::pair<int,int>> calculate_count_each_integer_in_vector(const std::vector<int>& vec) {
+        std::vector<std::pair<int,int>> value_counts;
+
+        for (auto el: vec)
+            increase_count_of_value(value_counts,el);
+
+
+        return value_counts;
+    }
+
+    void write_formatted_pairs_to_file(const std::string& filename, const std::vector<std::pair<int,int>>& vec) {
+        auto os = open_output_stream(filename);
+
+        for (auto pair: vec) {
+            os << pair.first << '\t' << pair.second << '\n';
+        }
+    }
+
+    void sort_pairs(std::vector<std::pair<int,int>>& vec) { //bubble method
+        for (int i = 0; i < vec.size() - 1; ++i)
+            for (int j = i+1; j < vec.size(); ++j) {
+                auto& a = vec[i];
+                auto& b = vec[j];
+
+                if (a.first > b.first)
+                    std::swap(a,b);
+            }
+    }
+
+    void test() {
+        try {
+            {
+                constexpr std::string file_in {"double.txt"};
+                constexpr std::string file_out {"out.txt"};
+
+                auto vec = read_doubles_from_file(file_in);
+                write_formatted_doubles_to_file(file_out, vec);
+            }
+
+            {
+                constexpr std::string file_in{"int.txt"};
+                constexpr std::string file_out{"int_out.txt"};
+
+                auto vec = read_ints_from_file(file_in);
+                auto value_and_counts = calculate_count_each_integer_in_vector(vec);
+                sort_pairs(value_and_counts);
+                write_formatted_pairs_to_file(file_out, value_and_counts);
+            }
+        } catch (std::exception& err) {
+            std::cerr << err.what();
+        }
 
     }
 }
