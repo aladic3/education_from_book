@@ -15,7 +15,7 @@ module;
 #include "../error.h"
 
 
-//import chapter8;
+
 
 module try_drill;
 
@@ -97,8 +97,73 @@ namespace ch9 {
 
         return vec;
     }
+    void read_number(std::istream& is, std::vector<double>& vec) {
+        double input;
+        while (is >> input) {
+            vec.push_back(input);
+        }
+    }
+
+    void try_recover(std::istream& is, char terminator) {
+        char ch;
+        is.unget();
+        is.get(ch);
+
+
+        if (ch == terminator)
+            is.clear();
+
+    }
+
+    std::vector<double> read_numbers_from_file(const std::string& filename, char terminator) {
+        std::vector<double> result;
+        auto is = open_input_stream(filename);
+
+        read_number(is,result);
+
+        if (is.bad())
+            error("Bad bit");
+        if (is.fail())
+            try_recover(is,terminator);
+
+        return result;
+    }
 }
 
+namespace ch9::ex14 {
+    std::vector<double> read_numbers_from_file(const std::string& filename, char terminator) {
+        return ch9::read_numbers_from_file(filename,terminator);
+    }
+
+    void write_formatted_to_file(const std::string& filename, const std::vector<double>& vec) {
+        auto os = open_output_stream(filename);
+        os << std::scientific;
+
+
+        for (int i = 0; i < vec.size(); ++i){
+            auto count_of_ch_per_line = 20;
+            auto precision = 8;
+            auto count_of_fields = 4;
+
+            os << std::setw(count_of_ch_per_line)
+                << std::setprecision(precision)
+                << vec[i];
+            if ((i+1) % count_of_fields == 0)
+                os << std::endl;
+        }
+
+
+    }
+
+    void test() {
+        constexpr std::string file_in {"double.txt"};
+        constexpr std::string file_out {"out.txt"};
+
+        auto vec = read_numbers_from_file(file_in);
+        write_formatted_to_file(file_out, vec);
+
+    }
+}
 
 namespace ch9::ex13 {
     Classifications read_and_get_classifications(const std::string& filename) {

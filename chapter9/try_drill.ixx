@@ -6,12 +6,12 @@ module;
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
+#import <iostream>
 
 export module try_drill;
 
-namespace ch9 {
 
+namespace ch9 {
     export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
     std::vector<std::string> read_words_from_stream(std::istream& is); //symbols after word is separated
     export void print_vec_of_strings(const std::vector<std::string>& vec);
@@ -21,7 +21,17 @@ namespace ch9 {
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word);
     std::ofstream open_output_stream(const std::string& file_name);
     std::vector<std::string> get_separated_words_from_stream(std::istream& is);
+    export std::vector<double> read_numbers_from_file(const std::string& filename, char terminator = '|');
 }
+
+namespace ch9::ex14 {
+    export std::vector<double> read_numbers_from_file(const std::string& filename, char terminator = '|');
+
+    export void write_formatted_to_file(const std::string& filename, const std::vector<int>& vec);
+
+    export void test();
+}
+
 
 namespace ch9::ex13 {
     export struct Classifications {
