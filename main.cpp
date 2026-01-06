@@ -5,7 +5,7 @@ import try_drill;
 
 int main() {
     try {
-        ch9::ex14_15::test();
+        ch9::ex17::test();
     }
     catch (...) {
         return -3;

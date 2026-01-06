@@ -19,6 +19,43 @@ module;
 
 module try_drill;
 
+namespace ch9::ex17 {
+
+    std::vector<Reading> input_readings(const std::string& file_name) {
+        std::vector<Reading> result;
+        auto is = open_input_stream(file_name);
+        int hour; double temperature;
+        char suffix;
+
+        while (is >> hour >> temperature >> suffix)
+            result.emplace_back(hour,temperature, suffix);
+
+        return result;
+    }
+    void print_readings( const std::string& file_name, const std::vector<Reading>& readings) {
+        auto os = open_output_stream(file_name);
+
+        for (auto& el: readings)
+            os << el.hour() << '\t' << el.temperature() << '\n';
+
+    }
+
+    void test() {
+        try {
+            constexpr std::string file_in {"readings_in.txt"};
+            constexpr std::string file_out {"readings_out.txt"};
+
+            auto readings = input_readings(file_in);
+            print_readings(file_out, readings);
+
+        } catch (std::exception& ex) {
+            std::cerr << ex.what();
+        }
+    }
+
+
+}
+
 namespace ch9 {
 
 
@@ -157,7 +194,16 @@ namespace ch9 {
     }
 }
 
-namespace ch9::ex14_15 {
+namespace ch9::ex14_16 {
+    int get_sum(const std::vector<int>& vec) {
+        auto sum = 0;
+        for (auto el: vec)
+            sum += el;
+
+        return sum;
+    }
+
+
     std::vector<double> read_doubles_from_file(const std::string& filename, char terminator) {
         return ch9::read_doubles_from_file(filename,terminator);
     }
@@ -212,7 +258,11 @@ namespace ch9::ex14_15 {
         auto os = open_output_stream(filename);
 
         for (auto pair: vec) {
-            os << pair.first << '\t' << pair.second << '\n';
+            os << pair.first;
+            if (pair.second > 1)
+                os << '\t' << pair.second << '\n';
+            else
+                os << '\n';
         }
     }
 
@@ -244,6 +294,7 @@ namespace ch9::ex14_15 {
                 auto vec = read_ints_from_file(file_in);
                 auto value_and_counts = calculate_count_each_integer_in_vector(vec);
                 sort_pairs(value_and_counts);
+                value_and_counts.emplace_back(get_sum(vec), 0);
                 write_formatted_pairs_to_file(file_out, value_and_counts);
             }
         } catch (std::exception& err) {
@@ -852,7 +903,7 @@ namespace ch9::ex1 {
 
 }
 
-//using namespace ch8::try_drill_ex;
+
 namespace ch9::drill {
      void print_birthyear() {
          int birth_year = 2001;

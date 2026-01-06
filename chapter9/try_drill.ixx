@@ -8,6 +8,8 @@ module;
 #include <vector>
 #import <iostream>
 
+#include "../error.h"
+
 export module try_drill;
 
 
@@ -30,7 +32,7 @@ namespace ch9 {
     void try_recover_from_fail_bit(std::istream& is, char terminator);
 }
 
-namespace ch9::ex14_15 {
+namespace ch9::ex14_16 {
     export std::vector<double> read_doubles_from_file(const std::string& filename, char terminator = '|');
     export std::vector<int> read_ints_from_file(const std::string& filename, char terminator = '|');
 
@@ -39,12 +41,45 @@ namespace ch9::ex14_15 {
     export void write_formatted_doubles_to_file(const std::string& filename, const std::vector<double>& vec);
     export void write_formatted_pairs_to_file(const std::string& filename, const std::vector<std::pair<int,int>>& vec);
     export std::vector<std::pair<int,int>> calculate_count_each_integer_in_vector(const std::vector<int>& vec);
+    int get_sum(const std::vector<int>& vec);
 
     void sort_pairs(std::vector<std::pair<int,int>>& vec);
 
     export void test();
 }
 
+namespace ch9::ex17 {
+    export struct Reading {
+        Reading(int h, double t, char suffix): _hour(h), _temperature(t){
+            if (h < 0 || h > 23)
+                error("bad hour in Reading.");
+
+            switch (suffix) {
+                case 'c': //get Fahrenheit
+                    _temperature*= 9./5.;
+                    _temperature+= 32;
+                    break;
+                case 'f': // also get from init
+                    break;
+
+                    default:
+                    error("bad suffix");
+            }
+        }
+        [[nodiscard]] int hour() const{return _hour;}
+        [[nodiscard]] double temperature() const {return _temperature;}
+    private:
+        int _hour; //[0;23]
+        double _temperature; //in Fahrenheit
+    };
+
+    export std::vector<Reading> input_readings(const std::string& file_name);
+    export void print_readings(const std::string& file_name, const std::vector<Reading>& readings);
+
+    export void test();
+
+
+}
 
 namespace ch9::ex13 {
     export struct Classifications {
