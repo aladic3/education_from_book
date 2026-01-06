@@ -13,22 +13,29 @@ module;
 #include <vector>
 #include <utility>
 #include "../error.h"
-
+#include <ranges>
+import chapter8;
 
 
 
 module try_drill;
 
-namespace ch9::ex17 {
-
+namespace ch9::ex17_19 {
+    using namespace ch8::try_drill_ex;
     std::vector<Reading> input_readings(const std::string& file_name) {
+
         std::vector<Reading> result;
         auto is = open_input_stream(file_name);
         int hour; double temperature;
         char suffix;
+        Date date;
 
-        while (is >> hour >> temperature >> suffix)
-            result.emplace_back(hour,temperature, suffix);
+        while (is >> date >> hour >> temperature >> suffix) // date is year >> month >> day
+            result.emplace_back(date,hour,temperature, suffix);
+
+
+        if (is.fail())
+            try_recover_from_fail_bit(is);
 
         return result;
     }
@@ -36,14 +43,14 @@ namespace ch9::ex17 {
         auto os = open_output_stream(file_name);
 
         for (auto& el: readings)
-            os << el.hour() << '\t' << el.temperature() << '\n';
+            os << el.date() << '\t' << el.hour() << '\t' << el.temperature() << '\n';
 
     }
 
     void test() {
         try {
-            constexpr std::string file_in {"readings_in.txt"};
-            constexpr std::string file_out {"readings_out.txt"};
+            const std::string file_in {"readings_in.txt"};
+            const std::string file_out {"readings_out.txt"};
 
             auto readings = input_readings(file_in);
             print_readings(file_out, readings);
@@ -57,8 +64,6 @@ namespace ch9::ex17 {
 }
 
 namespace ch9 {
-
-
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word) {
         std::string symbols_after_word;
         std::string symbols_before_word;
@@ -153,15 +158,14 @@ namespace ch9 {
     void try_recover_from_fail_bit(std::istream& is, char terminator) {
         char ch;
 
-        if (is.eof())
-            return;
-
         is.clear();
         is >> ch;
 
+        if (is.eof())
+            return;
 
         if (ch != terminator)
-            error("must be terminator");
+            error("must be terminator" );
 
     }
 
@@ -280,16 +284,16 @@ namespace ch9::ex14_16 {
     void test() {
         try {
             {
-                constexpr std::string file_in {"double.txt"};
-                constexpr std::string file_out {"out.txt"};
+                const std::string file_in {"double.txt"};
+                const std::string file_out {"out.txt"};
 
                 auto vec = read_doubles_from_file(file_in);
                 write_formatted_doubles_to_file(file_out, vec);
             }
 
             {
-                constexpr std::string file_in{"int.txt"};
-                constexpr std::string file_out{"int_out.txt"};
+                const std::string file_in{"int.txt"};
+                const std::string file_out{"int_out.txt"};
 
                 auto vec = read_ints_from_file(file_in);
                 auto value_and_counts = calculate_count_each_integer_in_vector(vec);
@@ -392,16 +396,16 @@ namespace  ch9::ex11 {
 
 
     void test() {
-        constexpr std::string filename_in {"readme.txt"};
+        const std::string filename_in {"readme.txt"};
         auto file  = read_file_to_char_vector(filename_in);
         reverse_order_of_characters(file);
 
-        constexpr std::string filename_out {"readme_out.txt"};
+        const std::string filename_out {"readme_out.txt"};
         auto os  = open_output_stream(filename_out);
         os << file;
         os.close();
 
-        constexpr std::string filename_out2 {"readme_out2.txt"};
+        const std::string filename_out2 {"readme_out2.txt"};
         auto file2 = read_file_to_str_vector(filename_in);
         reverse_order_of_words(file2);
         write_to_file(filename_out2,file2);
@@ -559,7 +563,7 @@ namespace ch9::ex6 {
     }
 
     void sort_strings(std::vector<std::string>& str_vec) {
-        std::ranges::sort(str_vec.begin(), str_vec.end());
+        std::ranges::sort(str_vec);
     }
 
 
@@ -1012,7 +1016,7 @@ namespace  ch9::drill11 {
 
      }
 
-    std::vector<Point> read_points_count_times(const int count_points, std::istream& is){
+    std::vector<Point> read_points_count_times(int count_points, std::istream& is){
         std::vector<Point> p_vector;
         for (int i = 0; i < count_points && is; ++i) {
             Point p{};

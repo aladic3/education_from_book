@@ -267,6 +267,14 @@ namespace ch8::try_drill_ex {
         return os << d.get_year().y << '/' << d.get_month() << '/' << d.get_day().month_day << " " << d.get_weekday();
     }
 
+    std::istream& operator>>(std::istream& is, Date& d) {
+        if (int day, year, month; is >> year >> month >> day)
+            d = Date{Year(year), static_cast<Month>(month), day};
+        else
+            is.clear(std::ios_base::failbit);
+
+        return is;
+    }
 
     Month& operator++(Month& month) {
         month == Month::dec ? month = Month::jan

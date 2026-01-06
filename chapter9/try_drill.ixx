@@ -9,6 +9,7 @@ module;
 #import <iostream>
 
 #include "../error.h"
+import chapter8;
 
 export module try_drill;
 
@@ -29,7 +30,7 @@ namespace ch9 {
 
     void read_double(std::istream& is, std::vector<double>& vec);
     void read_ints(std::istream& is, std::vector<int>& vec);
-    void try_recover_from_fail_bit(std::istream& is, char terminator);
+    void try_recover_from_fail_bit(std::istream& is, char terminator= '|');
 }
 
 namespace ch9::ex14_16 {
@@ -48,29 +49,41 @@ namespace ch9::ex14_16 {
     export void test();
 }
 
-namespace ch9::ex17 {
-    export struct Reading {
-        Reading(int h, double t, char suffix): _hour(h), _temperature(t){
+namespace ch9::ex17_19 {
+    using namespace ch8::try_drill_ex;
+
+    export struct  Reading {
+        Reading(const Date& date, int h, double t, char suffix):_date(date), _hour(h), _temperature(t){
             if (h < 0 || h > 23)
                 error("bad hour in Reading.");
 
+
             switch (suffix) {
-                case 'c': //get Fahrenheit
-                    _temperature*= 9./5.;
-                    _temperature+= 32;
-                    break;
-                case 'f': // also get from init
-                    break;
+                    case 'c':
+                        //get Fahrenheit
+                        _temperature*= 9./5.;
+                        _temperature+= 32;
+                        break;
+
+                    case 'f': // also get from init
+                        break;
 
                     default:
-                    error("bad suffix");
+                        error("bad suffix");
+
             }
+
+
         }
+        [[nodiscard]] Date date() const {return _date;}
         [[nodiscard]] int hour() const{return _hour;}
         [[nodiscard]] double temperature() const {return _temperature;}
     private:
+        Date _date;
         int _hour; //[0;23]
         double _temperature; //in Fahrenheit
+
+        //void valid_suffix(char suffix);
     };
 
     export std::vector<Reading> input_readings(const std::string& file_name);
@@ -268,7 +281,7 @@ namespace  ch9::drill11 {
     export  void write_points_to_file(const std::string& file_name, const std::vector<Point>& points);
     export std::vector<Point> write_points_to_file_with_prompt(const std::string& file_name);
 
-    std::vector<Point> read_points_count_times(const int count_points, std::istream& is);
+    std::vector<Point> read_points_count_times(int count_points, std::istream& is);
     std::vector<Point> read_from_prompt();
     std::ofstream& write_points_to_filestream(std::ofstream& ofs, const std::vector<Point>& points);
     void print_points(const std::vector<Point>& points_v);
