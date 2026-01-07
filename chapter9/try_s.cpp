@@ -4,6 +4,7 @@
 module;
 
 #include <algorithm>
+#include <numeric>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -21,14 +22,63 @@ import chapter8;
 module try_drill;
 
 namespace ch9::ex17_19 {
-    using namespace ch8::try_drill_ex;
+    struct Reading;
+
+
+
+    std::vector<double> get_temperatures(const std::vector<Reading>& readings) {
+        std::vector<double> result;
+
+        for (auto& el: readings)
+            result.push_back(el.temperature());
+
+        return result;
+    }
+    std::pair<double,double> calculate_mean_and_median(const std::vector<Reading>& readings){
+            std::pair<double, double> mean_and_median;
+
+            auto copy_v = get_temperatures(readings);
+
+            std::sort(copy_v.begin(),copy_v.end());
+            double sum = std::accumulate(copy_v.begin(), copy_v.end(), 0.0);
+            const auto& sorted_v = copy_v;
+            const auto size  = copy_v.size();
+            const auto half_size = size /2;
+            auto mean = sum / size;
+            auto median = size % 2 == 0 ? (sorted_v[half_size-1] + sorted_v[half_size]) / 2.
+                 : sorted_v[half_size+1];
+
+            mean_and_median.first = mean;
+            mean_and_median.second = median;
+
+            return mean_and_median;
+    }
+
+    void Reading::valid_suffix(char suffix){
+        switch (suffix) {
+        case 'c':
+            //get Fahrenheit
+            _temperature*= 9./5.;
+            _temperature+= 32;
+            break;
+
+        case 'f': // also get from init
+            break;
+
+        default:
+            error("bad suffix");
+        }
+
+        _suffix = 'f';
+    }
+
     std::vector<Reading> input_readings(const std::string& file_name) {
 
         std::vector<Reading> result;
         auto is = open_input_stream(file_name);
         int hour; double temperature;
         char suffix;
-        Date date;
+        ch8::try_drill_ex::Date date;
 
         while (is >> date >> hour >> temperature >> suffix) // date is year >> month >> day
             result.emplace_back(date,hour,temperature, suffix);
@@ -43,17 +93,26 @@ namespace ch9::ex17_19 {
         auto os = open_output_stream(file_name);
 
         for (auto& el: readings)
-            os << el.date() << '\t' << el.hour() << '\t' << el.temperature() << '\n';
+            os << el.date() << '\t' << el.hour() << '\t' << el.temperature() << '\t'<< el.suffix() << '\n';
 
     }
 
     void test() {
         try {
-            const std::string file_in {"readings_in.txt"};
-            const std::string file_out {"readings_out.txt"};
+            {
+                const std::string file_in {"readings_in.txt"};
+                const std::string file_out {"readings_out.txt"};
 
-            auto readings = input_readings(file_in);
-            print_readings(file_out, readings);
+                auto readings = input_readings(file_in);
+                print_readings(file_out, readings);
+            }
+
+            {
+                const std::string file_in {"readings_out.txt"};
+                auto readings = input_readings(file_in);
+                auto mean_median = calculate_mean_and_median(readings);
+            }
+
 
         } catch (std::exception& ex) {
             std::cerr << ex.what();
@@ -64,6 +123,13 @@ namespace ch9::ex17_19 {
 }
 
 namespace ch9 {
+    std::ostream& operator<< (std::ostream& os, const ch8::try_drill_ex::Date& date) {
+        return os << date.get_year().y << ' '
+                << static_cast<int>(date.get_month()) << ' '
+                 << date.get_day().month_day << '\t';
+
+    }
+
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word) {
         std::string symbols_after_word;
         std::string symbols_before_word;
@@ -940,7 +1006,6 @@ namespace ch9::drill {
      }
 
     std::ostream& operator<<(std::ostream& os, const UserInfo& row){
-         int width = 40;
          return os <<  std::format("|{:>20}\t|{:>20}\t|{:>40}\t|{:>15}\t|\n",
              row.first_name,row.last_name,row.email,row.t_number);
 

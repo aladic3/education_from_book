@@ -30,7 +30,7 @@ namespace ch8::try_drill_ex {
 
     export  std::ostream& operator<< (std::ostream& os, Weekday w);
     export  std::ostream& operator<<( std::ostream& os, Month month);
-    export std::ostream& operator<<(std::ostream& os, const Date& d);
+    std::ostream& operator<<(std::ostream& os, const Date& d);
     export std::istream& operator>>(std::istream& is, Date& d);
     export Month& operator++(Month& month);
     export Weekday& operator++(Weekday& weekday);

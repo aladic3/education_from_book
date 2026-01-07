@@ -21,6 +21,7 @@ namespace ch9 {
     export std::istream& operator>>(std::istream& is,  std::vector<char>& file); //read from stream
     export std::vector<double> read_doubles_from_file(const std::string& filename, char terminator = '|');
     export std::vector<int> read_ints_from_file(const std::string& filename, char terminator = '|');
+    export std::ostream& operator<< (std::ostream& os, const ch8::try_drill_ex::Date& date);
 
     std::ifstream open_input_stream(const std::string& file_name);
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word);
@@ -50,41 +51,33 @@ namespace ch9::ex14_16 {
 }
 
 namespace ch9::ex17_19 {
-    using namespace ch8::try_drill_ex;
+    //using namespace ch8::try_drill_ex;
 
     export struct  Reading {
-        Reading(const Date& date, int h, double t, char suffix):_date(date), _hour(h), _temperature(t){
+        Reading(const ch8::try_drill_ex::Date& date, int h, double t, char suffix = 'f'):
+                _date(date), _hour(h), _temperature(t){
             if (h < 0 || h > 23)
                 error("bad hour in Reading.");
 
-
-            switch (suffix) {
-                    case 'c':
-                        //get Fahrenheit
-                        _temperature*= 9./5.;
-                        _temperature+= 32;
-                        break;
-
-                    case 'f': // also get from init
-                        break;
-
-                    default:
-                        error("bad suffix");
-
-            }
-
+            valid_suffix(suffix);
 
         }
-        [[nodiscard]] Date date() const {return _date;}
+        [[nodiscard]] ch8::try_drill_ex::Date date() const {return _date;}
         [[nodiscard]] int hour() const{return _hour;}
         [[nodiscard]] double temperature() const {return _temperature;}
+        [[nodiscard]] char suffix() const {return _suffix;}
     private:
-        Date _date;
+        ch8::try_drill_ex::Date _date;
         int _hour; //[0;23]
         double _temperature; //in Fahrenheit
+        char _suffix;
 
-        //void valid_suffix(char suffix);
+        void valid_suffix(char suffix);
     };
+
+
+    std::vector<double> get_temperatures(const std::vector<Reading>& readings);
+    export std::pair<double,double> calculate_mean_and_median(const std::vector<Reading>& readings);
 
     export std::vector<Reading> input_readings(const std::string& file_name);
     export void print_readings(const std::string& file_name, const std::vector<Reading>& readings);
