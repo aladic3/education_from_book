@@ -34,6 +34,46 @@ namespace ch9 {
     void try_recover_from_fail_bit(std::istream& is, char terminator= '|');
 }
 
+namespace ch9::ex21_22 {
+    export class Roman;
+
+
+    int roman_ch_to_int(char ch);
+    bool is_valid_roman_str(const std::string& roman_str);
+    bool is_valid_roman_int(int roman_int);
+    int roman_str_to_int(const std::string& roman_str);
+    std::string roman_int_to_str(int roman_int);
+    void normalize_roman_str(std::string& roman_str); // to upper_case
+    std::istream& operator>>(std::istream&, Roman& roman);
+    std::ostream& operator<<(std::ostream&, const Roman& roman);
+
+    class Roman {
+    public:
+        Roman(std::string roman_str):roman_str(std::move(roman_str)) {
+            if (!is_valid_roman_str(roman_str))
+                error("Bad string roman");
+
+            normalize_roman_str(roman_str);
+            roman_int = roman_str_to_int(roman_str);
+        }
+        Roman(int roman_int):roman_int(roman_int) {
+            if (!is_valid_roman_int(roman_int))
+                error("Bad int roman");
+
+            roman_str = roman_int_to_str(roman_int);
+        }
+
+        const std::string& get_roman_str()const {return roman_str;}
+        int get_roman_int() const {return roman_int;}
+        void set_roman_str(const std::string& roman_str);
+        void set_roman_int(int roman_int);
+
+    private:
+        std::string roman_str{"I"};
+        int roman_int = 1;
+    };
+}
+
 namespace ch9::ex14_16 {
     export std::vector<double> read_doubles_from_file(const std::string& filename, char terminator = '|');
     export std::vector<int> read_ints_from_file(const std::string& filename, char terminator = '|');
@@ -51,7 +91,7 @@ namespace ch9::ex14_16 {
 }
 
 namespace ch9::ex17_19 {
-    //using namespace ch8::try_drill_ex;
+
 
     export struct  Reading {
         Reading(const ch8::try_drill_ex::Date& date, int h, double t, char suffix = 'f'):
