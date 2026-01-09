@@ -1,3 +1,6 @@
+#include <iostream>
+#include "error.h"
+
 import try_drill;
 
 
@@ -5,9 +8,10 @@ import try_drill;
 
 int main() {
     try {
-        ch9::ex17_19::test();
+        ch9::ex21_22::test();
     }
-    catch (...) {
+    catch (std::exception& err) {
+        std::cerr << err.what();
         return -3;
     }
 

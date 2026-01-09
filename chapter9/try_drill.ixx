@@ -13,6 +13,72 @@ import chapter8;
 
 export module try_drill;
 
+namespace ch9::test {
+    std::vector<std::pair<std::string, int>> good_romans = {
+
+
+        {"V", 5},
+        {"MCM", 1900},
+        {"MM", 2000},
+        {"L", 50},
+        {"LVIII", 58},
+        {"VI", 6},
+        {"D", 500},
+        {"MMMCMXCIX", 3999},
+
+        {"IX", 9},
+        {"X", 10},
+        {"XIV", 14},
+        {"XV", 15},
+        {"XIX", 19},
+        {"XX", 20},
+        {"IV", 4},
+        {"XL", 40},
+        {"XLIV", 44},
+        {"XLIX", 49},
+
+        {"III", 3},
+
+        {"XC", 90},
+        {"XCIV", 94},
+        {"C", 100},
+        {"CD", 400},
+        {"CDXLII", 442},
+
+        {"I", 1},
+        {"II", 2},
+        {"CM", 900},
+        {"CMXLIV", 944},
+        {"M", 1000},
+        {"MCMXCIV", 1994},
+        {"MMXXIV", 2024},
+
+    };
+
+    std::vector<std::string> bad_romans = {
+        "IIV",      // TODO двойное вычитание
+        "XXC",      // TODO неправильный порядок
+        "MCMC",     // TODO повтор вычитательной конструкции
+        "IIII",     // > 3 повторов I
+        "VV",       // V нельзя повторять
+        "LL",       // L нельзя повторять
+        "DD",       // D нельзя повторять
+        "VX",       // нельзя вычитать V
+        "IL",       // I нельзя вычитать из L
+        "IC",       // I нельзя вычитать из C
+        "ID",       // запрещено
+        "IM",       // запрещено
+        "XM",       // X нельзя вычитать из M
+        "XD",       // X нельзя вычитать из D
+        "LC",       // L не участвует в вычитании
+        "DM",       // D не участвует в вычитании
+
+        "DDM",      // повтор D + порядок
+        "MMMM",     // > 3999
+        "ABC",      // мусор
+        "",         // пустая строка
+    };
+}
 
 namespace ch9 {
     export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
@@ -37,7 +103,9 @@ namespace ch9 {
 namespace ch9::ex21_22 {
     export class Roman;
 
-
+    bool is_good_subtraction(char current_roman, char last_roman);
+    bool is_good_repeating(char last_roman, char current_roman, int& count_repeat);
+    bool is_roman(char current_roman);
     int roman_ch_to_int(char ch);
     bool is_valid_roman_str(const std::string& roman_str);
     bool is_valid_roman_int(int roman_int);
@@ -47,13 +115,15 @@ namespace ch9::ex21_22 {
     std::istream& operator>>(std::istream&, Roman& roman);
     std::ostream& operator<<(std::ostream&, const Roman& roman);
 
+    export void test();
+
     class Roman {
     public:
-        Roman(std::string roman_str):roman_str(std::move(roman_str)) {
+        Roman(std::string roman_str):roman_str(roman_str) {
             if (!is_valid_roman_str(roman_str))
-                error("Bad string roman");
+                error("Bad string roman:"+roman_str);
 
-            normalize_roman_str(roman_str);
+            // TODO normalize_roman_str(roman_str);
             roman_int = roman_str_to_int(roman_str);
         }
         Roman(int roman_int):roman_int(roman_int) {
@@ -63,8 +133,8 @@ namespace ch9::ex21_22 {
             roman_str = roman_int_to_str(roman_int);
         }
 
-        const std::string& get_roman_str()const {return roman_str;}
-        int get_roman_int() const {return roman_int;}
+        [[nodiscard]] const std::string& get_roman_str()const {return roman_str;}
+        [[nodiscard]] int get_roman_int() const {return roman_int;}
         void set_roman_str(const std::string& roman_str);
         void set_roman_int(int roman_int);
 
