@@ -225,19 +225,19 @@ namespace ch9::ex21_22 {
     bool is_valid_roman_int(int roman_int);
     int roman_str_to_int(const std::string& roman_str);
     std::string roman_int_to_str(int roman_int);
-    void normalize_roman_str(std::string& roman_str); // to upper_case
-    std::istream& operator>>(std::istream&, Roman& roman);
-    std::ostream& operator<<(std::ostream&, const Roman& roman);
+
+    std::istream& operator>>(std::istream& is, Roman& roman);
+    std::ostream& operator<<(std::ostream& os, const Roman& roman);
 
     export void test();
 
     class Roman {
     public:
-        Roman(std::string roman_str):roman_str(roman_str) {
+        Roman()= default;
+        Roman(const std::string& roman_str):roman_str(roman_str) {
             if (!is_valid_roman_str(roman_str))
                 error("Bad string roman:"+roman_str);
 
-            // TODO normalize_roman_str(roman_str);
             roman_int = roman_str_to_int(roman_str);
         }
         Roman(int roman_int):roman_int(roman_int) {

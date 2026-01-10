@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BackendCodeEditorSettings">
-    <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=603B6C8F_002DA076_002D5D41_002D86D2_002DCFD4BB3A7AED_002Fd_003Achapter9_002Ff_003ARoman_002Ecpp/@EntryIndexedValue" value="ExplicitlyExcluded" type="string" />
+    <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=603B6C8F_002DA076_002D5D41_002D86D2_002DCFD4BB3A7AED_002Fd_003Achapter9_002Ff_003ARoman_002Ecpp/@EntryIndexedValue" value="ForceIncluded" type="string" />
     <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=603B6C8F_002DA076_002D5D41_002D86D2_002DCFD4BB3A7AED_002Fd_003Achapter9_002Ff_003Atry_005Fs_002Ecpp/@EntryIndexedValue" value="ExplicitlyExcluded" type="string" />
     <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=603B6C8F_002DA076_002D5D41_002D86D2_002DCFD4BB3A7AED_002Ff_003Amain_002Ecpp/@EntryIndexedValue" value="ExplicitlyExcluded" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CDeclarationWithImplicitIntType/@EntryIndexedValue" value="WARNING" type="string" />

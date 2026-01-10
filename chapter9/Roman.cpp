@@ -7,11 +7,13 @@ module;
 #include <utility>
 #include <vector>
 #import <iostream>
+#include <sstream>
 
 #include "../error.h"
 
 
 module try_drill;
+
 
 namespace ch9::ex21_22 {
     class Roman;
@@ -160,28 +162,69 @@ namespace ch9::ex21_22 {
         return result;
     }
 
-    void normalize_roman_str(std::string& roman_str){
+    bool is_inputted_by_string(const std::string& i_string, Roman& roman) {
+        std::istringstream is {i_string};
 
+        std::string input_str;
+        is >> input_str;
+
+
+        if (is_valid_roman_str(input_str)) {
+            roman.set_roman_str(input_str);
+            return true;
+        }
+
+
+        return false;
     }
-    std::istream& operator>>(std::istream&, Roman& roman) {
 
+    bool is_inputted_by_int(const std::string& i_string, Roman& roman){
+        std::istringstream is {i_string};
+        int possible_input_int;
+
+        if (is >> possible_input_int) {
+            roman.set_roman_int(possible_input_int);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    std::istream& operator>>(std::istream& is, Roman& roman) {
+        std::string input;
+        is >> input;
+
+        // set operation in conditions
+        if (is_inputted_by_int(input,roman) ||
+            is_inputted_by_string(input,roman) )
+                return is;
+
+        is.clear(std::ios::failbit);
+        return is;
     }
     std::ostream& operator<<(std::ostream&, const Roman& roman) {
 
     }
 
     void Roman::set_roman_int(int roman_int) {
+        this->roman_str = roman_int_to_str(roman_int);
+        this->roman_int = roman_int;
 
     }
 
     void Roman::set_roman_str(const std::string &roman_str) {
+        if (!is_valid_roman_str(roman_str))
+            error("bad string roman");
 
+        this->roman_int = roman_str_to_int(roman_str);
+        this->roman_str = roman_str;
     }
 
     void test() {
 
         std::cout << "Testing good values:\n";
-        for (auto& el : ch9::test::good_romans_2)
+        for (std::pair<std::string,int>& el : ch9::test::good_romans_2)
             try {
                 Roman r{el.first};
                 Roman ri{el.second};
@@ -191,23 +234,45 @@ namespace ch9::ex21_22 {
                 if (r.get_roman_int() != el.second)
                     error("must be good");
 
-                std::cout << "PASS\n";
+                std::cout << std::format("PASS: {}\t{}\n", el.first, el.second);
             } catch (std::exception& ex) {
                 std::cerr << ex.what();
             }
 
 
             std::cout << "Testing bad values:\n";
-            for (auto& el: ch9::test::bad_romans_2)
+            for (std::string& el: ch9::test::bad_romans_2)
                 try {
                     Roman r{el};
                     throw Bad_exception {std::format("must be bad, but not for el:{}\t{}",r.get_roman_str(),
                             r.get_roman_int())};
                 } catch (std::exception& ex) {
-                    std::cout << "PASS\n";
+                    std::cout << std::format("PASS: '{}' \n", el);
                 } catch (Bad_exception& ex) {
                     std::cerr << ex.what();
                 }
+
+        std::cout << "Testing inputting values:\n";
+        for (std::pair<std::string,int>& el : ch9::test::good_romans_2)
+            try {
+                Roman r1{};
+                Roman r2{};
+                std::istringstream is_str {el.first};
+                std::istringstream is_int {std::format("{}",el.second)};
+
+                is_str >> r1;
+                is_int >> r2;
+                if (r2.get_roman_str() != el.first)
+                    error("must be " + el.first + " but:" + r2.get_roman_str());
+
+                if (r1.get_roman_int() != el.second)
+                    error("must be good");
+
+                std::cout << std::format("PASS: {}\t{}\n", el.first, el.second);
+            } catch (std::exception& ex) {
+                std::cerr << ex.what();
+            }
+
 
 
         return;
