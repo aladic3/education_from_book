@@ -8,7 +8,7 @@ import try_drill;
 
 int main() {
     try {
-        calculation(std::cin);
+        ch9::ex23::test();
     }
     catch (std::exception& err) {
         std::cerr << err.what();

@@ -21,6 +21,45 @@ import chapter8;
 
 module try_drill;
 
+
+namespace ch9::ex23 {
+    std::vector<std::string> get_concatenation_vector(const std::vector<std::string>& read_result_1,
+                const std::vector<std::string> & read_result_2) {
+        std::vector<std::string> concatenation_vector;
+        concatenation_vector.reserve(read_result_1.size() + read_result_2.size());
+
+        concatenation_vector.insert(concatenation_vector.end(),
+                                read_result_1.begin(), read_result_1.end());
+        concatenation_vector.insert(concatenation_vector.end(),
+                                    read_result_2.begin(), read_result_2.end());
+
+        return concatenation_vector;
+    }
+    //return name new file
+    std::string concatenates_two_files(const std::string& f_name1, const std::string& f_name2) {
+        const std::string res_name {"concatenation.txt"};
+        auto read_result_1 = read_lines_file(f_name1);
+        auto read_result_2 = read_lines_file(f_name2);
+
+        std::vector<std::string> concatenation_vector = get_concatenation_vector(read_result_1, read_result_2);
+        write_lines_to_file(res_name,concatenation_vector);
+
+        return res_name;
+
+    }
+
+    void test() {
+        const std::string f1{"readme.txt"};
+        const std::string f2{"out.txt"};
+        concatenates_two_files(f1,f2);
+
+    }
+
+
+
+
+}
+
 namespace ch9::ex17_19 {
     struct Reading;
 
@@ -110,7 +149,7 @@ namespace ch9::ex17_19 {
             {
                 const std::string file_in {"readings_out.txt"};
                 auto readings = input_readings(file_in);
-                auto mean_median = calculate_mean_and_median(readings);
+                [[maybe_unused]] auto mean_median = calculate_mean_and_median(readings);
             }
 
 
@@ -123,6 +162,54 @@ namespace ch9::ex17_19 {
 }
 
 namespace ch9 {
+    void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os) {
+        for (const auto& el: str_v)
+            os << el << std::endl;
+    }
+
+    std::vector<std::string> read_lines_file(const std::string& file_name) {
+        std::vector<std::string> result;
+        auto ifs = open_input_stream(file_name);
+
+        while (ifs) {
+            std::string input;
+
+            std::getline(ifs,input);
+
+            if (input.empty())
+                continue;
+
+            result.push_back(input);
+        }
+
+        return  result;
+    }
+    void write_lines_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
+        auto ofs = open_output_stream(file_name);
+        print_str_vec(vec,ofs);
+
+
+    }
+
+    std::vector<std::string> read_file(const std::string& file_name) {
+        std::vector<std::string> result;
+        auto ifs = open_input_stream(file_name);
+
+
+        while (ifs) {
+            std::string input;
+
+            ifs >> input;
+
+            if (input.empty())
+                continue;
+
+            result.push_back(input);
+        }
+
+        return  result;
+    }
+
     std::ostream& operator<< (std::ostream& os, const ch8::try_drill_ex::Date& date) {
         return os << date.get_year().y << ' '
                 << static_cast<int>(date.get_month()) << ' '
@@ -412,7 +499,7 @@ namespace ch9::ex13 {
 
     void test() {
         const std::string filename {"readme.txt"};
-        auto classifications = read_and_get_classifications(filename);
+        [[maybe_unused]] auto classifications = read_and_get_classifications(filename);
 
     }
 
@@ -837,7 +924,7 @@ namespace ch9::ex4 {
 
 namespace ch9::ex3 {
     [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name) {
-       return ex1::read_file(file_name);
+       return ch9::read_file(file_name);
     }
 
     void remove_vowels_from_vector(std::vector<std::string>& vec) {
@@ -891,48 +978,9 @@ namespace ch9::ex3 {
 
 namespace ch9::ex1 {
 
-    std::vector<std::string> read_file(const std::string& file_name) {
-        std::vector<std::string> result;
-        auto ifs = open_input_stream(file_name);
 
 
-        while (ifs) {
-            std::string input;
 
-            ifs >> input;
-
-            if (input.empty())
-                continue;
-
-            result.push_back(input);
-        }
-
-        return  result;
-    }
-
-    std::vector<std::string> read_line_file(const std::string& file_name) {
-        std::vector<std::string> result;
-        auto ifs = open_input_stream(file_name);
-
-        while (ifs) {
-            std::string input;
-
-            std::getline(ifs,input);
-
-            if (input.empty())
-                continue;
-
-            result.push_back(input);
-        }
-
-        return  result;
-    }
-    void write_line_to_file(const std::string& file_name, const std::vector<std::string>& vec) {
-        auto ofs = open_output_stream(file_name);
-        print_str_vec(vec,ofs);
-
-
-    }
     std::string& str_tolower(std::string& s) //from cpprefference
     {
         std::transform(s.begin(), s.end(), s.begin(),
@@ -950,10 +998,7 @@ namespace ch9::ex1 {
         return input_lines;
     }
 
-    void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os) {
-        for (const auto& el: str_v)
-            os << el << std::endl;
-    }
+
 
     void print_vec_with_line_num(const std::vector<std::string>& str_v, std::ostream& os) {
         for (int i = 0; i<str_v.size(); ++i)
@@ -963,7 +1008,7 @@ namespace ch9::ex1 {
     void test() {
         const std::string file_name = "test.txt";
         std::vector<std::string> test_v {"SDFaaw", "fdfEWWE", "SDFwerewr"};
-        write_line_to_file(file_name,test_v);
+        write_lines_to_file(file_name,test_v);
         auto from_file = read_file(file_name);
         print_str_vec(convert_to_lower(from_file), std::cout);
         print_vec_with_line_num(from_file,std::cout);

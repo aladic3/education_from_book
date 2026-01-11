@@ -197,6 +197,7 @@ namespace ch9::test {
 }
 
 namespace ch9 {
+    export void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os);
     export void write_to_file(const std::string& file_name, const std::vector<std::string>& vec);
     export void print_vec_of_strings(const std::vector<std::string>& vec);
     export std::ostream& operator<<(std::ostream& os, const std::vector<char>& file); //print file
@@ -214,6 +215,20 @@ namespace ch9 {
     void read_double(std::istream& is, std::vector<double>& vec);
     void read_ints(std::istream& is, std::vector<int>& vec);
     void try_recover_from_fail_bit(std::istream& is, char terminator= '|');
+
+    export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
+    export [[nodiscard]] std::vector<std::string>read_lines_file(const std::string& file_name);
+    export void write_lines_to_file(const std::string& file_name, const std::vector<std::string>& vec);
+}
+
+namespace ch9::ex23 {
+    std::vector<std::string> get_concatenation_vector(const std::vector<std::string>& read_result_1,
+            const std::vector<std::string> & read_result_2);
+    //return name new file
+    export std::string concatenates_two_files(const std::string& f_name1, const std::string& f_name2);
+
+    export void test();
+
 }
 
 namespace ch9::ex21_22 {
@@ -459,14 +474,12 @@ namespace ch9::ex6 {
 }
 
 namespace ch9::ex1 {
-    export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
-    export [[nodiscard]] std::vector<std::string>read_line_file(const std::string& file_name);
-    export void write_line_to_file(const std::string& file_name, const std::vector<std::string>& vec);
+
     export  std::vector<std::string>& convert_to_lower(std::vector<std::string>& input_lines);
 
 
 
-    export void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os);
+
     export void print_vec_with_line_num(const std::vector<std::string>& str_v, std::ostream& os);
 
     std::string& str_tolower(std::string& s);
