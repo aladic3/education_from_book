@@ -169,9 +169,9 @@ namespace ch9::test {
     };
 
     std::vector<std::string> bad_romans = {
-        "IIV",      // TODO двойное вычитание
-        "XXC",      // TODO неправильный порядок
-        "MCMC",     // TODO повтор вычитательной конструкции
+        "IIV",
+        "XXC",      // неправильный порядок
+        "MCMC",     // повтор вычитательной конструкции
         "IIII",     // > 3 повторов I
         "VV",       // V нельзя повторять
         "LL",       // L нельзя повторять
@@ -216,6 +216,8 @@ namespace ch9 {
 namespace ch9::ex21_22 {
     export class Roman;
 
+    bool is_inputted_by_int(const std::string& i_string, Roman& roman);
+    bool is_inputted_by_string(const std::string& i_string, Roman& roman);
     bool is_good_subtraction(char current_roman, char last_roman);
     bool is_good_repeating(char last_roman, char current_roman, int& count_repeat);
     bool is_roman(char current_roman);

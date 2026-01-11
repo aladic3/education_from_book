@@ -203,8 +203,8 @@ namespace ch9::ex21_22 {
         is.clear(std::ios::failbit);
         return is;
     }
-    std::ostream& operator<<(std::ostream&, const Roman& roman) {
-
+    std::ostream& operator<<(std::ostream& os, const Roman& roman) {
+        return os << roman.get_roman_str();
     }
 
     void Roman::set_roman_int(int roman_int) {
@@ -234,14 +234,14 @@ namespace ch9::ex21_22 {
                 if (r.get_roman_int() != el.second)
                     error("must be good");
 
-                std::cout << std::format("PASS: {}\t{}\n", el.first, el.second);
+                std::cout << "PASS: " << r << "\t" << r.get_roman_int() << '\t' << ri << '\t' << ri.get_roman_int() << '\n';
             } catch (std::exception& ex) {
                 std::cerr << ex.what();
             }
 
 
             std::cout << "Testing bad values:\n";
-            for (std::string& el: ch9::test::bad_romans_2)
+            for (std::string& el: test::bad_romans_2)
                 try {
                     Roman r{el};
                     throw Bad_exception {std::format("must be bad, but not for el:{}\t{}",r.get_roman_str(),
@@ -275,7 +275,6 @@ namespace ch9::ex21_22 {
 
 
 
-        return;
 
     }
 }
