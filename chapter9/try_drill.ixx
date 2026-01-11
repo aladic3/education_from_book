@@ -14,7 +14,8 @@ import chapter8;
 export module try_drill;
 
 namespace ch9::test {
-    std::vector<std::pair<std::string,int>> good_romans_2 = {
+    export struct Roman_test_helper {
+        inline static std::vector<std::pair<std::string,int>> good_romans_2 = {
         {"I", 1},
         {"II", 2},
         {"III", 3},
@@ -66,7 +67,7 @@ namespace ch9::test {
         {"V", 5}
     };
 
-    std::vector<std::string> bad_romans_2 = {
+        inline static std::vector<std::string> bad_romans_2 = {
         // запрещённые повторы
         "IIII",
         "VV",
@@ -127,7 +128,7 @@ namespace ch9::test {
     };
 
 
-    std::vector<std::pair<std::string, int>> good_romans = {
+        inline static std::vector<std::pair<std::string, int>> good_romans = {
 
         {"MMMCMXCIX", 3999},
         {"V", 5},
@@ -168,7 +169,7 @@ namespace ch9::test {
 
     };
 
-    std::vector<std::string> bad_romans = {
+        inline static std::vector<std::string> bad_romans = {
         "IIV",
         "XXC",      // неправильный порядок
         "MCMC",     // повтор вычитательной конструкции
@@ -191,6 +192,8 @@ namespace ch9::test {
         "ABC",      // мусор
         "",         // пустая строка
     };
+    };
+
 }
 
 namespace ch9 {
@@ -216,6 +219,26 @@ namespace ch9 {
 namespace ch9::ex21_22 {
     export class Roman;
 
+    export struct Roman_helper {
+        inline static const std::vector<std::pair<char,int>> basic_values{
+                {'M',1000},
+                {'D',500},
+                {'C', 100},
+                {'L', 50},
+                {'X', 10},
+                {'V', 5},
+                {'I', 1}
+        };
+        static constexpr  std::string non_repeatable_romans {"VLD"};
+        static constexpr std::string all_possible_romans {"VLDIXCM"};
+        inline static const std::vector<std::pair<char,std::string>> subtractions_rules{
+                {'I',"XV"},
+                {'X',"LC"},
+                {'C',"DM"}
+        };
+    };
+
+
     bool is_inputted_by_int(const std::string& i_string, Roman& roman);
     bool is_inputted_by_string(const std::string& i_string, Roman& roman);
     bool is_good_subtraction(char current_roman, char last_roman);
@@ -228,8 +251,8 @@ namespace ch9::ex21_22 {
     int roman_str_to_int(const std::string& roman_str);
     std::string roman_int_to_str(int roman_int);
 
-    std::istream& operator>>(std::istream& is, Roman& roman);
-    std::ostream& operator<<(std::ostream& os, const Roman& roman);
+    export std::istream& operator>>(std::istream& is, Roman& roman);
+    export std::ostream& operator<<(std::ostream& os, const Roman& roman);
 
     export void test();
 

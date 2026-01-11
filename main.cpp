@@ -1,6 +1,6 @@
 #include <iostream>
 #include "error.h"
-
+#include "calculator.h"
 import try_drill;
 
 
@@ -8,7 +8,7 @@ import try_drill;
 
 int main() {
     try {
-        ch9::ex21_22::test();
+        calculation(std::cin);
     }
     catch (std::exception& err) {
         std::cerr << err.what();

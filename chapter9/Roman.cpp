@@ -17,27 +17,14 @@ module try_drill;
 
 namespace ch9::ex21_22 {
     class Roman;
-    const std::vector<std::pair<char,int>> basic_values{
-        {'M',1000},
-        {'D',500},
-        {'C', 100},
-        {'L', 50},
-        {'X', 10},
-        {'V', 5},
-        {'I', 1}
-    };
-    constexpr  std::string non_repeatable_romans {"VLD"};
-    constexpr std::string all_possible_romans {"VLDIXCM"};
-    const std::vector<std::pair<char,std::string>> subtractions_rules{
-        {'I',"XV"},
-        {'X',"LC"},
-        {'C',"DM"}
-    };
+    struct Roman_helper;
+
+
 
     int roman_ch_to_int(char ch) {
         ch = static_cast<char>(std::toupper(ch));
 
-        for (auto& pair: basic_values)
+        for (auto& pair: Roman_helper::basic_values)
             if (ch == pair.first)
                 return pair.second;
 
@@ -46,7 +33,7 @@ namespace ch9::ex21_22 {
     }
 
     char roman_int_to_ch(int r) {
-        for (auto& pair: basic_values)
+        for (auto& pair: Roman_helper::basic_values)
             if (r == pair.second)
                 return pair.first;
 
@@ -62,16 +49,16 @@ namespace ch9::ex21_22 {
         // subtraction rules
         if (last_roman_int < current_roman_int && ratio != 10 && ratio != 5)
                 return false;
-        if (last_roman_int < current_roman_int && non_repeatable_romans.contains(last_roman))
+        if (last_roman_int < current_roman_int && Roman_helper::non_repeatable_romans.contains(last_roman))
                 return false;
 
         return true;
     }
 
     bool is_good_repeating(char last_roman, char current_roman, int& count_repeat) {
-        if (last_roman == current_roman && !non_repeatable_romans.contains(current_roman))
+        if (last_roman == current_roman && !Roman_helper::non_repeatable_romans.contains(current_roman))
             ++count_repeat;
-        else if (last_roman == current_roman && non_repeatable_romans.contains(current_roman))
+        else if (last_roman == current_roman && Roman_helper::non_repeatable_romans.contains(current_roman))
             return false;
         else
             count_repeat = 1;
@@ -83,7 +70,7 @@ namespace ch9::ex21_22 {
     }
 
     bool is_roman(char current_roman) {
-        if (!all_possible_romans.contains(current_roman)) // is roman
+        if (!Roman_helper::all_possible_romans.contains(current_roman)) // is roman
             return false;
         return true;
     }
@@ -110,7 +97,7 @@ namespace ch9::ex21_22 {
     int roman_str_to_int(const std::string& roman_str) {
         auto overall_roman = 0;
         auto current_roman_int = roman_ch_to_int(roman_str[0]);
-        auto next_roman_int = current_roman_int;
+        int next_roman_int = 0;
 
         for (auto el: roman_str.substr(1)) {
             next_roman_int = roman_ch_to_int(el);
@@ -138,8 +125,8 @@ namespace ch9::ex21_22 {
             error("bad input int in roman translate");
 
         while (ra > 0)
-            for (auto& roman_pair: basic_values) {
-                int diff_lower = non_repeatable_romans.contains(roman_pair.first)
+            for (auto& roman_pair: Roman_helper::basic_values) {
+                int diff_lower = Roman_helper::non_repeatable_romans.contains(roman_pair.first)
                                  ? roman_pair.second / 5: roman_pair.second / 10;
                 int ratio = ra / roman_pair.second;
                 int remainder = roman_pair.second % ra ;
@@ -224,7 +211,7 @@ namespace ch9::ex21_22 {
     void test() {
 
         std::cout << "Testing good values:\n";
-        for (std::pair<std::string,int>& el : ch9::test::good_romans_2)
+        for (std::pair<std::string,int>& el : test::Roman_test_helper::good_romans_2)
             try {
                 Roman r{el.first};
                 Roman ri{el.second};
@@ -241,19 +228,19 @@ namespace ch9::ex21_22 {
 
 
             std::cout << "Testing bad values:\n";
-            for (std::string& el: test::bad_romans_2)
+            for (std::string& el: test::Roman_test_helper::bad_romans_2)
                 try {
                     Roman r{el};
                     throw Bad_exception {std::format("must be bad, but not for el:{}\t{}",r.get_roman_str(),
                             r.get_roman_int())};
-                } catch (std::exception& ex) {
+                } catch (std::exception&) {
                     std::cout << std::format("PASS: '{}' \n", el);
                 } catch (Bad_exception& ex) {
                     std::cerr << ex.what();
                 }
 
         std::cout << "Testing inputting values:\n";
-        for (std::pair<std::string,int>& el : ch9::test::good_romans_2)
+        for (std::pair<std::string,int>& el : test::Roman_test_helper::good_romans_2)
             try {
                 Roman r1{};
                 Roman r2{};

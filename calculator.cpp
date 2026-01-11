@@ -78,10 +78,11 @@ const std::string result_prompt = "= ";
 constexpr char quit_kind = 'q';
 constexpr char print_kind = ';';
 constexpr char number_kind = '8';
+constexpr char roman_kind = 'r';
 constexpr char let_kind = 'L';
 constexpr char name_kind = 'N';
 constexpr char square_root_kind = 'R';
-constexpr char pow_kind ='P';
+constexpr char pow_kind = 'P';
 constexpr char nothing_kind = '0';
 constexpr char space_kind = ' ';
 constexpr char new_line_kind = '\n';
@@ -97,15 +98,16 @@ const std::string pow_key = "pow";
 const std::string help_key = "help";
 
 const std::string help_prompt = "The program implements an interactive calculator (REPL) that reads expressions\n"
-                                "from std::cin, evaluates them, and prints the result. It supports integer\n"
-                                "numbers, variables (mutable and const), the operations +, -, *, /, % (modulo via \n"
-                                "fmod), the postfix factorial !, the square root sqrt(...), integer exponentiation \n"
-                                "pow(x, i), round and curly brackets (...) and {...}, variable assignment, the \n"
-                                "keywords let and const, an exit command, and result output.\n";
+        "from std::cin, evaluates them, and prints the result. It supports integer\n"
+        "numbers, variables (mutable and const), the operations +, -, *, /, % (modulo via \n"
+        "fmod), the postfix factorial !, the square root sqrt(...), integer exponentiation \n"
+        "pow(x, i), round and curly brackets (...) and {...}, variable assignment, the \n"
+        "keywords let and const, an exit command, and result output.\n";
 
 
-double expression(Token_stream& ts);
-Variable& declaration(Token_stream& ts);
+double expression(Token_stream &ts);
+
+Variable &declaration(Token_stream &ts);
 
 bool is_integer(double val) {
     return (val - static_cast<int>(val)) == 0;
@@ -114,57 +116,85 @@ bool is_integer(double val) {
 class Token {
 public:
     char kind_of_token; // can be: q, ;, (, ), {, }, +, -, /, *, 8 (number)
-    double value;
+    double value = 0;
+    ch9::ex21_22::Roman roman{};
     std::string name;
 
-    Token(): kind_of_token(){} //default
-    Token(char ch): kind_of_token{ch}{} //operation, quit, print
-    Token(char ch, double val): kind_of_token{ch}, value{val}{}
-    Token(std::string str, char ch): kind_of_token{ch}, name{std::move(str)}{}
+    Token() : kind_of_token() {
+    } //default
+    Token(char ch, ch9::ex21_22::Roman& r) : kind_of_token{ch}, roman(r){}
+    Token(char ch) : kind_of_token{ch} {
+    } //operation, quit, print
+    Token(char ch, double val) : kind_of_token{ch}, value{val} {
+    }
 
+    Token(std::string str, char ch) : kind_of_token{ch}, name{std::move(str)} {
+    }
 };
 
 class Variable {
 private:
     std::string name;
-    double value;
+    double value = 0;
     bool is_constant;
 
 public:
-    Variable(std::string n): name(std::move(n)), is_constant(false){}
-    Variable(std::string n, double v): name(std::move(n)), value(v),  is_constant(false){}
-    Variable(std::string n, bool constant): name(std::move(n)), is_constant(constant){}
-    Variable(std::string n, double v, bool constant): name(std::move(n)), value(v),  is_constant(constant){}
-    Variable(){}
+    Variable(std::string n) : name(std::move(n)), is_constant(false) {
+    }
+
+    Variable(std::string n, double v) : name(std::move(n)), value(v), is_constant(false) {
+    }
+
+    Variable(std::string n, bool constant) : name(std::move(n)), is_constant(constant) {
+    }
+
+    Variable(std::string n, double v, bool constant) : name(std::move(n)), value(v), is_constant(constant) {
+    }
+
+    Variable() {
+    }
 
 
+    Variable &setValue(double val) {
+        if (is_constant) error("this is constant");
+        value = val;
+        return *this;
+    }
 
-    Variable& setValue(double val){ if (is_constant) error("this is constant"); value = val; return *this;}
-    Variable& set_constant_type() {this->is_constant = true; return *this; }
-    double getValue() const {return value;}
-    void setName(std::string n) { name = n;}
-    std::string getName() {return name;}
+    Variable &set_constant_type() {
+        this->is_constant = true;
+        return *this;
+    }
+
+    double getValue() const { return value; }
+    void setName(std::string n) { name = n; }
+    std::string getName() { return name; }
 };
-
 
 
 class Token_stream {
 public:
     void putback(Token t);
+
     Token get();
+
     void clean_mess();
-    Token_stream(std::istream& stream) : in(stream) {}
+
+    Token_stream(std::istream &stream) : in(stream) {
+    }
 
 private:
-    std::istream& in;
+    std::istream &in;
+
     static bool is_can_be_in_variable_name(char input);
-    static Token translate_keyword_to_token(const std::string& name);
+
+    static Token translate_keyword_to_token(const std::string &name);
+
     bool is_full = false;
     Token buffer;
-
 };
 
-Token Token_stream::translate_keyword_to_token(const std::string& name) {
+Token Token_stream::translate_keyword_to_token(const std::string &name) {
     if (name == declarationKey)
         return Token{let_kind};
 
@@ -200,7 +230,6 @@ void Token_stream::clean_mess() {
     char skip = 0;
     while (skip != print_kind && skip != new_line_kind)
         this->in.get(skip);
-
 }
 
 
@@ -208,11 +237,10 @@ bool Token_stream::is_can_be_in_variable_name(char input)
 // can be char include in variable name?
 {
     if (!std::isalpha(input) && !std::isdigit(input) && input != '_') //if not in alphabet or not number or _
-        return  false;
+        return false;
 
     return true;
 }
-
 
 
 void Token_stream::putback(Token t) {
@@ -223,7 +251,6 @@ void Token_stream::putback(Token t) {
 }
 
 
-
 Token Token_stream::get() {
     if (is_full) {
         is_full = false;
@@ -232,7 +259,7 @@ Token Token_stream::get() {
 
     char input = 0;
 
-    if (! (this->in.get(input))) error ("Bad input in Token_stream::get(). std::cin error!");
+    if (!(this->in.get(input))) error("Bad input in Token_stream::get(). std::cin error!");
 
     while (std::isspace(input) && input != new_line_kind) // omit spaces
         in.get(input);
@@ -243,8 +270,10 @@ Token Token_stream::get() {
         case '/':
         case '+':
         case '-':
-        case '(': case ')':
-        case '{': case '}':
+        case '(':
+        case ')':
+        case '{':
+        case '}':
         case '!':
         case '%':
         case '=':
@@ -255,8 +284,16 @@ Token Token_stream::get() {
             return Token{print_kind};
 
         //case '.': //if double input
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9': {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9': {
             this->in.putback(input);
             double value;
             this->in >> value;
@@ -265,6 +302,17 @@ Token Token_stream::get() {
 
             return Token{number_kind, value};
         }
+
+        case 'I': case 'V': case 'X': case 'L': case 'D':
+        case 'M': case 'C': {
+            this->in.putback(input);
+            ch9::ex21_22::Roman r;
+            this->in >> r;
+
+            return Token{roman_kind,r};
+        }
+
+
         default: {
             std::string variable_name;
             variable_name += input;
@@ -288,68 +336,69 @@ Token Token_stream::get() {
 
             return Token{variable_name, name_kind};
         }
-
     }
-
 }
-
-
-
 
 
 class VariableTable {
 private:
-    Variable null_buffer {};
+    Variable null_buffer{};
     std::vector<Variable> var_table;
 
 
-    Variable& get_var_from_table(const std::string &name);
+    Variable &get_var_from_table(const std::string &name);
+
     bool possibility_to_assign;
 
-
 public:
+    Variable &get_null_variable();
 
-    Variable& get_null_variable() ;
-    VariableTable(): possibility_to_assign(true){}
+    VariableTable() : possibility_to_assign(true) {
+    }
+
     void set_unability_to_assign();
+
     bool is_can_declaration() const;
+
     void set_ability_to_assign();
-    bool is_declared(const std::string& name) ;
-    double get_value_from_table(const std::string& name);
-    Variable& add_variable_to_table(const std::string& name, double value) ;
-    Variable& add_const_variable_to_table(const std::string& name, double value);
-    Variable& change_variable_in_table(const std::string& name, double value) ;
-    Variable& try_declaration_without_declKey(Token& token, Token_stream& ts);
 
+    bool is_declared(const std::string &name);
 
+    double get_value_from_table(const std::string &name);
+
+    Variable &add_variable_to_table(const std::string &name, double value);
+
+    Variable &add_const_variable_to_table(const std::string &name, double value);
+
+    Variable &change_variable_in_table(const std::string &name, double value);
+
+    Variable &try_declaration_without_declKey(Token &token, Token_stream &ts);
 };
 
-Variable& VariableTable::get_null_variable() {
+Variable &VariableTable::get_null_variable() {
     return null_buffer;
 }
 
 
-Variable& VariableTable::try_declaration_without_declKey(Token &token, Token_stream& ts) {
-        Variable& result = this->null_buffer; // declaration not success, we return null object
+Variable &VariableTable::try_declaration_without_declKey(Token &token, Token_stream &ts) {
+    Variable &result = this->null_buffer; // declaration not success, we return null object
 
-        char input = ts.get().kind_of_token;
-
-
-        set_unability_to_assign();
+    char input = ts.get().kind_of_token;
 
 
-        if ( input == '=') {
-            std::cin.putback(input);
-            ts.putback(token);
-
-            result = declaration(ts);;
-
-        } else
-            std::cin.putback(input);
+    set_unability_to_assign();
 
 
+    if (input == '=') {
+        std::cin.putback(input);
+        ts.putback(token);
 
-        return result;
+        result = declaration(ts);;
+    } else
+        std::cin.putback(input);
+
+
+    return result;
 }
 
 
@@ -371,44 +420,41 @@ void VariableTable::set_ability_to_assign() {
 }
 
 
-
 double VariableTable::get_value_from_table(const std::string &name) {
     return get_var_from_table(name).getValue();
 }
 
 
-bool VariableTable::is_declared(const std::string& name) {
-    for (Variable& element: var_table) {
+bool VariableTable::is_declared(const std::string &name) {
+    for (Variable &element: var_table) {
         if (name == element.getName()) return true;
     }
 
     return false;
 }
 
-Variable& VariableTable::get_var_from_table(const std::string &name) {
-    for (Variable& var: var_table) {
+Variable &VariableTable::get_var_from_table(const std::string &name) {
+    for (Variable &var: var_table) {
         if (var.getName() == name) return var;
     }
 
     error("Not existing var with name: " + name);
     return null_buffer;
-
-
 }
 
-Variable& VariableTable::add_variable_to_table(const std::string& name, double value) {
+Variable &VariableTable::add_variable_to_table(const std::string &name, double value) {
     if (is_declared(name))
         error("Variable is also declared! You can create with another name!");
 
-    return var_table.emplace_back(name,value);
+    return var_table.emplace_back(name, value);
 }
 
-Variable& VariableTable::add_const_variable_to_table(const std::string &name, double value) {
-    return add_variable_to_table(name,value).set_constant_type();
+Variable &VariableTable::add_const_variable_to_table(const std::string &name, double value) {
+    return add_variable_to_table(name, value).set_constant_type();
 }
 
 
-Variable& VariableTable::change_variable_in_table(const std::string& name, double value) {
+Variable &VariableTable::change_variable_in_table(const std::string &name, double value) {
     return get_var_from_table(name).setValue(value);
 }
 
@@ -417,36 +463,32 @@ bool is_multiply_double_max_min_limit(double left, double right) {
 }
 
 bool is_factorial_ull_limit(unsigned long long left, int right) {
-    return left > std::numeric_limits<unsigned long long>::max()/right;
+    return left > std::numeric_limits<unsigned long long>::max() / right;
 }
-
-
 
 
 //Token_stream ts(std::cin); // provides get() and pullback
 VariableTable variable_table;
 
 
-
-
 unsigned long long factorial(const double value) {
-        int result = 1;
+    int result = 1;
 
-        if (!is_integer(value)) error("must be integer value!");
-        if (value < 0) error("Minus factorial not exist!");
-        if (value <= 1) return result;
+    if (!is_integer(value)) error("must be integer value!");
+    if (value < 0) error("Minus factorial not exist!");
+    if (value <= 1) return result;
 
-        for (int i = 2; i <= value; ++i ) {
-            if (is_factorial_ull_limit(result,i))
-                error("Overflow factorial result");
+    for (int i = 2; i <= value; ++i) {
+        if (is_factorial_ull_limit(result, i))
+            error("Overflow factorial result");
 
-            result *= i;
-        }
+        result *= i;
+    }
 
-        return result;
+    return result;
 }
 
-double parentheses(Token& token, Token_stream& ts) {
+double parentheses(Token &token, Token_stream &ts) {
     switch (token.kind_of_token) {
         case '(': {
             double result = expression(ts);
@@ -456,8 +498,6 @@ double parentheses(Token& token, Token_stream& ts) {
 
             return result;
             break;
-
-
         }
         case '{': {
             double result = expression(ts);
@@ -468,7 +508,6 @@ double parentheses(Token& token, Token_stream& ts) {
 
             return result;
             break;
-
         }
 
         default:
@@ -476,7 +515,7 @@ double parentheses(Token& token, Token_stream& ts) {
     }
 }
 
-double pow_statement(Token_stream& ts) {
+double pow_statement(Token_stream &ts) {
     // pow (x,i) mean "multiply x with itself i times. i - integer"
     Token token = ts.get();
     switch (token.kind_of_token) {
@@ -489,7 +528,7 @@ double pow_statement(Token_stream& ts) {
 
             token = ts.get();
 
-            if (token.kind_of_token != number_kind) error ("number expected");
+            if (token.kind_of_token != number_kind) error("number expected");
 
             int power = static_cast<int>(token.value);
 
@@ -497,11 +536,9 @@ double pow_statement(Token_stream& ts) {
 
             if (token.kind_of_token != ')') error("Must be ( expression )!");
 
-            return std::pow(x,power);
+            return std::pow(x, power);
 
             break;
-
-
         }
 
         default:
@@ -509,7 +546,7 @@ double pow_statement(Token_stream& ts) {
     }
 }
 
-double primary(Token_stream& ts) {
+double primary(Token_stream &ts) {
     Token token = ts.get();
     double result = 0;
 
@@ -524,16 +561,19 @@ double primary(Token_stream& ts) {
         case '+':
             result = primary(ts);
             break;
+        case roman_kind:
+            result = token.roman.get_roman_int();
+            break;
         case number_kind:
             result = token.value;
             break;
 
         case name_kind: {
+            if (variable_table.is_can_declaration()) {
+                Variable &result_assigning = variable_table.try_declaration_without_declKey(token, ts);
 
-            if (variable_table.is_can_declaration() ) {
-                Variable& result_assigning = variable_table.try_declaration_without_declKey(token,ts);
-
-                if (&result_assigning != &variable_table.get_null_variable()) { // if assigning success
+                if (&result_assigning != &variable_table.get_null_variable()) {
+                    // if assigning success
                     return result_assigning.getValue();
                 }
             }
@@ -542,26 +582,25 @@ double primary(Token_stream& ts) {
             break;
         }
 
-        case '(': case '{':
-            result= parentheses(token,ts);
+        case '(':
+        case '{':
+            result = parentheses(token, ts);
             break;
 
         case square_root_kind: {
             token = ts.get(); // need for parentheses function. after sqrt_kind token must be ( expr ).
-            double res_parentheses =  parentheses(token,ts);
+            double res_parentheses = parentheses(token, ts);
 
             if (res_parentheses < 0)
                 error("Negative can't be in square root operation");
 
-            result= std::sqrt(res_parentheses);
+            result = std::sqrt(res_parentheses);
             break;
-
         }
 
         case pow_kind:
-            result= pow_statement(ts);
+            result = pow_statement(ts);
             break;
-
 
 
         default:
@@ -572,14 +611,13 @@ double primary(Token_stream& ts) {
 
 
     return result;
-
 }
 
-double postfix(Token_stream& ts) {
+double postfix(Token_stream &ts) {
     double result = primary(ts);
     Token token = ts.get();
 
-    for (;token.kind_of_token == '!';token = ts.get()) {
+    for (; token.kind_of_token == '!'; token = ts.get()) {
         result = factorial(result);
     }
 
@@ -588,8 +626,8 @@ double postfix(Token_stream& ts) {
 }
 
 
-
-double term(Token_stream& ts) { // deal with * and /
+double term(Token_stream &ts) {
+    // deal with * and /
     double left = postfix(ts);
     Token token = ts.get();
 
@@ -600,16 +638,15 @@ double term(Token_stream& ts) { // deal with * and /
 
                 if (right == 0) error("Divide (%) by zero!");
 
-                left=std::fmod(left,right);
+                left = std::fmod(left, right);
                 break;
-
             }
             case '/': {
                 double right = postfix(ts);
 
                 if (right == 0) error("Divide by zero!");
 
-                left/=right;
+                left /= right;
                 break;
             }
 
@@ -617,10 +654,10 @@ double term(Token_stream& ts) { // deal with * and /
             case '*': {
                 double right = postfix(ts);
 
-                if (is_multiply_double_max_min_limit(left,right))
-                  error("Multiplication limit fault.");
+                if (is_multiply_double_max_min_limit(left, right))
+                    error("Multiplication limit fault.");
 
-                left*=right;
+                left *= right;
                 break;
             }
 
@@ -630,26 +667,23 @@ double term(Token_stream& ts) { // deal with * and /
         }
         token = ts.get();
     }
-
 }
 
-double expression(Token_stream& ts) { // deal with + and -
+double expression(Token_stream &ts) {
+    // deal with + and -
     double left = term(ts);
     Token token = ts.get();
 
     while (true) {
         switch (token.kind_of_token) {
             case '+':
-                left+=term(ts);
+                left += term(ts);
                 break;
 
             case '-':
-                left-=term(ts);
+                left -= term(ts);
                 break;
 
-            case '=':
-                error("Can't assign here!");
-                break;
 
             default:
                 ts.putback(token);
@@ -658,16 +692,14 @@ double expression(Token_stream& ts) { // deal with + and -
         }
         token = ts.get();
     }
-
-
 }
 
-Variable& declaration(Token_stream& ts) {
+Variable &declaration(Token_stream &ts) {
     Token token = ts.get();
     Variable *result = &variable_table.get_null_variable();
 
     switch (token.kind_of_token) {
-        case name_kind:{
+        case name_kind: {
             const std::string name = token.name;
 
             token = ts.get();
@@ -677,27 +709,23 @@ Variable& declaration(Token_stream& ts) {
             double value = expression(ts);
 
             if (variable_table.is_declared(name))
-                result = &variable_table.change_variable_in_table(name,value);
+                result = &variable_table.change_variable_in_table(name, value);
             else
-                result = &variable_table.add_variable_to_table(name,value);
+                result = &variable_table.add_variable_to_table(name, value);
 
             break;
-
         }
         default:
             error("name expected");
-
     }
 
-    return  *result;
-
+    return *result;
 }
 
-double statement(Token_stream& ts) {
+double statement(Token_stream &ts) {
     Token token = ts.get();
 
     switch (token.kind_of_token) {
-
         case let_kind: {
             return declaration(ts).getValue();
         }
@@ -714,25 +742,22 @@ double statement(Token_stream& ts) {
 }
 
 void calculation(std::istream &input_stream) {
-        Token_stream ts(input_stream);
+    Token_stream ts(input_stream);
 
-        variable_table.add_const_variable_to_table("pi",3.1415926535);
-        variable_table.add_const_variable_to_table("e",2.7182818284);
-        Token token{};
+    variable_table.add_const_variable_to_table("pi", 3.1415926535);
+    variable_table.add_const_variable_to_table("e", 2.7182818284);
+    Token token{};
 
-        double result = 0;
-        std::cout << "Welcome to simple calculator.\n"
-                    "Please enter expressions using integer numbers.\n"
-                    "For help, enter 'help'." << std::endl;
-
-
+    double left = 0;
+    std::cout << "Welcome to simple calculator.\n"
+            "Please enter expressions using integer numbers.\n"
+            "For help, enter 'help'." << std::endl;
 
 
-        while (std::cin)
-            try {
-
+    while (std::cin)
+        try {
             //std::cout << input_prompt;
-            std::print("{}",input_prompt);
+            std::print("{}", input_prompt);
 
             token = ts.get();
             variable_table.set_ability_to_assign();
@@ -741,26 +766,22 @@ void calculation(std::istream &input_stream) {
                 token = ts.get();
 
             if (token.kind_of_token == help_kind) {
-                std::print("{}",help_prompt);
+                std::print("{}", help_prompt);
                 continue;
             }
             if (token.kind_of_token == quit_kind)
                 return;
 
+
+
             ts.putback(token);
 
-            result = statement(ts);
-
-            std::cout << result_prompt << result << std::endl;
+            left = statement(ts);
 
 
-        } catch (std::exception & exception) {
+            std::cout << result_prompt << left << std::endl; // ch9::ex21_22::Roman{static_cast<int>(left)}
+        } catch (std::exception &exception) {
             std::cerr << exception.what();
             ts.clean_mess();
         }
-    }
-
-
-
-
-
+}
