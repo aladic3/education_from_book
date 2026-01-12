@@ -3,6 +3,7 @@
 //
 module;
 
+#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -215,17 +216,45 @@ namespace ch9 {
     void read_double(std::istream& is, std::vector<double>& vec);
     void read_ints(std::istream& is, std::vector<int>& vec);
     void try_recover_from_fail_bit(std::istream& is, char terminator= '|');
+    export int get_number_from_strint(std::string& str);
 
     export [[nodiscard]] std::vector<std::string> read_file(const std::string& file_name);
     export [[nodiscard]] std::vector<std::string>read_lines_file(const std::string& file_name);
     export void write_lines_to_file(const std::string& file_name, const std::vector<std::string>& vec);
 }
 
-namespace ch9::ex23 {
+namespace ch9::ex23_24 {
     std::vector<std::string> get_concatenation_vector(const std::vector<std::string>& read_result_1,
             const std::vector<std::string> & read_result_2);
     //return name new file
     export std::string concatenates_two_files(const std::string& f_name1, const std::string& f_name2);
+
+    //Write a program that takes two files containing sorted whitespace-separated words and
+    //merges them, preserving order.
+    export std::vector<std::string> merge_two_already_sorted_files(const std::string& f_name1, const std::string& f_name2);
+    std::string read_stream_and_return_last(std::string& word, std::ifstream& stream);
+    export class Sorting_Read {
+        std::ifstream input_stream_1, input_stream_2;
+        std::string word_1, word_2;
+
+        std::string read_stream_1_and_get_last_word();
+        std::string read_stream_2_and_get_last_word();
+
+    public:
+        Sorting_Read(const std::string& file_name1, const std::string& file_name2):
+                        input_stream_1(open_input_stream(file_name1)),
+                        input_stream_2(open_input_stream(file_name2)) {
+            input_stream_1 >> word_1;
+            input_stream_2 >> word_2;
+        }
+
+        std::string get_next_str();
+    };
+
+    export std::vector<int> get_vector_integers_from_file(const std::string& file_name);
+    export int get_sum_integers_from_vector(const std::vector<int>& vec_numbers);
+
+
 
     export void test();
 
@@ -426,7 +455,7 @@ namespace ch9::ex4 {
     export std::vector<int> convert_to_decimal(const std::vector<std::string>& wet_integers); // if one of them non int - error
     bool is_octal(const std::string& wet_integer);
     bool is_hex(const std::string& wet_integer);
-    bool is_decimal(const std::string& wet_integer);
+    export bool is_decimal(const std::string& wet_integer);  //ch9::ex4::
     int get_integer(const std::string& wet_integer);
     std::vector<std::string> prepare_wet_str_to_print(const std::vector<std::string>& wet_integers);
     export void print(const std::vector<std::string>& wet_integers, const std::vector<int>& integers);

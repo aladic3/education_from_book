@@ -22,9 +22,62 @@ import chapter8;
 module try_drill;
 
 
-namespace ch9::ex23 {
+namespace ch9::ex23_24 {
+    class Sorting_Read;
+
+    std::string Sorting_Read::get_next_str() {
+        std::string result;
+
+        if (!input_stream_1.eof() && !input_stream_2.eof())
+            return word_1 < word_2 ? read_stream_1_and_get_last_word() : read_stream_2_and_get_last_word();
+
+        return input_stream_1.eof() ? read_stream_2_and_get_last_word() : read_stream_1_and_get_last_word();
+
+    }
+
+    std::string read_stream_and_return_last(std::string& word, std::ifstream& stream) {
+        auto last_string = word;
+        stream >> word;
+
+        if (stream.eof()) word = "";
+
+        return last_string;
+    }
+
+    std::string Sorting_Read::read_stream_1_and_get_last_word() {
+        return read_stream_and_return_last(word_1, input_stream_1);
+    }
+
+    std::string Sorting_Read::read_stream_2_and_get_last_word() {
+        return read_stream_and_return_last(word_2, input_stream_2);
+    }
+
+    std::vector<int> get_vector_integers_from_file(const std::string& file_name) {
+        auto isf = open_input_stream(file_name);
+        std::vector<int> result;
+        std::string input;
+
+        while (isf >> input)
+            if (ex4::is_decimal(input))
+                result.push_back(get_number_from_strint(input));
+
+
+        return result;
+
+    }
+
+    int get_sum_integers_from_vector(const std::vector<int>& vec_numbers) {
+        int result = 0;
+        for (auto num : vec_numbers)
+            result+= num;
+
+        return result;
+    }
+
+
+
     std::vector<std::string> get_concatenation_vector(const std::vector<std::string>& read_result_1,
-                const std::vector<std::string> & read_result_2) {
+                                                      const std::vector<std::string> & read_result_2) {
         std::vector<std::string> concatenation_vector;
         concatenation_vector.reserve(read_result_1.size() + read_result_2.size());
 
@@ -48,10 +101,37 @@ namespace ch9::ex23 {
 
     }
 
+    std::vector<std::string> merge_two_already_sorted_files(const std::string& f_name1, const std::string& f_name2) {
+        Sorting_Read sorting_read {f_name1, f_name2};
+        auto next_word = sorting_read.get_next_str();
+        std::vector<std::string> result;
+
+        for (;!next_word.empty(); next_word = sorting_read.get_next_str())
+            result.push_back(next_word);
+
+        return result;
+
+    }
+
     void test() {
-        const std::string f1{"readme.txt"};
-        const std::string f2{"out.txt"};
-        concatenates_two_files(f1,f2);
+        {
+            const std::string f1{"readme.txt"};
+            const std::string f2{"out.txt"};
+            concatenates_two_files(f1,f2);
+        }
+
+        {
+            const std::string f1{"sorted1.txt"};
+            const std::string f2{"sorted2.txt"};
+            print_vec_of_strings(merge_two_already_sorted_files(f1,f2));
+        }
+
+        {
+            const std::string f1{"readme.txt"};
+            auto vec = get_vector_integers_from_file(f1);
+            std::cout << "\nSum:" << get_sum_integers_from_vector(vec) << std::endl;
+        }
+
 
     }
 
@@ -162,6 +242,14 @@ namespace ch9::ex17_19 {
 }
 
 namespace ch9 {
+    int get_number_from_strint(std::string& str) {
+        std::istringstream i_str_stream {str};
+        int number;
+        i_str_stream >> number;
+
+        return number;
+    }
+
     void print_str_vec(const std::vector<std::string>& str_v, std::ostream& os) {
         for (const auto& el: str_v)
             os << el << std::endl;
@@ -256,7 +344,7 @@ namespace ch9 {
         }
     }
 
-    std::ifstream open_input_stream(const std::string& file_name) {
+    [[nodiscard]] std::ifstream open_input_stream(const std::string& file_name) {
         std::ifstream ifs {file_name};
         if (!ifs)
             error("can't open file");
