@@ -70,10 +70,18 @@ grammars:
 
 #include "calculator.h"
 
+#include <sstream>
+
 class Variable;
 class Token_stream;
 const std::string input_prompt = "> ";
 const std::string result_prompt = "= ";
+
+std::ostream* os_global;
+std::istream* is_global;
+std::ifstream ifs_global;
+std::ofstream ofs_global;
+
 
 constexpr char quit_kind = 'q';
 constexpr char print_kind = ';';
@@ -88,6 +96,9 @@ constexpr char space_kind = ' ';
 constexpr char new_line_kind = '\n';
 constexpr char const_kind = 'C';
 constexpr char help_kind = 'h';
+constexpr char file_read_kind = 'f';
+constexpr char file_write_kind = 'F';
+constexpr char file_name_kind = 'n';
 
 const std::string const_key = "const";
 const std::string quit_key = "exit";
@@ -96,6 +107,8 @@ const std::string declarationKey = "let";
 const std::string square_root_key = "sqrt";
 const std::string pow_key = "pow";
 const std::string help_key = "help";
+const std::string file_read_key = "from";
+const std::string file_write_key = "to";
 
 const std::string help_prompt = "The program implements an interactive calculator (REPL) that reads expressions\n"
         "from std::cin, evaluates them, and prints the result. It supports integer\n"
@@ -177,14 +190,14 @@ public:
     void putback(Token t);
 
     Token get();
+    Token get_file_name();
 
     void clean_mess();
 
-    Token_stream(std::istream &stream) : in(stream) {
-    }
+
 
 private:
-    std::istream &in;
+
 
     static bool is_can_be_in_variable_name(char input);
 
@@ -193,6 +206,30 @@ private:
     bool is_full = false;
     Token buffer;
 };
+
+Token Token_stream::get_file_name() {
+    if (is_full) {
+        is_full = false;
+        return buffer;
+    }
+
+    char input = 0;
+
+    if (!(is_global->get(input)))
+        error("Bad input in Token_stream::get(). std::cin error!");
+
+    while (std::isspace(input) && input != new_line_kind) // omit spaces
+        is_global->get(input);
+
+    is_global->putback(input);
+    std::string file_name;
+    *is_global >> file_name;
+
+
+    return Token{file_name, file_name_kind};
+
+
+}
 
 Token Token_stream::translate_keyword_to_token(const std::string &name) {
     if (name == declarationKey)
@@ -216,6 +253,12 @@ Token Token_stream::translate_keyword_to_token(const std::string &name) {
     if (name == help_key)
         return Token{help_kind};
 
+    if (name == file_read_key)
+        return Token{file_read_kind};
+
+    if (name == file_write_key)
+        return Token{file_write_kind};
+
     return Token{nothing_kind};
 }
 
@@ -226,10 +269,10 @@ void Token_stream::clean_mess() {
     }
     is_full = false;
 
-    this->in.clear();
+    is_global->clear();
     char skip = 0;
     while (skip != print_kind && skip != new_line_kind)
-        this->in.get(skip);
+        is_global->get(skip);
 }
 
 
@@ -258,11 +301,17 @@ Token Token_stream::get() {
     }
 
     char input = 0;
+    is_global->get(input);
+    if (is_global->fail()) {
 
-    if (!(this->in.get(input))) error("Bad input in Token_stream::get(). std::cin error!");
+        if (is_global->eof())
+            return Token{quit_kind};
 
+        error("Bad input in Token_stream::get(). std::cin error!");
+        throw;
+    }
     while (std::isspace(input) && input != new_line_kind) // omit spaces
-        in.get(input);
+        is_global->get(input);
 
     switch (input) {
         case print_kind: // for print and exit
@@ -294,9 +343,9 @@ Token Token_stream::get() {
         case '7':
         case '8':
         case '9': {
-            this->in.putback(input);
+            is_global->putback(input);
             double value;
-            this->in >> value;
+            *is_global >> value;
 
             if (!is_integer(value)) error("Must be integer");
 
@@ -305,9 +354,20 @@ Token Token_stream::get() {
 
         case 'I': case 'V': case 'X': case 'L': case 'D':
         case 'M': case 'C': {
-            this->in.putback(input);
             ch9::ex21_22::Roman r;
-            this->in >> r;
+
+            std::string roman_name;
+            roman_name += input;
+
+            while (is_global->get(input) && isalpha(input)) {
+                roman_name += input;
+            }
+
+            is_global->putback(input);
+
+            std::istringstream is_for_roman{roman_name};
+
+            is_for_roman >> r;
 
             return Token{roman_kind,r};
         }
@@ -323,11 +383,11 @@ Token Token_stream::get() {
             if (!std::isalpha(input) && input != '_') error("Bad input in Token_stream::get()!");
 
 
-            while (this->in.get(input) && is_can_be_in_variable_name(input)) {
+            while (is_global->get(input) && is_can_be_in_variable_name(input)) {
                 variable_name += input;
             }
 
-            this->in.putback(input);
+            is_global->putback(input);
 
             Token result_translate = translate_keyword_to_token(variable_name);
 
@@ -722,6 +782,39 @@ Variable &declaration(Token_stream &ts) {
     return *result;
 }
 
+std::ofstream get_file_output_stream(Token_stream& ts) {
+    Token token = ts.get_file_name();
+
+
+    switch (token.kind_of_token) {
+        case file_name_kind: {
+            return ch9::open_output_stream(token.name);
+
+        }
+        default:
+            error("name expected");
+            throw;
+    }
+
+}
+
+std::ifstream get_file_input_stream(Token_stream& ts) {
+    Token token = ts.get_file_name();
+
+
+    switch (token.kind_of_token) {
+        case file_name_kind: {
+            return  ch9::open_input_stream(token.name);
+
+        }
+        default:
+            error("name expected");
+            throw;
+    }
+
+
+}
+
 double statement(Token_stream &ts) {
     Token token = ts.get();
 
@@ -734,6 +827,17 @@ double statement(Token_stream &ts) {
             return declaration(ts).set_constant_type().getValue();
         }
 
+        case file_read_kind: {
+            ifs_global = get_file_input_stream(ts);
+            is_global = &ifs_global;
+            return 0;
+        }
+        case file_write_kind: {
+            ofs_global = get_file_output_stream(ts);
+            os_global = &ofs_global;
+            return 0;
+        }
+
 
         default:
             ts.putback(token);
@@ -741,23 +845,25 @@ double statement(Token_stream &ts) {
     }
 }
 
-void calculation(std::istream &input_stream) {
-    Token_stream ts(input_stream);
+void calculation(std::istream &input_stream, std::ostream& output_stream) {
+    is_global = &input_stream;
+    os_global = &output_stream;
+    Token_stream ts {};
 
     variable_table.add_const_variable_to_table("pi", 3.1415926535);
     variable_table.add_const_variable_to_table("e", 2.7182818284);
     Token token{};
 
     double left = 0;
-    std::cout << "Welcome to simple calculator.\n"
+    *os_global << "Welcome to simple calculator.\n"
             "Please enter expressions using integer numbers.\n"
             "For help, enter 'help'." << std::endl;
 
 
-    while (std::cin)
+    while (input_stream)
         try {
             //std::cout << input_prompt;
-            std::print("{}", input_prompt);
+             *os_global << input_prompt;
 
             token = ts.get();
             variable_table.set_ability_to_assign();
@@ -766,7 +872,7 @@ void calculation(std::istream &input_stream) {
                 token = ts.get();
 
             if (token.kind_of_token == help_kind) {
-                std::print("{}", help_prompt);
+                 *os_global << help_prompt;
                 continue;
             }
             if (token.kind_of_token == quit_kind)
@@ -778,8 +884,7 @@ void calculation(std::istream &input_stream) {
 
             left = statement(ts);
 
-
-            std::cout << result_prompt << left << std::endl; // ch9::ex21_22::Roman{static_cast<int>(left)}
+        *os_global << result_prompt << left << std::endl; // ch9::ex21_22::Roman{static_cast<int>(left)}
         } catch (std::exception &exception) {
             std::cerr << exception.what();
             ts.clean_mess();

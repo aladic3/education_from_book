@@ -12,6 +12,6 @@
 #include "error.h"
 import try_drill;
 
-void calculation(std::istream &input_stream);
+void calculation(std::istream &input_stream, std::ostream& output_stream);
 
 #endif //HELLO_WORLD_CALCULATOR_H

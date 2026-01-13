@@ -207,9 +207,9 @@ namespace ch9 {
     export std::vector<int> read_ints_from_file(const std::string& filename, char terminator = '|');
     export std::ostream& operator<< (std::ostream& os, const ch8::try_drill_ex::Date& date);
 
-    std::ifstream open_input_stream(const std::string& file_name);
+    export [[nodiscard]] std::ifstream open_input_stream(const std::string& file_name);
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word);
-    std::ofstream open_output_stream(const std::string& file_name);
+    export [[nodiscard]] std::ofstream open_output_stream(const std::string& file_name);
     std::vector<std::string> get_separated_words_from_stream(std::istream& is);
     std::vector<std::string> read_words_from_stream(std::istream& is); //symbols after word is separated
 
