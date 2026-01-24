@@ -21,6 +21,8 @@ add_executable(hello_world main.cpp
         chapter9/Roman.cpp
         calculator.h
         calculator.cpp
+        chapter10/ex.ixx
+        chapter10/ex.cpp
 
 
 )
@@ -31,6 +33,7 @@ target_sources(hello_world PUBLIC
        FILES
         chapter9/try_drill.ixx
         chapter8/try/try8.ixx
+        chapter10/ex.ixx
 
 
 )

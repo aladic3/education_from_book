@@ -1,14 +1,13 @@
 #include <iostream>
-#include "error.h"
 #include "calculator.h"
-import try_drill;
+import chapter10;
 
 
 
 
 int main() {
     try {
-        calculation(std::cin, std::cout);
+        ch10::ex12_13::ex12();
     }
     catch (std::exception& err) {
         std::cerr << err.what();
