@@ -9,7 +9,7 @@ int main() {
 
 
     try {
-        ch15::try_::sizeof_test();
+        ch15::try_::test_constructor_and_destructor();
     }
     catch (std::exception& err) {
         std::cerr << err.what();

@@ -8,6 +8,35 @@ module chapter15;
 
 
 namespace ch15::try_ {
+    void test_constructor_and_destructor() {
+        Own_Exception own_exception1;
+        std::exception* own_exception2 = new Own_Exception{"Must create and delete"};
+
+        std::cerr << own_exception1.what() << " -- " << own_exception2->what() << std::endl;
+
+        delete own_exception2;
+    }
+
+    Own_Exception::Own_Exception(const std::string &msg) {
+        this->msg = new std::string(msg);
+        std::cout << "Constructor done\n";
+    }
+
+    Own_Exception::~Own_Exception() noexcept {
+        if (msg)
+            delete msg;
+        std::cout << "Destructor done\n";
+    }
+
+    const char * Own_Exception::what() const noexcept {
+        if (msg)
+            return msg->c_str();
+
+        return std::exception::what();
+    }
+
+
+
     void sizeof_test() {
         long int li = 0;
         long long int lli = 0;
