@@ -29,6 +29,13 @@ namespace ch15::drill {
         }
     }
 
+    void set_values_to_elements_array_double(int start, int *array, int size_array) {
+        for (int* el = array; el != array + size_array; ++el) {
+            *el = start;
+            start*=2;
+        }
+    }
+
     void part1_2() {
         constexpr int size_v = 20;
         std::vector<int> vector(size_v);
@@ -47,6 +54,20 @@ namespace ch15::drill {
             el = start;
             ++start;
         }
+    }
+
+    void part2() {
+        const int size_array = 7;
+        int* p1 = new int(size_array);
+        int* p2 = new int[size_array];
+
+        set_values_to_elements_array_double(1,p2,size_array);
+        print_array(std::cout,p2,size_array);
+
+        std::cout << *p1 << std::endl;
+
+        delete p1;
+        delete[] p2;
     }
 
 }

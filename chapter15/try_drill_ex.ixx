@@ -27,8 +27,14 @@ export namespace ch15::drill {
     void part1();
     void part1_2();
 
+    void part2();
+
+
+
     void print_array(std::ostream& os, const int* array, int size_array);
     void set_values_to_elements_array(int start, int* array, int size_array); // start with start ... start+size_array is end
+    void set_values_to_elements_array_double(int start, int* array, int size_array); // 1 2 4 8 etc
+
 
     void print_vector(std::ostream& os, const std::vector<int>& vector);
     void set_values_to_elements_vector(int start, std::vector<int>& vector); // start with start ... start+size_array is end
