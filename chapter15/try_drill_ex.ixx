@@ -38,6 +38,6 @@ export namespace ch15::drill {
 
     void print_vector(std::ostream& os, const std::vector<int>& vector);
     void set_values_to_elements_vector(int start, std::vector<int>& vector); // start with start ... start+size_array is end
-
+    void set_values_to_elements_vector_double(int start, std::vector<int>& vector);
 }
 
