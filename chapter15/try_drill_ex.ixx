@@ -43,6 +43,31 @@ export namespace ch15::drill {
 }
 
 export namespace ch15::exercises {
+
+    struct Linked_list_char { // char
+        Linked_list_char(char val) : value(val) {}
+        Linked_list_char() : value('_'){}
+
+        Linked_list_char operator=(Linked_list_char&) = delete;
+        Linked_list_char(Linked_list_char&) = delete;
+
+        ~Linked_list_char();
+
+        void add(char val);
+        [[nodiscard]] char get_value() const;
+        [[nodiscard]] Linked_list_char* next() const;
+
+
+    private:
+        char value{};
+
+        Linked_list_char* right = nullptr;
+    };
+
+    std::ostream& operator<<(std::ostream& os, const Linked_list_char& list);
+
+
+
     void ex4();
     void ex5();
     void ex6();

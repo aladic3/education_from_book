@@ -55,6 +55,35 @@ namespace ch15::exercises {
         delete p1;
     }
 
+    Linked_list_char::~Linked_list_char() {
+        delete right;
+    }
+
+    void Linked_list_char::add(char val) {
+        if (right)
+            return right->add(val);
+
+        right = new Linked_list_char(val);
+    }
+
+    char Linked_list_char::get_value() const {
+        return value;
+    }
+
+    Linked_list_char * Linked_list_char::next() const {
+        if (right)
+            return right;
+
+        return nullptr;
+    }
+
+    std::ostream & operator<<(std::ostream &os,  Linked_list_char& list) {
+        for (Linked_list_char* link = list.next(); link != nullptr; link = link->next())
+            os << link->get_value();
+
+        return os;
+    }
+
     void ex4() {
         stack_test(1,true);
         free_test();
@@ -80,6 +109,15 @@ namespace ch15::exercises {
     }
 
     void ex6() {
+        Linked_list_char list;
+        constexpr char terminator = '!';
 
+        std::cout << "For terminate enter \'" << terminator <<"\'. Enter smth:\n";
+
+        for (char input = static_cast<char>(std::cin.get()); input != terminator; std::cin.get(input))
+            list.add(input);
+
+        std::cout << "\nInputted:\n";
+        std::cout << list;
     }
 }
