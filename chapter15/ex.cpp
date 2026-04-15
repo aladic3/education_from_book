@@ -5,7 +5,10 @@
 module;
 
 #include <iostream>
+#include <utility>
 #include <vector>
+
+#include "../error.h"
 
 module chapter15;
 
@@ -77,6 +80,66 @@ namespace ch15::exercises {
         return nullptr;
     }
 
+    Link::Link(const std::string& val) {
+        add(val);
+    }
+
+    Link::Link(std::string  val, Link* left) : value(std::move(val)), left(left) {}
+
+    Link::~Link() {
+        if (right) {
+            delete right;
+            return;
+        }
+
+        delete this;
+    }
+
+    Link & Link::insert(const std::string &, const Link &right) {
+    }
+
+    Link * Link::erase(const std::string &) {
+    }
+
+    void Link::add(const std::string & val) {
+        if (right)
+            // ReSharper disable once CppDFANullDereference
+            return right->add(val);
+
+        right = new Link(val,this);
+    }
+
+    Link * Link::find(const std::string &) {
+    }
+
+    const std::string& Link::get_value() const{
+        return value;
+    }
+
+    const std::string & Link::operator[](int iterator) const{
+        if (iterator >= size())
+            error("out of range");
+
+        const Link *temp = this;
+
+        for (int i = 0; i < iterator; i++)
+            temp = temp->right;
+
+        return temp->get_value();
+    }
+
+    int Link::size() const{
+        const Link* temp = this;
+        int count = 0;
+
+        while (temp->right) {
+            ++count;
+            temp = temp->right;
+        }
+
+        return count;
+    }
+
     std::ostream & operator<<(std::ostream &os,  Linked_list_char& list) {
         for (Linked_list_char* link = list.next(); link != nullptr; link = link->next())
             os << link->get_value();
@@ -84,9 +147,9 @@ namespace ch15::exercises {
         return os;
     }
 
-    void ex4() {
-        stack_test(1,true);
-        free_test();
+    void ex4_and_8() {
+        stack_test(1,true); // stack grow down
+        free_test(); // free grow up
         static_test();
     }
 
@@ -108,7 +171,7 @@ namespace ch15::exercises {
 
     }
 
-    void ex6() {
+    void ex6_and_9() {
         Linked_list_char list;
         constexpr char terminator = '!';
 

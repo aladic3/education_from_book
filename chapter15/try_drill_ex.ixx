@@ -56,22 +56,43 @@ export namespace ch15::exercises {
         void add(char val);
         [[nodiscard]] char get_value() const;
         [[nodiscard]] Linked_list_char* next() const;
-
-
     private:
-        char value{};
-
+        char value;
         Linked_list_char* right = nullptr;
     };
 
     std::ostream& operator<<(std::ostream& os, const Linked_list_char& list);
 
+    struct Link {
+        Link& operator=(Link&) = delete;
+        Link(Link&) = delete;
+        Link()= default;
+
+        Link(const std::string&);
+        Link(std::string , Link* left);
+        ~Link();
+
+        Link& insert(const std::string&, const Link& right);
+        Link* erase(const std::string&);
+        void add(const std::string&);
+        Link* find(const std::string&);
+        const std::string& get_value() const;
+
+        const std::string& operator[](int iterator) const;
+        int size() const;
+
+
+    private:
+        std::string value;
+        Link* left = nullptr;
+        Link* right = nullptr;
+    };
 
 
 
-    void ex4();
+    void ex4_and_8();
     void ex5();
-    void ex6();
+    void ex6_and_9();
     void ex7();
 
 
