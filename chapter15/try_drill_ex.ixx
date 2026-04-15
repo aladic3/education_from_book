@@ -68,7 +68,11 @@ export namespace ch15::exercises {
 
 
 
+
     void ex4();
     void ex5();
     void ex6();
+    void ex7();
+
+
 }

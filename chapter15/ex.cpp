@@ -120,4 +120,16 @@ namespace ch15::exercises {
         std::cout << "\nInputted:\n";
         std::cout << list;
     }
+
+    void ex7() {
+        std::string buffer;
+        constexpr char terminator = '!';
+        std::cout << "For terminate enter \'" << terminator <<"\'. Enter smth:\n";
+
+        for (char input = static_cast<char>(std::cin.get()); input != terminator; std::cin.get(input))
+            buffer.push_back(input);
+
+        std::cout << "\nInputted:\n";
+        std::cout << buffer;
+    }
 }
