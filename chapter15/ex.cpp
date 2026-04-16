@@ -80,25 +80,48 @@ namespace ch15::exercises {
         return nullptr;
     }
 
-    Link::Link(const std::string& val) {
-        add(val);
-    }
+    Link::Link(const std::string& val) : value(val){}
 
     Link::Link(std::string  val, Link* left) : value(std::move(val)), left(left) {}
 
+    Link::Link(std::string val, Link *left, Link *right) : value(std::move(val)), left(left), right(right){}
+
     Link::~Link() {
-        if (right) {
+        if (right)
             delete right;
-            return;
-        }
 
-        delete this;
     }
 
-    Link & Link::insert(const std::string &, const Link &right) {
+    Link * Link::insert(const std::string & val, Link * right_link) const {
+        if (right_link == nullptr)
+            return nullptr;
+
+        Link* temp = right_link->left;
+        right_link->left = new Link(val,right_link->left,right_link);
+        temp->right = right_link->left;
+
+        return right_link->left;
     }
 
-    Link * Link::erase(const std::string &) {
+    Link * Link::insert(const std::string & val, int index) {
+        Link * right_link = this->operator[](index);
+        return insert(val,right_link);
+    }
+
+    Link * Link::erase(const std::string & val) {
+        Link* element = find(val);
+
+        if (element == nullptr)
+            return nullptr;
+
+        if (element->right)
+            element->right->left = element->left;
+
+        element->left->right = element->right;
+        element->left = nullptr;
+        element->right = nullptr;
+
+        return element;
     }
 
     void Link::add(const std::string & val) {
@@ -109,23 +132,32 @@ namespace ch15::exercises {
         right = new Link(val,this);
     }
 
-    Link * Link::find(const std::string &) {
+    Link * Link::find(const std::string & val) const {
+        Link *temp = this->right;
+
+        for (int i = 0; i < size(); i++) {
+            if (val == temp->get_value())
+                return temp;
+            temp = temp->right;
+        }
+
+        return nullptr;
     }
 
     const std::string& Link::get_value() const{
         return value;
     }
 
-    const std::string & Link::operator[](int iterator) const{
+    Link* Link::operator[](int iterator) const {
         if (iterator >= size())
             error("out of range");
 
-        const Link *temp = this;
+        Link *temp = this->right;
 
         for (int i = 0; i < iterator; i++)
             temp = temp->right;
 
-        return temp->get_value();
+        return temp;
     }
 
     int Link::size() const{
@@ -194,5 +226,19 @@ namespace ch15::exercises {
 
         std::cout << "\nInputted:\n";
         std::cout << buffer;
+    }
+
+    void ex10() {
+        Link link;
+        link.add("First");
+        link.add("Second");
+        Link* p0 = link[1];
+        Link* p = link.insert("Third",1);
+        p = link.insert("Fourth",p);
+        p = link.find("Second");
+        p = link.erase(p->get_value());
+        delete p;
+
+
     }
 }

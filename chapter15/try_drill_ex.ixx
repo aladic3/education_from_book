@@ -68,21 +68,24 @@ export namespace ch15::exercises {
         Link(Link&) = delete;
         Link()= default;
 
-        Link(const std::string&);
-        Link(std::string , Link* left);
         ~Link();
 
-        Link& insert(const std::string&, const Link& right);
+        Link* insert(const std::string&, Link* right_link) const;
+        Link* insert(const std::string&, int index);
         Link* erase(const std::string&);
         void add(const std::string&);
-        Link* find(const std::string&);
+        Link* find(const std::string&) const;
         const std::string& get_value() const;
 
-        const std::string& operator[](int iterator) const;
+        Link*  operator[](int iterator) const;
         int size() const;
 
 
     private:
+        Link(const std::string&);
+        Link(std::string , Link* left); // in end link
+        Link(std::string, Link* left, Link* right);
+
         std::string value;
         Link* left = nullptr;
         Link* right = nullptr;
@@ -94,6 +97,7 @@ export namespace ch15::exercises {
     void ex5();
     void ex6_and_9();
     void ex7();
+    void ex10();
 
 
 }
