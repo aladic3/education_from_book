@@ -80,11 +80,20 @@ namespace ch15::exercises {
         return nullptr;
     }
 
-    Link::Link(const std::string& val) : value(val){}
+    void print_all(const Link& link, std::ostream &os) {
+        for (int i = 0; i < link.size(); i++) {
+            const auto& properties = link[i]->get_value();
+            os << properties.name << '\t' << properties.mythology << '\t'
+            << properties.vehicle << '\t' << properties.weapon << '\n';
+        }
 
-    Link::Link(std::string  val, Link* left) : value(std::move(val)), left(left) {}
+    }
 
-    Link::Link(std::string val, Link *left, Link *right) : value(std::move(val)), left(left), right(right){}
+    Link::Link(God  val) : properties(std::move(val)){}
+
+    Link::Link(God val, Link* left) : properties(std::move(val)), left(left) {}
+
+    Link::Link(God val, Link *left, Link *right) : properties(std::move(val)), left(left), right(right){}
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
     Link * Link::move_right(Link *el) {
@@ -127,7 +136,7 @@ namespace ch15::exercises {
 
     }
 
-    Link * Link::insert(const std::string & val, Link * right_link) const {
+    Link * Link::insert(const God & val, Link * right_link) const {
         if (right_link == nullptr)
             return nullptr;
 
@@ -138,7 +147,7 @@ namespace ch15::exercises {
         return right_link->left;
     }
 
-    Link * Link::insert(const std::string & val, int index) {
+    Link * Link::insert(const God & val, int index) {
         Link * right_link = this->operator[](index);
         return insert(val,right_link);
     }
@@ -159,7 +168,7 @@ namespace ch15::exercises {
         return element;
     }
 
-    Link * Link::advance(Link *element, int n) {
+    Link * Link::move(Link *element, int n) {
         if (element == nullptr || n == 0)
             return nullptr;
 
@@ -178,7 +187,7 @@ namespace ch15::exercises {
         return element;
     }
 
-    void Link::add(const std::string & val) {
+    void Link::add(const God & val) {
         if (right)
             // ReSharper disable once CppDFANullDereference
             return right->add(val);
@@ -186,11 +195,27 @@ namespace ch15::exercises {
         right = new Link(val,this);
     }
 
+    void Link::add_ordered(const God & element) { // by first word only
+        char first_word_new = static_cast<char>(
+                std::tolower(element.name[0]));
+        for (int i = 0; i < size(); i++) {
+            char first_word_current = static_cast<char>(
+                std::tolower(this->operator[](i)->get_value().name[0]));
+
+            if (first_word_new <= first_word_current) {
+                insert(element,i);
+                return;
+            }
+
+        }
+        add(element);
+    }
+
     Link * Link::find(const std::string & val) {
         Link *temp = this->right;
 
         for (int i = 0; i < size(); i++) {
-            if (val == temp->get_value())
+            if (val == temp->get_value().name)
                 return temp;
             temp = temp->right;
         }
@@ -202,7 +227,7 @@ namespace ch15::exercises {
         Link *temp = this->right;
 
         for (int i = 0; i < size(); i++) {
-            if (val == temp->get_value())
+            if (val == temp->get_value().name)
                 return temp;
             temp = temp->right;
         }
@@ -210,8 +235,8 @@ namespace ch15::exercises {
         return nullptr;
     }
 
-    const std::string& Link::get_value() const{
-        return value;
+    const Link::God& Link::get_value() const{
+        return properties;
     }
 
     Link* Link::operator[](int iterator) const {
@@ -294,18 +319,23 @@ namespace ch15::exercises {
         std::cout << buffer;
     }
 
-    void ex10() {
+    void ex10_12() {
         Link link;
-        link.add("First");
-        link.add("Second");
+        link.add({"First"});
+        link.add({"Second"});
         Link* p0 = link[1];
-        Link* p = link.insert("Third",1);
-        p = link.insert("Fourth",p);
+        Link* p = link.insert({"Third"},1);
+        p = link.insert({"Fourth"},p);
         p = link.find("Second");
-        p = link.advance(link[0],10);
-        p = link.advance(link[3], -10);
-        p = link.erase(p->get_value());
+        p = link.move(link[0],10);
+        p = link.move(link[3], -10);
+        p = link.erase(p->get_value().name);
 
+        link.add_ordered({"Arnold"});
+        link.add_ordered({"Zelenskiy"});
+        link.add_ordered({"Kyrylo"});
+
+        print_all(link,std::cout);
 
         delete p;
 
