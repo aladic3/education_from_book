@@ -86,6 +86,41 @@ namespace ch15::exercises {
 
     Link::Link(std::string val, Link *left, Link *right) : value(std::move(val)), left(left), right(right){}
 
+    // ReSharper disable once CppMemberFunctionMayBeStatic
+    Link * Link::move_right(Link *el) {
+        if (el->right == nullptr)
+            return nullptr;
+
+        el->left->right = el->right;
+        el->right->left = el->left;
+
+        Link* right_el = el->right;
+        el->left = right_el;
+        el->right = right_el->right;
+        right_el->right = el;
+
+        if (el->right) el->right->left = el;
+
+        return el;
+    }
+
+    Link * Link::move_left(Link *el) {
+        if (el->left == this)
+            return nullptr;
+
+        el->left->right = el->right;
+        if (el->right) el->right->left = el->left;
+
+        Link* left_el = el->left;
+        el->right = left_el;
+        el->left = left_el->left;
+        left_el->left = el;
+
+        el->left->right = el;
+
+        return el;
+    }
+
     Link::~Link() {
         if (right)
             delete right;
@@ -124,6 +159,25 @@ namespace ch15::exercises {
         return element;
     }
 
+    Link * Link::advance(Link *element, int n) {
+        if (element == nullptr || n == 0)
+            return nullptr;
+
+        Link* res_moving = element;
+        int increment_i = 1;
+
+        if (n < 0) increment_i = -1;
+
+        if (increment_i > 0)
+            for (int i = 0; i != n && res_moving; i+=increment_i)
+                res_moving = move_right(element);
+        else
+            for (int i = 0; i != n && res_moving; i+=increment_i)
+                res_moving = move_left(element);
+
+        return element;
+    }
+
     void Link::add(const std::string & val) {
         if (right)
             // ReSharper disable once CppDFANullDereference
@@ -132,7 +186,19 @@ namespace ch15::exercises {
         right = new Link(val,this);
     }
 
-    Link * Link::find(const std::string & val) const {
+    Link * Link::find(const std::string & val) {
+        Link *temp = this->right;
+
+        for (int i = 0; i < size(); i++) {
+            if (val == temp->get_value())
+                return temp;
+            temp = temp->right;
+        }
+
+        return nullptr;
+    }
+
+    const Link * Link::find(const std::string & val) const {
         Link *temp = this->right;
 
         for (int i = 0; i < size(); i++) {
@@ -236,7 +302,11 @@ namespace ch15::exercises {
         Link* p = link.insert("Third",1);
         p = link.insert("Fourth",p);
         p = link.find("Second");
+        p = link.advance(link[0],10);
+        p = link.advance(link[3], -10);
         p = link.erase(p->get_value());
+
+
         delete p;
 
 

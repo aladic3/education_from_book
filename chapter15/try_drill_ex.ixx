@@ -64,27 +64,33 @@ export namespace ch15::exercises {
     std::ostream& operator<<(std::ostream& os, const Linked_list_char& list);
 
     struct Link {
-        Link& operator=(Link&) = delete;
-        Link(Link&) = delete;
-        Link()= default;
+        Link& operator=(const Link&) = delete;
+        Link(const Link&) = delete;
+        Link() : value("BEGIN"){}
 
         ~Link();
 
         Link* insert(const std::string&, Link* right_link) const;
         Link* insert(const std::string&, int index);
         Link* erase(const std::string&);
+        Link* advance(Link* element, int n); // move backward or forward
         void add(const std::string&);
-        Link* find(const std::string&) const;
-        const std::string& get_value() const;
+        [[nodiscard]] Link* find(const std::string&);
+
+        [[nodiscard]] const Link* find(const std::string&) const;
+        [[nodiscard]] const std::string& get_value() const;
 
         Link*  operator[](int iterator) const;
-        int size() const;
+        [[nodiscard]] int size() const;
 
 
     private:
         Link(const std::string&);
         Link(std::string , Link* left); // in end link
         Link(std::string, Link* left, Link* right);
+ 
+        Link* move_right(Link* el);
+        Link* move_left(Link* el);
 
         std::string value;
         Link* left = nullptr;
