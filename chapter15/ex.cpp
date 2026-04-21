@@ -131,9 +131,10 @@ namespace ch15::exercises {
     }
 
     Link::~Link() {
-        if (right)
-            delete right;
+        if (left)
+            left->right = nullptr;
 
+        delete right;
     }
 
     Link * Link::insert(const God & val, Link * right_link) const {
@@ -161,7 +162,9 @@ namespace ch15::exercises {
         if (element->right)
             element->right->left = element->left;
 
-        element->left->right = element->right;
+        if (element->left)
+             element->left->right = element->right;
+
         element->left = nullptr;
         element->right = nullptr;
 
@@ -209,6 +212,12 @@ namespace ch15::exercises {
 
         }
         add(element);
+    }
+
+    void Link::add_ordered(Link * node) {
+        if (node)
+            add_ordered(node->get_value());
+        delete node;
     }
 
     Link * Link::find(const std::string & val) {
@@ -319,24 +328,44 @@ namespace ch15::exercises {
         std::cout << buffer;
     }
 
-    void ex10_12() {
+    void ex10_13() {
+        Link* aedra = new Link;
+        Link* daedra = new Link;
+        Link* nine = new Link;
         Link link;
-        link.add({"First"});
-        link.add({"Second"});
-        Link* p0 = link[1];
-        Link* p = link.insert({"Third"},1);
-        p = link.insert({"Fourth"},p);
+        link.add({"First","Daedra"});
+        link.add_ordered({"Gaaaal"});
+        link.add_ordered({"Boooo"});
+        link.add_ordered({"J"});
+        daedra->add_ordered(link.erase("First"));
+        link.add({"Second","Aedra"});
+        Link* p0 = link[0];
+        Link* p = link.insert({"Third","Nine"},0);
+        p = link.insert({"Fourth","Nine"},p);
         p = link.find("Second");
         p = link.move(link[0],10);
         p = link.move(link[3], -10);
         p = link.erase(p->get_value().name);
 
+        aedra->add_ordered(link.erase("Second"));
+        nine->add_ordered(link.erase("Fourth"));
+        nine->add_ordered(link.erase("Third"));
+
         link.add_ordered({"Arnold"});
         link.add_ordered({"Zelenskiy"});
         link.add_ordered({"Kyrylo"});
 
+        std::cout << "<<<<<<<<<<link\n";
         print_all(link,std::cout);
+        std::cout << "<<<<<<<<<<aedra\n";
+        print_all(*aedra,std::cout);
+        std::cout << "<<<<<<<<<<daedra\n";
+        print_all(*daedra,std::cout);
+        std::cout << "<<<<<<<<<<nine\n";
+        print_all(*nine,std::cout);
 
+        delete link[1];
+        delete link[0];
         delete p;
 
 

@@ -85,6 +85,7 @@ export namespace ch15::exercises {
         Link* move(Link* element, int n); // move backward or forward
         void add(const God&);
         void add_ordered(const God&);
+        void add_ordered(Link*);
         [[nodiscard]] Link* find(const std::string&); // by name
 
         [[nodiscard]] const Link* find(const std::string&) const;
@@ -117,7 +118,7 @@ export namespace ch15::exercises {
     void ex5();
     void ex6_and_9();
     void ex7();
-    void ex10_12();
+    void ex10_13();
 
 
 }
