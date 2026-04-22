@@ -88,6 +88,166 @@ namespace ch15::exercises {
         }
 
     }
+    void print_all(const Link_v1 &link, std::ostream &os) {
+        for (int i = 0; i < link.size(); i++) {
+            const auto& properties = link[i]->get_value();
+            os << properties.name << '\t' << properties.mythology << '\t'
+            << properties.vehicle << '\t' << properties.weapon << '\n';
+        }
+    }
+
+    // TODO
+    Link_v1::~Link_v1() = default;
+
+    Link_v1::Link_v1(God el) : properties(std::move(el)){}
+
+    Link_v1::Link_v1(God param, Link_v1 *right) : properties(std::move(param)), right(right){}
+
+    Link_v1 * Link_v1::insert(const God & param, const Link_v1 *right_link) {
+        Link_v1* temp = this; // left element
+
+        while (temp->right != right_link && temp->right != nullptr)
+            temp = temp->right;
+
+        Link_v1* left_link = temp;
+
+        left_link->right = new Link_v1(param,left_link->right);
+
+        return left_link->right;
+    }
+
+    Link_v1 * Link_v1::insert(const God & param, int index) {
+        if (index >= size() || index < 0)
+            error("Bad index");
+
+        return insert(param,this->operator[](index));
+    }
+
+    Link_v1 * Link_v1::erase(const std::string & name) {
+        Link_v1* temp = this;
+
+        while (temp->right->get_value().name != name && temp->right != nullptr)
+            temp = temp->right;
+
+        Link_v1* right_link = temp->right;
+
+        if (right_link == nullptr)
+            return right_link;
+
+        temp->right = right_link->right;
+        right_link->right = nullptr;
+
+        return right_link;
+    }
+
+    void Link_v1::add(const God & el) {
+        Link_v1* temp = this;
+
+        while (temp->right)
+            temp = temp->right;
+
+        temp->right = new Link_v1(el);
+    }
+
+    void Link_v1::add_ordered(const God & element) {
+        char first_word_new = static_cast<char>(
+                std::tolower(element.name[0]));
+
+        for (Link_v1* temp = this; temp->right != nullptr; temp = temp->right){
+            char first_word_current = static_cast<char>(
+                std::tolower(temp->right->get_value().name[0]));
+
+            if (first_word_new <= first_word_current) {
+                Link_v1* left_link = temp;
+
+                left_link->right = new Link_v1(element,left_link->right);
+                return;
+            }
+
+        }
+        add(element);
+
+    }
+
+    void Link_v1::add_ordered(Link_v1 * node) {
+        if (node == nullptr)
+            return error("void Link_v1::add_ordered(Link_v1 * node):bad node address");
+
+        char first_word_new = static_cast<char>(
+                std::tolower(node->get_value().name[0]));
+
+        Link_v1* temp = this;
+
+        for (; temp->right != nullptr; temp = temp->right){
+            char first_word_current = static_cast<char>(
+                std::tolower(temp->right->get_value().name[0]));
+
+            if (first_word_new <= first_word_current) {
+                Link_v1* left_link = temp;
+                node->right = left_link->right;
+                left_link->right = node;
+                return;
+            }
+
+        }
+
+        temp->right = node;
+        node->right = nullptr;
+    }
+
+    Link_v1 * Link_v1::find(const std::string & val) {
+        Link_v1 *temp = this->right;
+
+        for (int i = 0; i < size(); i++) {
+            if (val == temp->get_value().name)
+                return temp;
+            temp = temp->right;
+        }
+
+        return nullptr;
+    }
+
+    const Link_v1 * Link_v1::find(const std::string & val) const {
+        Link_v1 *temp = this->right;
+
+        for (int i = 0; i < size(); i++) {
+            if (val == temp->get_value().name)
+                return temp;
+            temp = temp->right;
+        }
+
+        return nullptr;
+    }
+
+    const Link_v1::God & Link_v1::get_value() const {
+        return this->properties;
+    }
+
+    Link_v1 * Link_v1::operator[](int iterator) const {
+        if (iterator >= size())
+            error("out of range");
+
+        Link_v1 *temp = this->right;
+
+        for (int i = 0; i < iterator; i++)
+            temp = temp->right;
+
+        return temp;
+    }
+
+    int Link_v1::size() const {
+        const Link_v1* temp = this;
+        int count = 0;
+
+        while (temp->right) {
+            ++count;
+            temp = temp->right;
+        }
+
+        return count;
+    }
+
+
 
     Link::Link(God  val) : properties(std::move(val)){}
 
@@ -171,7 +331,7 @@ namespace ch15::exercises {
         return element;
     }
 
-    Link * Link::move(Link *element, int n) {
+    Link * Link::move_on_this(Link *element, int n) {
         if (element == nullptr || n == 0)
             return nullptr;
 
@@ -343,8 +503,8 @@ namespace ch15::exercises {
         Link* p = link.insert({"Third","Nine"},0);
         p = link.insert({"Fourth","Nine"},p);
         p = link.find("Second");
-        p = link.move(link[0],10);
-        p = link.move(link[3], -10);
+        p = link.move_on_this(link[0],10);
+        p = link.move_on_this(link[3], -10);
         p = link.erase(p->get_value().name);
 
         aedra->add_ordered(link.erase("Second"));
@@ -370,4 +530,48 @@ namespace ch15::exercises {
 
 
     }
+
+    void ex14() {
+        Link_v1* aedra = new Link_v1;
+        Link_v1* daedra = new Link_v1;
+        Link_v1* nine = new Link_v1;
+        Link_v1 link;
+        link.add({"First","Daedra"});
+        link.add_ordered({"Gaaaal"});
+        link.add_ordered({"Boooo"});
+        link.add_ordered({"J"});
+        daedra->add_ordered(link.erase("First"));
+        link.add({"Second","Aedra"});
+        Link_v1* p0 = link[0];
+        Link_v1* p = link.insert({"Third","Nine"},0);
+        p = link.insert({"Fourth","Nine"},p);
+        p = link.find("Second");
+        // p = link.move_on_this(link[0],10);
+        // p = link.move_on_this(link[3], -10);
+        p = link.erase(p->get_value().name);
+
+        aedra->add_ordered(p);
+        nine->add_ordered(link.erase("Fourth"));
+        nine->add_ordered(link.erase("Third"));
+
+        link.add_ordered({"Arnold"});
+        link.add_ordered({"Zelenskiy"});
+        link.add_ordered({"Kyrylo"});
+
+        std::cout << "<<<<<<<<<<link\n";
+        print_all(link,std::cout);
+        std::cout << "<<<<<<<<<<aedra\n";
+        print_all(*aedra,std::cout);
+        std::cout << "<<<<<<<<<<daedra\n";
+        print_all(*daedra,std::cout);
+        std::cout << "<<<<<<<<<<nine\n";
+        print_all(*nine,std::cout);
+
+        delete link[1];
+        delete link[0];
+        delete p;
+
+    }
+
+
 }

@@ -82,7 +82,7 @@ export namespace ch15::exercises {
         Link* insert(const God&, Link* right_link) const; // create and insert by
         Link* insert(const God&, int index); // create and insert by index
         Link* erase(const std::string&); // by name
-        Link* move(Link* element, int n); // move backward or forward
+        Link* move_on_this(Link* element, int n); // move backward or forward
         void add(const God&);
         void add_ordered(const God&);
         void add_ordered(Link*);
@@ -96,10 +96,10 @@ export namespace ch15::exercises {
 
 
     private:
-        Link(God );
+        Link(God ); // create without left and right pointers
         Link(God, Link* left); // in end link
         Link(God, Link* left, Link* right);
- 
+
         Link* move_right(Link* el);
         Link* move_left(Link* el);
 
@@ -108,17 +108,55 @@ export namespace ch15::exercises {
         Link* right = nullptr;
     };
 
+
+    struct Link_v1 {
+        struct God{
+            std::string name;
+            std::string mythology;
+            std::string vehicle;
+            std::string weapon;
+        };
+
+        Link_v1& operator=(const Link_v1&) = delete;
+        Link_v1(const Link_v1&) = delete;
+        Link_v1() : properties("BEGIN"){}
+
+        ~Link_v1();
+
+        Link_v1* insert(const God&, const Link_v1* right_link); // create and insert by
+        Link_v1* insert(const God&, int index); // create and insert by index
+        Link_v1* erase(const std::string&); // by name
+
+        void add(const God&);
+        void add_ordered(const God&);
+        void add_ordered(Link_v1*);
+        [[nodiscard]] Link_v1* find(const std::string&); // by name
+
+        [[nodiscard]] const Link_v1* find(const std::string&) const;
+        [[nodiscard]] const God& get_value() const;
+
+        Link_v1*  operator[](int iterator) const;
+        [[nodiscard]] int size() const;
+
+
+    private:
+        Link_v1(God );
+        Link_v1(God, Link_v1* right);
+
+        God properties;
+
+        Link_v1* right = nullptr;
+    };
+
     void print_all(const Link& link, std::ostream& os);
-
-
-
-
+    void print_all(const Link_v1& link, std::ostream& os);
 
     void ex4_and_8();
     void ex5();
     void ex6_and_9();
     void ex7();
     void ex10_13();
+    void ex14();
 
 
 }
