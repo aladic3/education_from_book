@@ -137,7 +137,7 @@ export namespace ch15::exercises {
 
         Link_v1*  operator[](int iterator) const;
         [[nodiscard]] int size() const;
-
+        [[nodiscard]] Link_v1* next() const  {return right;}
 
     private:
         Link_v1(God );
@@ -147,6 +147,32 @@ export namespace ch15::exercises {
 
         Link_v1* right = nullptr;
     };
+
+
+    struct Node {
+        double val{0};
+        Node* next = nullptr; // for both is right node
+        Node* prev = nullptr; // for Forward_node is left node, for Skip_node is down node
+    };
+
+
+    struct Skipped_link {
+
+
+        Node* add(double);
+        Node* erase(double);
+        Node* find(double);
+
+    private:
+        std::vector<Node*> layer;
+
+        Node* first_attempt(double);
+        Node* insert(double);
+
+        bool flip_coin();
+    };
+
+
 
     void print_all(const Link& link, std::ostream& os);
     void print_all(const Link_v1& link, std::ostream& os);

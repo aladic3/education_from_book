@@ -80,6 +80,70 @@ namespace ch15::exercises {
         return nullptr;
     }
 
+
+    Node * Skipped_link::add(double val) {
+        if (layer.empty())
+            return first_attempt(val);
+
+
+        Node* current_node = layer.back();
+        Node* prev_node = current_node;
+
+        // must add to current_node->next
+        while (current_node) {
+            if (current_node->next == prev_node) { // if first level reached
+                // must add to this level
+                current_node = current_node->next;
+                break;
+            }
+
+            prev_node = current_node;
+
+            if (val <= current_node->val || current_node->next == nullptr) {
+                current_node = current_node->prev; // go down
+                continue;
+            }
+
+            current_node = current_node->next;
+        }
+
+        if (current_node) // we must insert right of node
+        {
+            Node* temp = current_node->next;
+            current_node->next = new Node{val,temp,current_node};
+            temp->prev = current_node->next;
+        }else { // we must insert left of first node. Use prev_node
+            Node* temp = layer.front();
+            temp->prev = new Node{val,temp,nullptr};
+            layer.front() = temp;
+        }
+    }
+
+
+    Node * Skipped_link::first_attempt(double val) {
+        layer.emplace_back(new Node{val});
+
+        while (flip_coin()) {
+            layer.emplace_back(new Node{val,nullptr,layer.back()});
+        }
+
+        return layer.back();
+    }
+
+    Node * Skipped_link::insert(double val) {
+
+    }
+
+    Node * Skipped_link::erase(double val) {
+    }
+
+    Node * Skipped_link::find(double val) {
+    }
+
+    bool Skipped_link::flip_coin() {
+
+    }
+
     void print_all(const Link& link, std::ostream &os) {
         for (int i = 0; i < link.size(); i++) {
             const auto& properties = link[i]->get_value();
@@ -97,7 +161,11 @@ namespace ch15::exercises {
     }
 
     // TODO
-    Link_v1::~Link_v1() = default;
+    Link_v1::~Link_v1() {
+        delete right;
+    }
+
+
 
     Link_v1::Link_v1(God el) : properties(std::move(el)){}
 
