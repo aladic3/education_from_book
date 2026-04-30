@@ -83,44 +83,13 @@ namespace ch15::exercises {
 
     Node * Skipped_link::add(double val) {
         if (layer.empty())
-            return first_attempt(val);
+            return first_addition(val);
 
-
-        Node* current_node = layer.back();
-        Node* prev_node = current_node;
-
-        // must add to current_node->next
-        while (current_node) {
-            if (current_node->next == prev_node) { // if first level reached
-                // must add to this level
-                current_node = current_node->next;
-                break;
-            }
-
-            prev_node = current_node;
-
-            if (val <= current_node->val || current_node->next == nullptr) {
-                current_node = current_node->prev; // go down
-                continue;
-            }
-
-            current_node = current_node->next;
-        }
-
-        if (current_node) // we must insert right of node
-        {
-            Node* temp = current_node->next;
-            current_node->next = new Node{val,temp,current_node};
-            temp->prev = current_node->next;
-        }else { // we must insert left of first node. Use prev_node
-            Node* temp = layer.front();
-            temp->prev = new Node{val,temp,nullptr};
-            layer.front() = temp;
-        }
+        Node* result = insert_to_first_layer(val);
     }
 
 
-    Node * Skipped_link::first_attempt(double val) {
+    Node * Skipped_link::first_addition(double val) {
         layer.emplace_back(new Node{val});
 
         while (flip_coin()) {
@@ -130,8 +99,70 @@ namespace ch15::exercises {
         return layer.back();
     }
 
-    Node * Skipped_link::insert(double val) {
+    Node * insert_right_dual_linked(double val, Node* left_node) {
+        Node* right_node = left_node->next;
+        left_node->next = new Node{val,right_node,left_node};
+        if (right_node) right_node->prev = left_node->next;
 
+        return left_node->next;
+    }
+
+    Node * insert_left_dual_linked(double val, Node* right_node) {
+        Node* left_node = right_node->prev;
+        right_node->prev = new Node{val,right_node,left_node};
+        if (left_node) left_node->next = right_node->prev;
+
+        return right_node->prev;
+    }
+
+
+    Node * Skipped_link::insert_to_first_layer(double val) {
+        auto current_layer = layer.size() - 1;
+
+        Node* current_node = layer.back();
+        Node* prev_node = current_node;
+
+        // must add to current_node->next
+        while (current_node) {
+            if (current_layer > 0 && (val <= current_node->val || current_node->next == nullptr)) {
+                prev_node = current_node;
+                current_node = current_node->prev; // go down
+                --current_layer;
+                continue;
+            }
+
+            if (current_layer == 0 && val <= current_node->val) {
+                prev_node = current_node;
+                current_node = current_node->prev; // go backward
+                continue;
+            }
+
+            if (current_node->next == prev_node) { // if first level reached
+                break;
+            }
+
+            prev_node = current_node;
+            current_node = current_node->next;
+        }
+
+
+        if (current_node) // we must insert right of node
+            return  insert_right_dual_linked(val,current_node);
+
+        if (!prev_node)
+            return nullptr;
+
+        if (prev_node->next == nullptr)
+            return insert_right_dual_linked(val,prev_node);
+
+        if (prev_node->prev == nullptr) // first node in all list
+        {
+            layer.front() = insert_left_dual_linked(val,prev_node);
+            return layer.front();
+        }
+
+
+        return nullptr;
     }
 
     Node * Skipped_link::erase(double val) {

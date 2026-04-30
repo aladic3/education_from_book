@@ -166,8 +166,8 @@ export namespace ch15::exercises {
     private:
         std::vector<Node*> layer;
 
-        Node* first_attempt(double);
-        Node* insert(double);
+        Node* first_addition(double);
+        Node* insert_to_first_layer(double);
 
         bool flip_coin();
     };
