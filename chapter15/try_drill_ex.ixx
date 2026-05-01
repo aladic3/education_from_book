@@ -5,7 +5,8 @@ module;
 
 #include <vector>
 #include <iostream>
-
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 
 export module chapter15;
 
@@ -157,7 +158,9 @@ export namespace ch15::exercises {
 
 
     struct Skipped_link {
-
+        Skipped_link() {
+            srand (time(nullptr));
+        }
 
         Node* add(double);
         Node* erase(double);
@@ -168,6 +171,7 @@ export namespace ch15::exercises {
 
         Node* first_addition(double);
         Node* insert_to_first_layer(double);
+        Node* insert_to_specific_layer(Node*,int number_layer);
 
         bool flip_coin();
     };
@@ -183,6 +187,7 @@ export namespace ch15::exercises {
     void ex7();
     void ex10_13();
     void ex14();
+    void ex15();
 
 
 }

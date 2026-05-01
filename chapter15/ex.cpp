@@ -85,7 +85,47 @@ namespace ch15::exercises {
         if (layer.empty())
             return first_addition(val);
 
-        Node* result = insert_to_first_layer(val);
+        Node* layer_node = insert_to_first_layer(val);
+
+        for (int number_layer = 1; flip_coin(); ++number_layer) {
+            layer_node = insert_to_specific_layer(layer_node,number_layer);
+        }
+
+        return layer_node;
+
+    }
+
+
+    Node * Skipped_link::insert_to_specific_layer(Node * node_from_prev_layer, int number_layer) {
+        if (number_layer >= layer.size()) {
+            Node *result = new Node{node_from_prev_layer->val, nullptr, node_from_prev_layer};
+            return layer.emplace_back(result);
+        }
+
+        if (layer[number_layer]->val >= node_from_prev_layer->val) {
+            layer[number_layer] = new Node{node_from_prev_layer->val,layer[number_layer],node_from_prev_layer};
+            return layer[number_layer];
+        }
+
+        Node* temp = layer[number_layer];
+        Node* result = nullptr;
+        do {
+            if (temp->next == nullptr) {
+                temp->next = new Node{node_from_prev_layer->val,nullptr,node_from_prev_layer};
+                result = temp->next;
+                break;
+            }
+
+            if (temp->next->val >= node_from_prev_layer->val) {
+                temp->next = new Node{node_from_prev_layer->val,temp->next,node_from_prev_layer};
+                result = temp->next;
+                break;
+            }
+
+            temp = temp->next;
+        } while (temp);
+
+        return result;
     }
 
 
@@ -165,6 +205,7 @@ namespace ch15::exercises {
         return nullptr;
     }
 
+
     Node * Skipped_link::erase(double val) {
     }
 
@@ -172,7 +213,9 @@ namespace ch15::exercises {
     }
 
     bool Skipped_link::flip_coin() {
+        int coin = rand() % 2;
 
+        return coin == 1;
     }
 
     void print_all(const Link& link, std::ostream &os) {
@@ -191,7 +234,6 @@ namespace ch15::exercises {
         }
     }
 
-    // TODO
     Link_v1::~Link_v1() {
         delete right;
     }
@@ -669,6 +711,16 @@ namespace ch15::exercises {
         delete link[1];
         delete link[0];
         delete p;
+
+    }
+
+    void ex15() {
+        Skipped_link skipped_link;
+        for (int i = 1000; i > 0; --i) {
+            skipped_link.add(i);
+        }
+
+        std::cout << "End;";
 
     }
 
