@@ -81,6 +81,23 @@ namespace ch15::exercises {
     }
 
 
+    Node * insert_right_triple_linked(double val, Node* left_node, Node* down_node = nullptr) {
+        Node* right_node = left_node->next;
+        left_node->next = new Node{val,right_node,left_node, down_node};
+        if (right_node) right_node->prev = left_node->next;
+
+        return left_node->next;
+    }
+
+    Node * insert_left_triple_linked(double val, Node* right_node, Node* down_node = nullptr) {
+        Node* left_node = right_node->prev;
+        right_node->prev = new Node{val,right_node,left_node, down_node};
+        if (left_node) left_node->next = right_node->prev;
+
+        return right_node->prev;
+    }
+
+
     Node * Skipped_link::add(double val) {
         if (layer.empty())
             return first_addition(val);
@@ -97,13 +114,17 @@ namespace ch15::exercises {
 
 
     Node * Skipped_link::insert_to_specific_layer(Node * node_from_prev_layer, int number_layer) {
-        if (number_layer >= layer.size()) {
-            Node *result = new Node{node_from_prev_layer->val, nullptr, node_from_prev_layer};
+        if (number_layer >= layer.size()) { // if layer didn't exist
+            Node *result = new Node{node_from_prev_layer->val, nullptr, nullptr, node_from_prev_layer};
             return layer.emplace_back(result);
         }
 
-        if (layer[number_layer]->val >= node_from_prev_layer->val) {
-            layer[number_layer] = new Node{node_from_prev_layer->val,layer[number_layer],node_from_prev_layer};
+        if (layer[number_layer]->val >= node_from_prev_layer->val) { // if first element on layer, update this layer
+            /*layer[number_layer] = new Node{node_from_prev_layer->val,
+                layer[number_layer],nullptr, node_from_prev_layer};*/
+            layer[number_layer] = insert_left_triple_linked(node_from_prev_layer->val,
+                layer[number_layer],node_from_prev_layer);
+
             return layer[number_layer];
         }
 
@@ -111,14 +132,17 @@ namespace ch15::exercises {
         Node* result = nullptr;
         do {
             if (temp->next == nullptr) {
-                temp->next = new Node{node_from_prev_layer->val,nullptr,node_from_prev_layer};
+                insert_right_triple_linked(node_from_prev_layer->val,
+                    temp,node_from_prev_layer);
+                // temp->next = new Node{node_from_prev_layer->val,nullptr,temp,node_from_prev_layer};
                 result = temp->next;
                 break;
             }
 
             if (temp->next->val >= node_from_prev_layer->val) {
-                Node* right_node = temp->next;
-                temp->next = new Node{node_from_prev_layer->val,right_node,node_from_prev_layer};
+                //Node* right_node = temp->next;
+                //temp->next = new Node{node_from_prev_layer->val,right_node,temp,node_from_prev_layer};
+                insert_right_triple_linked(node_from_prev_layer->val,temp,node_from_prev_layer);
                 result = temp->next;
                 break;
             }
@@ -134,45 +158,51 @@ namespace ch15::exercises {
         layer.emplace_back(new Node{val});
 
         while (flip_coin()) {
-            layer.emplace_back(new Node{val,nullptr,layer.back()});
+            layer.emplace_back(new Node{val,nullptr,nullptr, layer.back()});
         }
 
         return layer.back();
     }
 
-    Node * insert_right_dual_linked(double val, Node* left_node) {
-        Node* right_node = left_node->next;
-        left_node->next = new Node{val,right_node,left_node};
-        if (right_node) right_node->prev = left_node->next;
 
-        return left_node->next;
+    Node * Skipped_link::create_node_in_first_layer(double val, Node* current_node, Node* prev_node) {
+        if (current_node) // we must insert right of node
+            return  insert_right_triple_linked(val,current_node);
+
+        if (!prev_node)
+            return nullptr;
+
+        if (prev_node->prev == nullptr) // first node in all list
+        {
+            layer.front() = insert_left_triple_linked(val,prev_node);
+            return layer.front();
+        }
+
+        if (prev_node->next == nullptr)
+            return insert_right_triple_linked(val,prev_node);
+
+        return nullptr;
     }
-
-    Node * insert_left_dual_linked(double val, Node* right_node) {
-        Node* left_node = right_node->prev;
-        right_node->prev = new Node{val,right_node,left_node};
-        if (left_node) left_node->next = right_node->prev;
-
-        return right_node->prev;
-    }
-
 
     Node * Skipped_link::insert_to_first_layer(double val) {
-        auto current_layer = layer.size() - 1;
-
         Node* current_node = layer.back();
         Node* prev_node = current_node;
 
         // must add to current_node->next
         while (current_node) {
-            if (current_layer > 0 && (val <= current_node->val || current_node->next == nullptr)) {
+            if (current_node->down && (val <= current_node->val || current_node->next == nullptr)) {
                 prev_node = current_node;
-                current_node = current_node->prev; // go down
-                --current_layer;
+
+                if (current_node->prev && val <= current_node->prev->val) {
+                    current_node = current_node->prev; // go left on layer
+                    continue;
+                }
+
+                current_node = current_node->down; // go down
                 continue;
             }
 
-            if (current_layer == 0 && val <= current_node->val) {
+            if (!current_node->down && val <= current_node->val) {
                 prev_node = current_node;
                 current_node = current_node->prev; // go backward
                 continue;
@@ -186,26 +216,7 @@ namespace ch15::exercises {
             current_node = current_node->next;
         }
 
-
-        if (current_node) // we must insert right of node
-            return  insert_right_dual_linked(val,current_node);
-
-        if (!prev_node)
-            return nullptr;
-
-        if (prev_node->prev == nullptr) // first node in all list
-        {
-            layer.front() = insert_left_dual_linked(val,prev_node);
-            return layer.front();
-        }
-        
-        if (prev_node->next == nullptr)
-            return insert_right_dual_linked(val,prev_node);
-
-
-
-
-        return nullptr;
+        return create_node_in_first_layer(val,current_node,prev_node);
     }
 
 
@@ -215,38 +226,31 @@ namespace ch15::exercises {
 
 
     Node * Skipped_link::find(double x ) {
-        size_t number_of_layer = layer.size() - 1;
         int iterator = 0;
-        for (Node* temp_node = layer.back(); temp_node && temp_node->val != x;) {
-            std::cout << "o" << iterator << std::endl; ++iterator;
+        Node* temp_node = layer.back();
 
+        while (temp_node && temp_node->val != x) {
+                std::cout << "o" << iterator << std::endl; ++iterator;
 
-            if (temp_node->val == x)
-                return temp_node;
-
-            if (number_of_layer > 0 && x <= temp_node->val ) {
-                //if ( x <= temp_node->val ) {
-                    temp_node = temp_node->prev;
-                    --number_of_layer;
-                    continue;
-                }
-
-
-                if (number_of_layer != 0 && temp_node->next == nullptr) {
-                    temp_node = temp_node->prev;
-                }
-
-                if (number_of_layer == 0 && x <= temp_node->val ) {
+                if (temp_node->prev && x <= temp_node->prev->val){
                     temp_node = temp_node->prev;
                     continue;
                 }
 
+                if (temp_node->down && x <= temp_node->val ) {
+                    temp_node = temp_node->down;
+                    continue;
+                }
 
+                if (temp_node->down && !temp_node->next) {
+                    temp_node = temp_node->down;
+                    continue;
+                }
 
                 temp_node = temp_node->next;
             }
 
-            return nullptr;
+            return temp_node;
         }
 
 
@@ -758,9 +762,11 @@ namespace ch15::exercises {
                 skipped_link.add(i);
             }
 
-            skipped_link.find(999);
-            skipped_link.find(50);
-            skipped_link.find(13);
+            auto* res = skipped_link.find(999);
+            res = skipped_link.find(50);
+            res = skipped_link.find(13);
+            res = skipped_link.find(500);
+            res = skipped_link.find(10034);
 
             std::cout << "End;";
 

@@ -154,7 +154,7 @@ export namespace ch15::exercises {
         double val{0};
         Node* next = nullptr; // for both is right node
         Node* prev = nullptr; // for Forward_node is left node, for Skip_node is down node
-       // Node* down = nullptr;
+        Node* down = nullptr;
     };
 
 
@@ -173,6 +173,7 @@ export namespace ch15::exercises {
         Node* first_addition(double);
         Node* insert_to_first_layer(double);
         Node* insert_to_specific_layer(Node*,int number_layer);
+        Node* create_node_in_first_layer(double val,Node* current_node, Node* prev_node);
 
         bool flip_coin();
     };
