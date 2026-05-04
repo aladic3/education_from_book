@@ -155,6 +155,8 @@ export namespace ch15::exercises {
         Node* next = nullptr; // for both is right node
         Node* prev = nullptr; // for Forward_node is left node, for Skip_node is down node
         Node* down = nullptr;
+
+        void erase(){ next = nullptr; prev = nullptr; down = nullptr;}
     };
 
 

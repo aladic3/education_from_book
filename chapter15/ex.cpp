@@ -219,34 +219,99 @@ namespace ch15::exercises {
         return create_node_in_first_layer(val,current_node,prev_node);
     }
 
+    Node* exclude_node_from_layer(Node* erasing) {
+        Node* left = erasing->prev;
+        Node* right = erasing->next;
+
+        if (left) left->next = right;
+        if (right) right->prev = left;
+
+        erasing->erase();
+        return erasing;
+    }
+
+    Node* find_on_layer(const Node* erasing_from_prev_layer, Node* layer) {
+        Node* temp = layer;
+        for (; temp && temp->down != erasing_from_prev_layer; temp = temp->next) {}
+
+        return temp;
+    }
+
 
     Node * Skipped_link::erase(double val) {
-        return  nullptr;
+        Node * element_for_erasing = find(val);
+        if (element_for_erasing == layer[0])
+            layer[0] = element_for_erasing->next;
+
+        if (element_for_erasing == nullptr)
+            return nullptr;
+
+        Node * result = exclude_node_from_layer(element_for_erasing);
+
+
+        for (int i = 1; i < layer.size(); ++i) {
+            element_for_erasing = find_on_layer(element_for_erasing,layer[i]);
+
+            if (element_for_erasing == layer[i]) {
+                layer[i] = layer[i]->next;
+            }
+
+
+            if (element_for_erasing)
+                exclude_node_from_layer(element_for_erasing);
+            else break;
+
+        }
+
+        for (auto iterator = layer.begin(); iterator != layer.end(); ++iterator) {
+            if (*iterator == nullptr) {
+                layer.erase(iterator);
+                --iterator;
+            }
+
+        }
+
+
+        return  result;
     }
 
 
     Node * Skipped_link::find(double x ) {
         int iterator = 0;
         Node* temp_node = layer.back();
-
-        while (temp_node && temp_node->val != x) {
+        Node* prev_node = temp_node;
+        while (temp_node) {
                 std::cout << "o" << iterator << std::endl; ++iterator;
 
+
+
                 if (temp_node->prev && x <= temp_node->prev->val){
+                    prev_node = temp_node;
                     temp_node = temp_node->prev;
                     continue;
                 }
 
                 if (temp_node->down && x <= temp_node->val ) {
+                    prev_node = temp_node;
                     temp_node = temp_node->down;
                     continue;
                 }
 
                 if (temp_node->down && !temp_node->next) {
+                    prev_node = temp_node;
                     temp_node = temp_node->down;
                     continue;
                 }
 
+                if(!temp_node->down && temp_node->val == x) {
+                    break;
+                }
+
+                if (temp_node->next == prev_node) {
+                    return nullptr;
+                }
+
+                prev_node = temp_node;
                 temp_node = temp_node->next;
             }
 
@@ -767,6 +832,11 @@ namespace ch15::exercises {
             res = skipped_link.find(13);
             res = skipped_link.find(500);
             res = skipped_link.find(10034);
+
+            for (double input; std::cin >> input; ) {
+                [[maybe_unused]] const auto* erased = skipped_link.erase(input);
+                delete erased;
+            }
 
             std::cout << "End;";
 
