@@ -212,25 +212,20 @@ namespace ch15::exercises {
         while (current_node) {
             if (current_node->down && (val <= current_node->val || current_node->next == nullptr)) {
                 prev_node = current_node;
-
-                if (current_node->prev && val <= current_node->prev->val) {
-                    current_node = current_node->prev; // go left on layer
-                    continue;
-                }
-
                 current_node = current_node->down; // go down
                 continue;
             }
 
-            if (!current_node->down && val <= current_node->val) {
+            if ( (!current_node->down && val <= current_node->val) ||
+                (current_node->prev && val <= current_node->prev->val)) {
                 prev_node = current_node;
                 current_node = current_node->prev; // go backward
                 continue;
             }
 
-            if (current_node->next == prev_node) { // if first level reached
-                break;
-            }
+            if (current_node->next == prev_node)  break; // if repeating next->prev
+
+
 
             prev_node = current_node;
             current_node = current_node->next;
@@ -259,7 +254,7 @@ namespace ch15::exercises {
 
 
     Node * Skipped_link::erase(double val) {
-        if (layer.size() == 0)
+        if (layer.empty())
             return nullptr;
 
         Node * element_for_erasing = find(val);
@@ -311,25 +306,14 @@ namespace ch15::exercises {
                     continue;
                 }
 
-                if (temp_node->down && x <= temp_node->val ) {
+                if (temp_node->down && (x <= temp_node->val || !temp_node->next ) ) {
                     prev_node = temp_node;
                     temp_node = temp_node->down;
                     continue;
                 }
 
-                if (temp_node->down && !temp_node->next) {
-                    prev_node = temp_node;
-                    temp_node = temp_node->down;
-                    continue;
-                }
-
-                if(!temp_node->down && temp_node->val == x) {
-                    break;
-                }
-
-                if (temp_node->next == prev_node) {
-                    return nullptr;
-                }
+                if(!temp_node->down && temp_node->val == x)  break;
+                if (temp_node->next == prev_node) return nullptr;
 
                 prev_node = temp_node;
                 temp_node = temp_node->next;
