@@ -164,6 +164,7 @@ export namespace ch15::exercises {
         Skipped_link() {
             srand (time(nullptr));
         }
+        ~Skipped_link();
 
         Node* add(double);
         Node* erase(double);

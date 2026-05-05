@@ -98,6 +98,26 @@ namespace ch15::exercises {
     }
 
 
+    Skipped_link::~Skipped_link() {
+        const int size = layer.size();
+        if (size == 0)
+            return;
+
+        for ( int number_layer = 0; number_layer < size; ++number_layer) {
+            Node* temp = layer[number_layer];
+            layer[number_layer] = nullptr;
+            Node* next = nullptr;
+            while (temp) {
+                next = temp->next;
+                delete temp;
+                temp = next;
+
+            }
+        }
+
+
+    }
+
     Node * Skipped_link::add(double val) {
         if (layer.empty())
             return first_addition(val);
@@ -239,6 +259,9 @@ namespace ch15::exercises {
 
 
     Node * Skipped_link::erase(double val) {
+        if (layer.size() == 0)
+            return nullptr;
+
         Node * element_for_erasing = find(val);
         if (element_for_erasing == layer[0])
             layer[0] = element_for_erasing->next;
@@ -281,10 +304,7 @@ namespace ch15::exercises {
         Node* temp_node = layer.back();
         Node* prev_node = temp_node;
         while (temp_node) {
-                std::cout << "o" << iterator << std::endl; ++iterator;
-
-
-
+                //std::cout << "o" << iterator << std::endl; ++iterator;
                 if (temp_node->prev && x <= temp_node->prev->val){
                     prev_node = temp_node;
                     temp_node = temp_node->prev;
@@ -833,10 +853,31 @@ namespace ch15::exercises {
             res = skipped_link.find(500);
             res = skipped_link.find(10034);
 
+            for (int i = 1000; i > -100; --i) {
+                Node * found = skipped_link.find(i);
+                if (!found) {
+                    std::cerr << "Didnt found: " << i << "\n";
+                }
+                else  if (found->val != i) {
+                    std::cerr << "Must be : " << i <<  " but : " << found->val << "\n";
+                }
+
+            }
+
+            for (int i = 1000; i > -100; --i) {
+                Node* erased = skipped_link.erase(i);
+                if (!erased)
+                    std::cerr << "Didnt erased: " << i << "\n";
+
+                delete erased;
+            }
+
             for (double input; std::cin >> input; ) {
                 [[maybe_unused]] const auto* erased = skipped_link.erase(input);
                 delete erased;
             }
+
+
 
             std::cout << "End;";
 
