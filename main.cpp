@@ -1,6 +1,6 @@
 #include <iostream>
 
-import chapter15;
+import chapter16;
 
 
 
@@ -9,11 +9,13 @@ int main() {
 
 
     try {
-        ch15::exercises::ex15();
+        ch16::drill::drill1();
     }
     catch (std::exception& err) {
         std::cerr << err.what();
         return -1;
+    } catch (...) {
+        return -666;
     }
 
     return 0;

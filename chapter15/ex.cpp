@@ -252,21 +252,7 @@ namespace ch15::exercises {
         return temp;
     }
 
-
-    Node * Skipped_link::erase(double val) {
-        if (layer.empty())
-            return nullptr;
-
-        Node * element_for_erasing = find(val);
-        if (element_for_erasing == layer[0])
-            layer[0] = element_for_erasing->next;
-
-        if (element_for_erasing == nullptr)
-            return nullptr;
-
-        Node * result = exclude_node_from_layer(element_for_erasing);
-
-
+    void exclude_from_all_layers(std::vector<Node*>& layer,  Node * element_for_erasing ) {
         for (int i = 1; i < layer.size(); ++i) {
             element_for_erasing = find_on_layer(element_for_erasing,layer[i]);
 
@@ -280,7 +266,9 @@ namespace ch15::exercises {
             else break;
 
         }
+    }
 
+    void clear_null_layers(std::vector<Node*>& layer) {
         for (auto iterator = layer.begin(); iterator != layer.end(); ++iterator) {
             if (*iterator == nullptr) {
                 layer.erase(iterator);
@@ -288,7 +276,26 @@ namespace ch15::exercises {
             }
 
         }
+    }
 
+
+    Node * Skipped_link::erase(double val) {
+        if (layer.empty())
+            return nullptr;
+
+        Node * element_for_erasing = find(val);
+
+        if (element_for_erasing == layer[0])
+            layer[0] = element_for_erasing->next;
+
+        if (element_for_erasing == nullptr)
+            return nullptr;
+
+        Node * result = exclude_node_from_layer(element_for_erasing);
+
+
+        exclude_from_all_layers(layer, element_for_erasing);
+        clear_null_layers(layer);
 
         return  result;
     }
@@ -299,7 +306,7 @@ namespace ch15::exercises {
         Node* temp_node = layer.back();
         Node* prev_node = temp_node;
         while (temp_node) {
-                //std::cout << "o" << iterator << std::endl; ++iterator;
+               // std::cout << "o" << iterator << std::endl; ++iterator;
                 if (temp_node->prev && x <= temp_node->prev->val){
                     prev_node = temp_node;
                     temp_node = temp_node->prev;
@@ -850,14 +857,21 @@ namespace ch15::exercises {
 
             for (int i = 1000; i > -100; --i) {
                 Node* erased = skipped_link.erase(i);
+
                 if (!erased)
                     std::cerr << "Didnt erased: " << i << "\n";
+                else
+                    std::cerr << "Erased: " << i << '\n';
 
                 delete erased;
             }
 
             for (double input; std::cin >> input; ) {
                 [[maybe_unused]] const auto* erased = skipped_link.erase(input);
+                if (!erased)
+                    std::cerr << "Didnt erased: " << input << "\n";
+                else
+                    std::cerr << "Erased: " << input << '\n';
                 delete erased;
             }
 
