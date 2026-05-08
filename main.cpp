@@ -9,7 +9,7 @@ int main() {
 
 
     try {
-        ch16::drill::drill1();
+        ch16::drill::drill2();
     }
     catch (std::exception& err) {
         std::cerr << err.what();

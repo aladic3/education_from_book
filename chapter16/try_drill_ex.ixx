@@ -16,6 +16,7 @@ export module chapter16;
 
 export namespace ch16::drill {
     void drill1();
+    void drill2();
 
 }
 
