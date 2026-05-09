@@ -17,8 +17,13 @@ export namespace ch16::exercises {
     void to_lower(char* input_str);
     char* str_dup(const char*);
 
+    const char *find_x(const char *str, const char *x);
+
+
+
     void ex1();
     void ex2();
+    void ex3();
 
 }
 

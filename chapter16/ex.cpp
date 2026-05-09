@@ -14,8 +14,8 @@ namespace ch16::exercises {
         }
     }
 
-    void print_str(char* str) {
-        for (char* p = str; *p != 0; ++p)
+    void print_str(const char* str) {
+        for (const char* p = str; *p != 0; ++p)
             std::cout << *p;
 
         std::cout << std::endl;
@@ -40,6 +40,47 @@ namespace ch16::exercises {
         return res;
     }
 
+    const char *find_x(const char *str, const char *x) {
+        const char* px = x;
+        const char *result = nullptr;
+
+        bool processing = false;
+        for (const char* ps = str; *ps != 0 && *px != 0; ++ps) {
+            if (processing && *ps != *px) {
+                px = x;
+                processing = false;
+            }
+
+            if (*ps == *px) {
+                if (processing == false)
+                    result = ps;
+                ++px;
+                processing = true;
+            }
+        }
+
+        if (*px == 0)
+            return result;
+
+        return nullptr;
+    }
+
+
+    void ex3() {
+        char s[] {"Hello, world! ellow bababa."};
+        char x[] {"world!"};
+
+        const char* found = find_x(s, "world!");
+        found = find_x(s,"ellow ba");
+        if (found == nullptr) {
+            std::cout << "Not found";
+            return;
+        }
+
+
+        print_str(found);
+    }
+
     void ex1() {
         char str [] = "Hello, World! NICE TO SEE YOU!!!\n";
         print_str(str);
@@ -56,5 +97,8 @@ namespace ch16::exercises {
 
         delete copy;
     }
+
+
+
 
 }
