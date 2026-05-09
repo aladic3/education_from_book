@@ -13,6 +13,13 @@ module;
 export module chapter16;
 
 
+export namespace ch16::exercises {
+    void to_lower(char* input_str);
+
+    void ex1();
+
+}
+
 
 export namespace ch16::drill {
     void drill1();
