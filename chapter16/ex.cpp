@@ -17,6 +17,27 @@ namespace ch16::exercises {
     void print_str(char* str) {
         for (char* p = str; *p != 0; ++p)
             std::cout << *p;
+
+        std::cout << std::endl;
+    }
+
+    int str_len(const char* str) {
+        int result = 0;
+
+        for (const char* p = str; *p != 0; ++p)
+            ++result;
+
+        return result;
+    }
+
+    char* str_dup(const char* str) {
+        int len = str_len(str);
+        char* res = new char [len];
+        for (int i = 0; i < len; ++i) {
+            res[i] = str[i];
+        }
+
+        return res;
     }
 
     void ex1() {
@@ -24,13 +45,16 @@ namespace ch16::exercises {
         print_str(str);
         to_lower(str);
         print_str(str);
+    }
 
-        /*char ch_A = 'A';
-        char ch_a = 'a';
-        char ch_punct = ',';
-        std::cout << ch_A << '\t' << static_cast<int> (ch_A) << std::endl;
-        std::cout << ch_a << '\t' << static_cast<int> (ch_a) << std::endl;
-        std::cout << ch_punct << '\t' << static_cast<int> (ch_punct) << std::endl;*/
+    void ex2() {
+        char buffer [256] {"Good game... It was nice idea...Last your idea..."};
+        char* copy = str_dup(buffer);
+
+        print_str(buffer);
+        print_str(copy);
+
+        delete copy;
     }
 
 }

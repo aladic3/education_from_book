@@ -15,8 +15,10 @@ export module chapter16;
 
 export namespace ch16::exercises {
     void to_lower(char* input_str);
+    char* str_dup(const char*);
 
     void ex1();
+    void ex2();
 
 }
 
