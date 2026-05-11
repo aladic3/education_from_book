@@ -65,6 +65,35 @@ namespace ch16::exercises {
         return nullptr;
     }
 
+    int str_cmp(const char *s1, const char *s2) {
+        while (*s1 && *s2 && *s1 == *s2) {
+            ++s1;
+            ++s2;
+        }
+
+        return *s1 - *s2; // arbitrary banana 1-2 = -1
+    }
+
+
+    void ex5() {
+        char a [] = {'1','2','3','4'};
+        char b [] = {'1','2','3','4', '5'};
+
+        auto result = find_x(b,a);
+        str_cmp(a,b);
+        auto r = str_dup(a);
+        delete [] r;
+
+    }
+
+    void ex4() {
+        std::cout << str_cmp("Arbitrary","arbitrary") << std::endl;
+        std::cout << str_cmp("ban","banana") << std::endl;
+        std::cout << str_cmp("boom","beem") << std::endl;
+        std::cout << str_cmp("boo","bo") << std::endl;
+        std::cout << str_cmp("arbitrary","arbitrary") << std::endl;
+    }
+
 
     void ex3() {
         char s[] {"Hello, world! ellow bababa."};
@@ -95,7 +124,7 @@ namespace ch16::exercises {
         print_str(buffer);
         print_str(copy);
 
-        delete copy;
+        delete [] copy;
     }
 
 

@@ -18,12 +18,16 @@ export namespace ch16::exercises {
     char* str_dup(const char*);
 
     const char *find_x(const char *str, const char *x);
+    int str_cmp(const char* s1, const char* s2);
+
 
 
 
     void ex1();
     void ex2();
     void ex3();
+    void ex4();
+    void ex5();
 
 }
 
