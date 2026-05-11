@@ -65,10 +65,76 @@ namespace ch16::exercises {
         return nullptr;
     }
 
+    char * str_dup(const char * str, int size) {
+        int len = size;
+        char* res = new char [len];
+        for (int i = 0; i < len; ++i) {
+            res[i] = str[i];
+        }
+
+        return res;
+    }
+
+    const char * find_x(const char *str, const char *x, const std::pair<int, int> &size) {
+        const char* px = x;
+        const char *result = nullptr;
+        int i1 = 0;
+        int i2 = 0;
+
+        bool processing = false;
+        for (const char* ps = str; i1<size.first && i2<size.second; ++ps) {
+            ++i1;
+            if (processing && *ps != *px) {
+                px = x;
+                i2 = 0;
+                processing = false;
+            }
+
+            if (*ps == *px) {
+                if (processing == false) {
+                    result = ps;
+                }
+
+                ++i2;
+                ++px;
+                processing = true;
+            }
+        }
+
+        if (i2 == size.second) {
+            return result;
+        }
+
+
+        return nullptr;
+    }
+
     int str_cmp(const char *s1, const char *s2) {
+
         while (*s1 && *s2 && *s1 == *s2) {
             ++s1;
             ++s2;
+        }
+
+        return *s1 - *s2; // arbitrary banana 1-2 = -1
+    }
+
+    int str_cmp(const char *s1, const char *s2, const std::pair<int,int>& size) {
+        int i1 = 0;
+        int i2 = 0;
+        while (i1<size.first && i2<size.second && *s1 == *s2) {
+            ++s1;
+            ++s2;
+            ++i1;
+            ++i2;
+        }
+
+        if (i1 == i2 && size.first < size.second) {
+            return '\0' - *s2;
+
+        }
+        if (i1 == i2 && size.first > size.second) {
+            return *s1 - '\0';
         }
 
         return *s1 - *s2; // arbitrary banana 1-2 = -1
@@ -78,20 +144,28 @@ namespace ch16::exercises {
     void ex5() {
         char a [] = {'1','2','3','4'};
         char b [] = {'1','2','3','4', '5'};
+        char aa[] = {"1234"};
+        char bb[] = {"12345"};
+        char s[] {"Hello, world! ellow bababa."};
+        char x[] {"world!"};
 
-        auto result = find_x(b,a);
-        str_cmp(a,b);
-        auto r = str_dup(a);
+
+
+        auto result = find_x(b,a,{5,4});
+        result = find_x(s, "world!",{str_len(s),6});
+        int asd = str_cmp(a,b,std::pair<int,int>{4,5});
+        int asdd = str_cmp(aa,bb, {str_len(aa),str_len(bb)});
+        auto r = str_dup(a, 4);
         delete [] r;
 
     }
 
     void ex4() {
-        std::cout << str_cmp("Arbitrary","arbitrary") << std::endl;
+       /* std::cout << str_cmp("Arbitrary","arbitrary") << std::endl;
         std::cout << str_cmp("ban","banana") << std::endl;
         std::cout << str_cmp("boom","beem") << std::endl;
         std::cout << str_cmp("boo","bo") << std::endl;
-        std::cout << str_cmp("arbitrary","arbitrary") << std::endl;
+        std::cout << str_cmp("arbitrary","arbitrary") << std::endl;*/
     }
 
 

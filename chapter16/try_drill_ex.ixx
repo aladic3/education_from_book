@@ -16,9 +16,12 @@ export module chapter16;
 export namespace ch16::exercises {
     void to_lower(char* input_str);
     char* str_dup(const char*);
+    char* str_dup(const char*,int size);
 
     const char *find_x(const char *str, const char *x);
+    const char *find_x(const char *str, const char *x, const std::pair<int,int>& size);
     int str_cmp(const char* s1, const char* s2);
+    int str_cmp(const char *s1, const char *s2, const std::pair<int,int>& size);
 
 
 
