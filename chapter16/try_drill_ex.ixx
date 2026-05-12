@@ -22,6 +22,7 @@ export namespace ch16::exercises {
     const char *find_x(const char *str, const char *x, const std::pair<int,int>& size);
     int str_cmp(const char* s1, const char* s2);
     int str_cmp(const char *s1, const char *s2, const std::pair<int,int>& size);
+    std::string cat_dot(const char* s1, const char* s2);
 
 
 
@@ -31,6 +32,8 @@ export namespace ch16::exercises {
     void ex3();
     void ex4();
     void ex5();
+    void ex7();
+
 
 }
 
