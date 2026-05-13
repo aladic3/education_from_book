@@ -9,7 +9,7 @@ int main() {
 
 
     try {
-        ch16::exercises::ex8_9();
+        ch16::exercises::ex8_9_10();
     }
     catch (std::exception& err) {
         std::cerr << err.what();

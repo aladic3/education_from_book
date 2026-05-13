@@ -23,6 +23,7 @@ export namespace ch16::exercises {
     int str_cmp(const char* s1, const char* s2);
     int str_cmp(const char *s1, const char *s2, const std::pair<int,int>& size);
     std::string cat_dot(const char* s1, const char* s2, const char* separator = ".");
+    char* cat_dot_c(const char* s1, const char* s2, const char* separator = ".");
     std::string cat_dot(const std::string& s1, const std::string& s2, const std::string& separator = ".");
 
 
@@ -34,7 +35,7 @@ export namespace ch16::exercises {
     void ex4();
     void ex5();
     void ex7();
-    void ex8_9();
+    void ex8_9_10();
 
 
 }

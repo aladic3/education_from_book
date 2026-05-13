@@ -1,1 +1,260 @@
-//// Created by Dmytrenko Kyrylo on 07.05.2026.module;#include <iostream>module chapter16;namespace ch16::exercises {    void to_lower(char* input_str) {        for (char* p = input_str; *p != 0; ++p) {            if (*p > 'A' && *p < 'Z')                *p += 32;        }    }    void print_str(const char* str) {        for (const char* p = str; *p != 0; ++p)            std::cout << *p;        std::cout << std::endl;    }    int str_len(const char* str) {        int result = 0;        for (const char* p = str; *p != 0; ++p)            ++result;        return result;    }    char* str_dup(const char* str) {        int len = str_len(str);        char* res = new char [len];        for (int i = 0; i < len; ++i) {            res[i] = str[i];        }        return res;    }    const char *find_x(const char *str, const char *x) {        const char* px = x;        const char *result = nullptr;        bool processing = false;        for (const char* ps = str; *ps != 0 && *px != 0; ++ps) {            if (processing && *ps != *px) {                px = x;                processing = false;            }            if (*ps == *px) {                if (processing == false)                    result = ps;                ++px;                processing = true;            }        }        if (*px == 0)            return result;        return nullptr;    }    char * str_dup(const char * str, int size) {        int len = size;        char* res = new char [len];        for (int i = 0; i < len; ++i) {            res[i] = str[i];        }        return res;    }    const char * find_x(const char *str, const char *x, const std::pair<int, int> &size) {        const char* px = x;        const char *result = nullptr;        int i1 = 0;        int i2 = 0;        bool processing = false;        for (const char* ps = str; i1<size.first && i2<size.second; ++ps) {            ++i1;            if (processing && *ps != *px) {                px = x;                i2 = 0;                processing = false;            }            if (*ps == *px) {                if (processing == false) {                    result = ps;                }                ++i2;                ++px;                processing = true;            }        }        if (i2 == size.second) {            return result;        }        return nullptr;    }    int str_cmp(const char *s1, const char *s2) {        while (*s1 && *s2 && *s1 == *s2) {            ++s1;            ++s2;        }        return *s1 - *s2; // arbitrary banana 1-2 = -1    }    int str_cmp(const char *s1, const char *s2, const std::pair<int,int>& size) {        int i1 = 0;        int i2 = 0;        while (i1<size.first && i2<size.second && *s1 == *s2) {            ++s1;            ++s2;            ++i1;            ++i2;        }        if (i1 == i2 && size.first < size.second) {            return '\0' - *s2;        }        if (i1 == i2 && size.first > size.second) {            return *s1 - '\0';        }        return *s1 - *s2; // arbitrary banana 1-2 = -1    }    std::string cat_dot(const char *s1, const char *s2, const char* separator) {        const std::pair len {str_len(s1),str_len(s2)};        const int separator_size = str_len(separator);        std::string result (s1,len.first+len.second+separator_size);        result.replace(len.first,separator_size,separator);        result.replace(len.first+separator_size,len.second,s2);        /*for (int i = len.first; *separator != 0; ++i && ++separator)            result[i] = *separator;        for (int i = len.first+str_len(separator); *s2 != 0; ++i && ++s2)            result[i] = *s2;*/        return result;    }    std::string cat_dot(const std::string &s1, const std::string &s2, const std::string& separator ) {        std::string result (s1,0,s1.length()+s2.length()+separator.length());        result.insert(s1.length(),separator);        result.insert(s1.length()+separator.length(),s2);        return result;    }    void ex8_9() {        std::cout << cat_dot(std::string("cat"),std::string("dog"), "bababony") << std::endl;        std::cout << cat_dot("cat","dog","-+-=");    }    void ex7() {        cat_dot("bam","boom");    }    void ex5() {        char a [] = {'1','2','3','4'};        char b [] = {'1','2','3','4', '5'};        char aa[] = {"1234"};        char bb[] = {"12345"};        char s[] {"Hello, world! ellow bababa."};        char x[] {"world!"};        auto result = find_x(b,a,{5,4});        result = find_x(s, "world!",{str_len(s),6});        int asd = str_cmp(a,b,std::pair<int,int>{4,5});        int asdd = str_cmp(aa,bb, {str_len(aa),str_len(bb)});        asd =  std::strcmp(a,b);        asdd = std::strcmp(aa,bb);        auto r = str_dup(a, 4);        delete [] r;    }    void ex4() {       /* std::cout << str_cmp("Arbitrary","arbitrary") << std::endl;        std::cout << str_cmp("ban","banana") << std::endl;        std::cout << str_cmp("boom","beem") << std::endl;        std::cout << str_cmp("boo","bo") << std::endl;        std::cout << str_cmp("arbitrary","arbitrary") << std::endl;*/    }    void ex3() {        char s[] {"Hello, world! ellow bababa."};        char x[] {"world!"};        const char* found = find_x(s, "world!");        found = find_x(s,"ellow ba");        if (found == nullptr) {            std::cout << "Not found";            return;        }        print_str(found);    }    void ex1() {        char str [] = "Hello, World! NICE TO SEE YOU!!!\n";        print_str(str);        to_lower(str);        print_str(str);    }    void ex2() {        char buffer [256] {"Good game... It was nice idea...Last your idea..."};        char* copy = str_dup(buffer);        print_str(buffer);        print_str(copy);        delete [] copy;    }}
+//
+// Created by Dmytrenko Kyrylo on 07.05.2026.
+
+module;
+#include <iostream>
+
+module chapter16;
+
+namespace ch16::exercises {
+    void to_lower(char* input_str) {
+        for (char* p = input_str; *p != 0; ++p) {
+            if (*p > 'A' && *p < 'Z')
+                *p += 32;
+        }
+    }
+
+    void print_str(const char* str) {
+        for (const char* p = str; *p != 0; ++p)
+            std::cout << *p;
+
+        std::cout << std::endl;
+    }
+
+    int str_len(const char* str) {
+        int result = 0;
+
+        for (const char* p = str; *p != 0; ++p)
+            ++result;
+
+        return result;
+    }
+
+    char* str_dup(const char* str) {
+        int len = str_len(str);
+        char* res = new char [len];
+        for (int i = 0; i < len; ++i) {
+            res[i] = str[i];
+        }
+
+        return res;
+    }
+
+    const char *find_x(const char *str, const char *x) {
+        const char* px = x;
+        const char *result = nullptr;
+
+        bool processing = false;
+        for (const char* ps = str; *ps != 0 && *px != 0; ++ps) {
+            if (processing && *ps != *px) {
+                px = x;
+                processing = false;
+            }
+
+            if (*ps == *px) {
+                if (processing == false)
+                    result = ps;
+                ++px;
+                processing = true;
+            }
+        }
+
+        if (*px == 0)
+            return result;
+
+        return nullptr;
+    }
+
+    char * str_dup(const char * str, int size) {
+        int len = size;
+        char* res = new char [len];
+        for (int i = 0; i < len; ++i) {
+            res[i] = str[i];
+        }
+
+        return res;
+    }
+
+    const char * find_x(const char *str, const char *x, const std::pair<int, int> &size) {
+        const char* px = x;
+        const char *result = nullptr;
+        int i1 = 0;
+        int i2 = 0;
+
+        bool processing = false;
+        for (const char* ps = str; i1<size.first && i2<size.second; ++ps) {
+            ++i1;
+            if (processing && *ps != *px) {
+                px = x;
+                i2 = 0;
+                processing = false;
+            }
+
+            if (*ps == *px) {
+                if (processing == false) {
+                    result = ps;
+                }
+
+                ++i2;
+                ++px;
+                processing = true;
+            }
+        }
+
+        if (i2 == size.second) {
+            return result;
+        }
+
+
+        return nullptr;
+    }
+
+    int str_cmp(const char *s1, const char *s2) {
+
+        while (*s1 && *s2 && *s1 == *s2) {
+            ++s1;
+            ++s2;
+        }
+
+        return *s1 - *s2; // arbitrary banana 1-2 = -1
+    }
+
+    int str_cmp(const char *s1, const char *s2, const std::pair<int,int>& size) {
+        int i1 = 0;
+        int i2 = 0;
+        while (i1<size.first && i2<size.second && *s1 == *s2) {
+            ++s1;
+            ++s2;
+            ++i1;
+            ++i2;
+        }
+
+        if (i1 == i2 && size.first < size.second) {
+            return '\0' - *s2;
+
+        }
+        if (i1 == i2 && size.first > size.second) {
+            return *s1 - '\0';
+        }
+
+        return *s1 - *s2; // arbitrary banana 1-2 = -1
+    }
+
+    char* cat_dot_c(const char *s1, const char *s2, const char* separator) {
+        const std::pair len {str_len(s1),str_len(s2)};
+        const int separator_size = str_len(separator);
+        char* result = new char[len.first+len.second+separator_size]; //(s1,len.first+len.second+separator_size);
+
+        for (int i = 0; *s1 != 0; ++i && ++s1) // add s1 to result
+            result[i] = *s1;
+
+        for (int i = len.first; *separator != 0; ++i && ++separator) // add separator to result
+          result[i] = *separator;
+
+        for (int i = len.first+separator_size; *s2 != 0; ++i && ++s2)
+          result[i] = *s2;
+
+        return result;
+    }
+
+    std::string cat_dot(const char *s1, const char *s2, const char* separator) {
+        const std::pair len {str_len(s1),str_len(s2)};
+        const int separator_size = str_len(separator);
+        std::string result (s1,len.first+len.second+separator_size);
+
+        result.replace(len.first,separator_size,separator);
+        result.replace(len.first+separator_size,len.second,s2);
+
+
+
+        return result;
+    }
+
+    std::string cat_dot(const std::string &s1, const std::string &s2, const std::string& separator ) {
+        std::string result (s1,0,s1.length()+s2.length()+separator.length());
+        result.insert(s1.length(),separator);
+        result.insert(s1.length()+separator.length(),s2);
+
+        return result;
+    }
+
+    void ex8_9_10() {
+        std::cout << cat_dot(std::string("cat"),std::string("dog"), "bababony") << std::endl;
+        std::cout << cat_dot("cat","dog","-+-=") << std::endl;
+        auto cat = cat_dot_c("cat","dog","-+-=");
+        std::cout << cat;
+        delete [] cat;
+        cat = nullptr;
+    }
+
+    void ex7() {
+        cat_dot("bam","boom");
+    }
+
+
+    void ex5() {
+        char a [] = {'1','2','3','4'};
+        char b [] = {'1','2','3','4', '5'};
+        char aa[] = {"1234"};
+        char bb[] = {"12345"};
+        char s[] {"Hello, world! ellow bababa."};
+        char x[] {"world!"};
+
+
+
+        auto result = find_x(b,a,{5,4});
+        result = find_x(s, "world!",{str_len(s),6});
+        int asd = str_cmp(a,b,std::pair<int,int>{4,5});
+        int asdd = str_cmp(aa,bb, {str_len(aa),str_len(bb)});
+        asd =  std::strcmp(a,b);
+        asdd = std::strcmp(aa,bb);
+        auto r = str_dup(a, 4);
+        delete [] r;
+
+    }
+
+    void ex4() {
+       /* std::cout << str_cmp("Arbitrary","arbitrary") << std::endl;
+        std::cout << str_cmp("ban","banana") << std::endl;
+        std::cout << str_cmp("boom","beem") << std::endl;
+        std::cout << str_cmp("boo","bo") << std::endl;
+        std::cout << str_cmp("arbitrary","arbitrary") << std::endl;*/
+    }
+
+
+    void ex3() {
+        char s[] {"Hello, world! ellow bababa."};
+        char x[] {"world!"};
+
+        const char* found = find_x(s, "world!");
+        found = find_x(s,"ellow ba");
+        if (found == nullptr) {
+            std::cout << "Not found";
+            return;
+        }
+
+
+        print_str(found);
+    }
+
+    void ex1() {
+        char str [] = "Hello, World! NICE TO SEE YOU!!!\n";
+        print_str(str);
+        to_lower(str);
+        print_str(str);
+    }
+
+    void ex2() {
+        char buffer [256] {"Good game... It was nice idea...Last your idea..."};
+        char* copy = str_dup(buffer);
+
+        print_str(buffer);
+        print_str(copy);
+
+        delete [] copy;
+    }
+
+
+
+
+}
