@@ -25,7 +25,7 @@ export namespace ch16::exercises {
     std::string cat_dot(const char* s1, const char* s2, const char* separator = ".");
     char* cat_dot_c(const char* s1, const char* s2, const char* separator = ".");
     std::string cat_dot(const std::string& s1, const std::string& s2, const std::string& separator = ".");
-
+    bool isPalindrome(const std::string&);
 
 
 
@@ -36,6 +36,7 @@ export namespace ch16::exercises {
     void ex5();
     void ex7();
     void ex8_9_10();
+    void ex11();
 
 
 }

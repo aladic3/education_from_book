@@ -3,6 +3,7 @@
 
 module;
 #include <iostream>
+#include <sstream>
 
 module chapter16;
 
@@ -176,6 +177,46 @@ namespace ch16::exercises {
         result.insert(s1.length()+separator.length(),s2);
 
         return result;
+    }
+
+    bool isPalindrome(const std::string & input) {
+        std::string reverse {"",input.size()};
+        auto iterator = input.end();
+        auto reverse_iterator = reverse.begin();
+
+        do {
+            --iterator;
+            *reverse_iterator = *iterator;
+            ++reverse_iterator;
+        } while (iterator != input.begin());
+
+        return reverse == input;
+    }
+
+    void j() {
+        char x[20];
+        std::istringstream stream("HelloWorld");
+        stream.width(15);
+        stream >> x;
+        for (auto c = x;  *c != 0 ; ++c){
+            std::cout << *c;
+        }
+        auto b = stream.get();
+        if ( !stream.eof())
+            std::cout << "Overflow";
+        else
+            std::cout << "Good";
+       // stream.read(x, sizeof x);
+        std::cout << "\nCharacters extracted: " << stream.gcount();
+
+    }
+
+    void ex11() {
+        j();
+        bool res = isPalindrome("BooB");
+        res = isPalindrome("BokoB");
+        res = isPalindrome("home");
+        res = isPalindrome("tennet");
     }
 
     void ex8_9_10() {
