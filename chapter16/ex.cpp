@@ -5,6 +5,8 @@ module;
 #include <iostream>
 #include <sstream>
 
+#include "../error.h"
+
 module chapter16;
 
 namespace ch16::exercises {
@@ -193,6 +195,52 @@ namespace ch16::exercises {
         return reverse == input;
     }
 
+    /*std::istream& operator>>(std::istream & is, char * buffer) {
+        for (; is.width() > 0; ++buffer) {
+            is.get(buffer,)
+        }
+        return is;
+    }*/
+
+    std::istream& read_c_string_throwable(std::istream& is, char* buffer, int max){
+        is.width(max);
+
+        is.get(buffer,max);
+        char last = 0;
+        is.get(last);
+        if (last != '\n' && last != 0)
+            error("buffer is too short!");
+
+        return is;
+    }
+
+    void copy_str_to_str(const char* from, char* to) {
+        for (const char* ch = from; *ch != 0; ++ch) {
+            *to = *ch;
+            ++to;
+        }
+    }
+
+    std::istream& read_c_string_extendable(std::istream& is, char* buffer, int max){
+        is.get(buffer,max);
+
+        char last = 0;
+        is.get(last);
+
+        for (int new_size = max*2; !is.eof() && last != '\n'; new_size+=max) {
+            is.putback(last);
+            char* copy = str_dup(buffer);
+            delete [] buffer;
+            buffer = new char[new_size];
+            copy_str_to_str(copy,buffer);
+            delete [] copy;
+            is.get(buffer+new_size-max-1,max+1);
+            is.get(last);
+        }
+
+        return is;
+    }
+
     void j() {
         char x[20];
         std::istringstream stream("HelloWorld");
@@ -212,11 +260,19 @@ namespace ch16::exercises {
     }
 
     void ex11() {
-        j();
+        //j();
+        int max = 3;
+        char* buffer = new char[max];
+        read_c_string_throwable(std::cin,buffer,max);
+        std::istringstream str {"1234"};
+        read_c_string_throwable(str,buffer,max);
+        read_c_string_extendable(std::cin,buffer,max);
         bool res = isPalindrome("BooB");
         res = isPalindrome("BokoB");
         res = isPalindrome("home");
         res = isPalindrome("tennet");
+
+        delete [] buffer;
     }
 
     void ex8_9_10() {
