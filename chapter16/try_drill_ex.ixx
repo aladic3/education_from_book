@@ -29,6 +29,11 @@ export namespace ch16::exercises {
 
 
 
+    char* read_c_string_extendable(std::istream& is, char* buffer, int max);
+    void copy_str_to_str(const char* from, char* to);
+    char* read_c_string_throwable(std::istream& is, char* buffer, int max);
+    bool isPalindrome(const char * input);
+
     void ex1();
     void ex2();
     void ex3();
@@ -37,6 +42,7 @@ export namespace ch16::exercises {
     void ex7();
     void ex8_9_10();
     void ex11();
+    void ex12();
 
 
 }

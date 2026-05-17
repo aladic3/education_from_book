@@ -195,6 +195,24 @@ namespace ch16::exercises {
         return reverse == input;
     }
 
+    char* get_medium_char_from_str(char* str) { // if 2 elements, return first. if 3 elements, return second
+        const int size = str_len(str);
+
+        if (size%2 == 1)  return str+size/2;
+
+        return str+size/2 - 1;
+    }
+
+    bool isPalindrome(const char * input) {
+        int size = str_len(input);
+        if (size == 0) return false;
+
+        for (const char* ch = input; *ch == *(ch+size-1) && size > 0; ++ch && (size-=2)){}
+
+        return size <= 0;
+
+    }
+
     /*std::istream& operator>>(std::istream & is, char * buffer) {
         for (; is.width() > 0; ++buffer) {
             is.get(buffer,)
@@ -202,7 +220,7 @@ namespace ch16::exercises {
         return is;
     }*/
 
-    std::istream& read_c_string_throwable(std::istream& is, char* buffer, int max){
+    char* read_c_string_throwable(std::istream& is, char* buffer, int max){
         is.width(max);
 
         is.get(buffer,max);
@@ -211,7 +229,7 @@ namespace ch16::exercises {
         if (last != '\n' && last != 0)
             error("buffer is too short!");
 
-        return is;
+        return buffer;
     }
 
     void copy_str_to_str(const char* from, char* to) {
@@ -221,24 +239,27 @@ namespace ch16::exercises {
         }
     }
 
-    std::istream& read_c_string_extendable(std::istream& is, char* buffer, int max){
-        is.get(buffer,max);
+    char* read_c_string_extendable(std::istream& is, char* buffer, int* max){ //return buffer
+        is.get(buffer,*max);
 
         char last = 0;
         is.get(last);
 
-        for (int new_size = max*2; !is.eof() && last != '\n'; new_size+=max) {
+        int new_size = *max;
+        for (; !is.eof() && last != '\n'; ) {
+            new_size+=*max;
             is.putback(last);
             char* copy = str_dup(buffer);
             delete [] buffer;
             buffer = new char[new_size];
             copy_str_to_str(copy,buffer);
             delete [] copy;
-            is.get(buffer+new_size-max-1,max+1);
+            is.get(buffer+new_size-*max-1,*max+1);
             is.get(last);
         }
 
-        return is;
+        *max = new_size;
+        return buffer;
     }
 
     void j() {
@@ -259,6 +280,29 @@ namespace ch16::exercises {
 
     }
 
+    void ex12() {
+        int max = 5;
+        char* buffer = new char[max];
+        char buffer2 [max];
+
+
+        std::cout << "Enter palindrome: ";
+        std::cout << isPalindrome(read_c_string_throwable(std::cin,buffer2,max));
+
+
+        while (std::cin) {
+            std::cout << "Enter palindrome: ";
+            std::string prompt =
+                isPalindrome(read_c_string_extendable(std::cin,buffer,&max)) ? "It is Palindrome\n"
+                : "It is not palindrome\n";
+            std::cout << prompt;
+        }
+
+
+
+        delete [] buffer;
+    }
+
     void ex11() {
         //j();
         int max = 3;
@@ -266,7 +310,7 @@ namespace ch16::exercises {
         read_c_string_throwable(std::cin,buffer,max);
         std::istringstream str {"1234"};
         read_c_string_throwable(str,buffer,max);
-        read_c_string_extendable(std::cin,buffer,max);
+        read_c_string_extendable(std::cin,buffer,&max);
         bool res = isPalindrome("BooB");
         res = isPalindrome("BokoB");
         res = isPalindrome("home");
