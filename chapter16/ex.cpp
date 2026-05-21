@@ -3,11 +3,62 @@
 
 module;
 #include <iostream>
+#include <map>
+#include <set>
 #include <sstream>
 
 #include "../error.h"
 
 module chapter16;
+
+namespace ch16::exercises::Hunt_the_wumpus {
+
+    std::set<int> get_full_20_set_range() {
+        std::set<int> result;
+        for (int i = 0; i < 20; ++i) {
+            result.insert(i+1);
+        }
+
+        return result;
+    }
+
+    void init_numbers_of_mup(std::vector<Room>& map) {
+        auto set = get_full_20_set_range();
+        for (auto el: map) {
+
+        }
+    }
+
+
+    void init_map(std::vector<Room>& map) {
+        // TODO random number each room
+        map[0].next_1 = &map[1];    map[0].next_2 = &map[4];    map[0].next_3 = &map[7]; // 1
+        map[1].next_1 = &map[0];    map[1].next_2 = &map[2];    map[1].next_3 = &map[9]; // 2
+        map[2].next_1 = &map[1];    map[2].next_2 = &map[3];    map[2].next_3 = &map[11]; // 3
+        map[3].next_1 = &map[13];    map[3].next_2 = &map[4];    map[3].next_3 = &map[2]; // 4
+        map[4].next_1 = &map[0];    map[4].next_2 = &map[3];    map[4].next_3 = &map[5]; // 5
+        map[5].next_1 = &map[14];    map[5].next_2 = &map[4];    map[5].next_3 = &map[6]; // 6
+        map[6].next_1 = &map[16];    map[6].next_2 = &map[5];    map[6].next_3 = &map[7]; // 7
+        map[7].next_1 = &map[6];    map[7].next_2 = &map[0];    map[7].next_3 = &map[8]; // 8
+        map[8].next_1 = &map[17];    map[8].next_2 = &map[9];    map[8].next_3 = &map[7]; // 9
+        map[9].next_1 = &map[10];    map[9].next_2 = &map[8];    map[9].next_3 = &map[1]; // 10
+        map[10].next_1 = &map[18];    map[10].next_2 = &map[11];    map[10].next_3 = &map[9]; // 11
+        map[11].next_1 = &map[12];    map[11].next_2 = &map[10];    map[11].next_3 = &map[2]; // 12
+        map[12].next_1 = &map[11];    map[12].next_2 = &map[19];    map[12].next_3 = &map[13]; // 13
+        map[13].next_1 = &map[14];    map[13].next_2 = &map[12];    map[13].next_3 = &map[3]; // 14
+        map[14].next_1 = &map[13];    map[14].next_2 = &map[15];    map[14].next_3 = &map[5]; // 15
+        map[15].next_1 = &map[14];    map[15].next_2 = &map[16];    map[15].next_3 = &map[19]; // 16
+        map[16].next_1 = &map[15];    map[16].next_2 = &map[6];    map[16].next_3 = &map[17]; // 17
+        map[17].next_1 = &map[16];    map[17].next_2 = &map[8];    map[17].next_3 = &map[18]; // 18
+        map[18].next_1 = &map[10];    map[18].next_2 = &map[17];    map[18].next_3 = &map[19]; // 19
+        map[19].next_1 = &map[12];    map[19].next_2 = &map[18];    map[19].next_3 = &map[15]; // 20
+
+
+    }
+
+
+}
+
 
 namespace ch16::exercises {
     void to_lower(char* input_str) {

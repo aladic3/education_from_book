@@ -43,6 +43,33 @@ export namespace ch16::exercises {
     void ex8_9_10();
     void ex11();
     void ex12();
+    void ex13();
+
+
+}
+
+export namespace ch16::exercises::Hunt_the_wumpus {
+    struct Room;
+    struct Cave;
+    struct Antagonist;
+    struct Wumpus;
+    struct Pit;
+    struct Bat;
+
+    
+    void init_map(std::vector<Room>&);
+
+    struct Room {
+
+        int number_this = -1;
+        Room* next_1 = nullptr;
+        Room* next_2 = nullptr;
+        Room* next_3 = nullptr;
+    };
+
+    struct Cave {
+        std::vector<Room> map{20};
+    };
 
 
 }
