@@ -4,6 +4,7 @@
 module;
 #include <iostream>
 #include <map>
+#include <random>
 #include <set>
 #include <sstream>
 
@@ -12,6 +13,18 @@ module;
 module chapter16;
 
 namespace ch16::exercises::Hunt_the_wumpus {
+
+    std::default_random_engine& get_rand()
+    {
+        static std::default_random_engine ran;
+        return ran;
+    };
+
+    void seed(int s) { get_rand().seed(s); }
+    void seed() { get_rand().seed(); }
+    inline int random_int(int min, int max) { return std::uniform_int_distribution<>{min, max}(get_rand()); }
+
+    inline int random_int(int max) { return random_int(0, max); }
 
     std::set<int> get_full_20_set_range() {
         std::set<int> result;
@@ -24,14 +37,32 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
     void init_numbers_of_mup(std::vector<Room>& map) {
         auto set = get_full_20_set_range();
-        for (auto el: map) {
+        for (auto& el: map) {
+            int result_random = random_int(1,20);
+            int val_left = result_random-1;
+            int val_right = result_random+1;
+            while (!set.contains(result_random)) {
+                if (set.contains(val_left)) {
+                    result_random = val_left;
+                    break;
+                }
+
+                if (set.contains(val_right)) {
+                    result_random = val_right;
+                    break;
+                }
+
+                --val_left;
+                ++val_right;
+            }
+
+            el.number_this = set.extract(result_random).value();
 
         }
     }
 
 
     void init_map(std::vector<Room>& map) {
-        // TODO random number each room
         map[0].next_1 = &map[1];    map[0].next_2 = &map[4];    map[0].next_3 = &map[7]; // 1
         map[1].next_1 = &map[0];    map[1].next_2 = &map[2];    map[1].next_3 = &map[9]; // 2
         map[2].next_1 = &map[1];    map[2].next_2 = &map[3];    map[2].next_3 = &map[11]; // 3
@@ -53,10 +84,14 @@ namespace ch16::exercises::Hunt_the_wumpus {
         map[18].next_1 = &map[10];    map[18].next_2 = &map[17];    map[18].next_3 = &map[19]; // 19
         map[19].next_1 = &map[12];    map[19].next_2 = &map[18];    map[19].next_3 = &map[15]; // 20
 
+        init_numbers_of_mup(map);
 
+        return;
     }
 
-
+    Cave::Cave() {
+        init_map(this->map);
+    }
 }
 
 
@@ -328,6 +363,13 @@ namespace ch16::exercises {
             std::cout << "Good";
        // stream.read(x, sizeof x);
         std::cout << "\nCharacters extracted: " << stream.gcount();
+
+    }
+
+    void ex13() {
+        using namespace ch16::exercises::Hunt_the_wumpus;
+
+        Cave cave;
 
     }
 

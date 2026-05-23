@@ -8,6 +8,7 @@ module;
 
 #include <vector>
 #include <iostream>
+#include <random>
 
 
 export module chapter16;
@@ -49,6 +50,7 @@ export namespace ch16::exercises {
 }
 
 export namespace ch16::exercises::Hunt_the_wumpus {
+
     struct Room;
     struct Cave;
     struct Antagonist;
@@ -68,6 +70,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     };
 
     struct Cave {
+        Cave();
         std::vector<Room> map{20};
     };
 
