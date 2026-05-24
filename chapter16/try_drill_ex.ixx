@@ -9,6 +9,7 @@ module;
 #include <vector>
 #include <iostream>
 #include <random>
+#include <set>
 
 
 export module chapter16;
@@ -61,6 +62,36 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     
     void init_map(std::vector<Room>&);
 
+
+
+    struct Pit {
+        void contact_action();
+
+        Room& location;
+    };
+
+    struct Bat {
+        void contact_action();
+
+        Room& location;
+    };
+
+    struct Wumpus {
+        void contact_action();
+        void move(); // random move on 1 step in range from 3 connected rooms
+
+        Room* location;
+
+    };
+
+    struct Antagonist {
+        bool shoot(std::span<int,5> trajectory);
+        bool move(int next_room);
+
+        int arrows_capacity = 5;
+        Room* location;
+    };
+
     struct Room {
 
         int number_this = -1;
@@ -71,7 +102,22 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
     struct Cave {
         Cave();
+        void random_move_wumpus();
+        bool move_antagonist(int location);
+        void shoot(std::span<int,5> trajectory);
+
         std::vector<Room> map{20};
+
+        std::vector<Pit> pits;
+        std::vector<Bat> bats;
+        Wumpus wumpus;
+        Antagonist antagonist;
+
+    private:
+        void init_bats(int count, std::set<int>& sibel_values);
+        void init_pits(int count, std::set<int>& sibel_values);
+        void init_wumpus(std::set<int>& sibel_values);
+        void init_antagonist(std::set<int>& sibel_values);
     };
 
 

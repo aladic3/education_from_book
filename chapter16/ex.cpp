@@ -62,6 +62,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
 
+
     void init_map(std::vector<Room>& map) {
         map[0].next_1 = &map[1];    map[0].next_2 = &map[4];    map[0].next_3 = &map[7]; // 1
         map[1].next_1 = &map[0];    map[1].next_2 = &map[2];    map[1].next_3 = &map[9]; // 2
@@ -89,9 +90,29 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return;
     }
 
+    void Cave::init_bats(int count, std::set<int> &sibel_values) {
+    }
+
+    void Cave::init_pits(int count, std::set<int> &sibel_values) {
+    }
+
+    void Cave::init_wumpus(std::set<int> &sibel_values) {
+    }
+
+    void Cave::init_antagonist(std::set<int> &sibel_values) {
+    }
+
     Cave::Cave() {
         init_map(this->map);
+        auto set = get_full_20_set_range();
+
+        init_pits(2,set);
+        init_bats(2,set);
+        init_antagonist(set);
+        init_wumpus(set);
+        
     }
+
 }
 
 
