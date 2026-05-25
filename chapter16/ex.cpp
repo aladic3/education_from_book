@@ -2,6 +2,7 @@
 // Created by Dmytrenko Kyrylo on 07.05.2026.
 
 module;
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <random>
@@ -26,35 +27,41 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
     inline int random_int(int max) { return random_int(0, max); }
 
-    std::set<int> get_full_20_set_range() {
+    std::set<int> get_set_range(const std::pair<int,int>& min_max = {1,20}) {
         std::set<int> result;
-        for (int i = 0; i < 20; ++i) {
+        for (int i = min_max.first-1; i < min_max.second; ++i) {
             result.insert(i+1);
         }
 
         return result;
     }
 
-    void init_numbers_of_mup(std::vector<Room>& map) {
-        auto set = get_full_20_set_range();
-        for (auto& el: map) {
-            int result_random = random_int(1,20);
-            int val_left = result_random-1;
-            int val_right = result_random+1;
-            while (!set.contains(result_random)) {
-                if (set.contains(val_left)) {
-                    result_random = val_left;
-                    break;
-                }
-
-                if (set.contains(val_right)) {
-                    result_random = val_right;
-                    break;
-                }
-
-                --val_left;
-                ++val_right;
+    int get_random_value_in_set(const std::set<int>& sibel_values, const std::pair<int,int>& min_max = {1,20}) {
+        int result_random = random_int(min_max.first,min_max.second);
+        int val_left = result_random-1;
+        int val_right = result_random+1;
+        while (!sibel_values.contains(result_random)) {
+            if (sibel_values.contains(val_left)) {
+                result_random = val_left;
+                break;
             }
+
+            if (sibel_values.contains(val_right)) {
+                result_random = val_right;
+                break;
+            }
+
+            --val_left;
+            ++val_right;
+        }
+
+        return result_random;
+    }
+
+    void init_numbers_of_mup(std::vector<Room>& map) {
+        auto set = get_set_range();
+        for (auto& el: map) {
+            int result_random = get_random_value_in_set(set);
 
             el.number_this = set.extract(result_random).value();
 
@@ -90,26 +97,59 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return;
     }
 
-    void Cave::init_bats(int count, std::set<int> &sibel_values) {
+    const Room& get_room_from_map_by_number(const int number, const std::vector<Room>& map) {
+        for (const Room& room : map) {
+            if (room.number_this == number)
+                return room;
+        }
+
+        error("bad room number");
+        return map.front();
     }
 
-    void Cave::init_pits(int count, std::set<int> &sibel_values) {
+    void Cave::init_bats(std::set<int> &sibel_values, int count) {
+        for (int i = 0; i < count; ++i) {
+            int random_room_number = sibel_values.extract(
+                get_random_value_in_set(sibel_values)).value();
+            const Room& room_for_bat = get_room_from_map_by_number(random_room_number,this->map);
+            this->bats.emplace_back(room_for_bat);
+        }
+
+    }
+
+
+
+    void Cave::init_pits(std::set<int> &sibel_values, const int count) {
+        for (int i = 0; i < count; ++i) {
+            int random_room_number = sibel_values.extract(
+                get_random_value_in_set(sibel_values)).value();
+            const Room& room_for_pit = get_room_from_map_by_number(random_room_number,this->map);
+            this->pits.emplace_back(room_for_pit);
+        }
     }
 
     void Cave::init_wumpus(std::set<int> &sibel_values) {
+        int random_room_number = sibel_values.extract(
+                get_random_value_in_set(sibel_values)).value();
+        const Room& room_for_wumpus = get_room_from_map_by_number(random_room_number,this->map);
+        this->wumpus = new Wumpus{room_for_wumpus};
     }
 
     void Cave::init_antagonist(std::set<int> &sibel_values) {
+        int random_room_number = sibel_values.extract(
+         get_random_value_in_set(sibel_values)).value();
+        const Room& room_for_antagonist = get_room_from_map_by_number(random_room_number,this->map);
+        this->antagonist = new Antagonist{room_for_antagonist};
     }
 
     Cave::Cave() {
         init_map(this->map);
-        auto set = get_full_20_set_range();
+        auto set_sibel_rooms = get_set_range();
 
-        init_pits(2,set);
-        init_bats(2,set);
-        init_antagonist(set);
-        init_wumpus(set);
+        init_pits(set_sibel_rooms);
+        init_bats(set_sibel_rooms);
+        init_antagonist(set_sibel_rooms);
+        init_wumpus(set_sibel_rooms);
         
     }
 

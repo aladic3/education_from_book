@@ -6,6 +6,7 @@
 
 module;
 
+#include <functional>
 #include <vector>
 #include <iostream>
 #include <random>
@@ -63,42 +64,46 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     void init_map(std::vector<Room>&);
 
 
-
-    struct Pit {
-        void contact_action();
-
-        Room& location;
-    };
-
-    struct Bat {
-        void contact_action();
-
-        Room& location;
-    };
-
-    struct Wumpus {
-        void contact_action();
-        void move(); // random move on 1 step in range from 3 connected rooms
-
-        Room* location;
-
-    };
-
-    struct Antagonist {
-        bool shoot(std::span<int,5> trajectory);
-        bool move(int next_room);
-
-        int arrows_capacity = 5;
-        Room* location;
-    };
-
     struct Room {
-
         int number_this = -1;
         Room* next_1 = nullptr;
         Room* next_2 = nullptr;
         Room* next_3 = nullptr;
     };
+
+    struct Pit {
+        Pit (const Room& loc) : location(loc){};
+        void contact_action();
+
+        const Room& location;
+    };
+
+    struct Bat {
+        void contact_action();
+
+        const Room& location;
+    };
+
+    struct Wumpus {
+        Wumpus(const Room& loc) : location(&loc){}
+
+        void contact_action() {}
+        void move(); // random move on 1 step in range from 3 connected rooms
+
+        const Room *location;
+
+    };
+
+    struct Antagonist {
+        Antagonist(const Room& loc) : location(&loc){}
+
+        bool shoot(std::span<int,5> trajectory);
+        bool move(int next_room);
+
+        int arrows_capacity = 5;
+        const Room* location;
+    };
+
 
     struct Cave {
         Cave();
@@ -110,12 +115,12 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
         std::vector<Pit> pits;
         std::vector<Bat> bats;
-        Wumpus wumpus;
-        Antagonist antagonist;
+        Wumpus* wumpus = nullptr;
+        Antagonist* antagonist = nullptr;
 
     private:
-        void init_bats(int count, std::set<int>& sibel_values);
-        void init_pits(int count, std::set<int>& sibel_values);
+        void init_bats(std::set<int>& sibel_values, int count = 2);
+        void init_pits(std::set<int>& sibel_values, int count = 2);
         void init_wumpus(std::set<int>& sibel_values);
         void init_antagonist(std::set<int>& sibel_values);
     };
