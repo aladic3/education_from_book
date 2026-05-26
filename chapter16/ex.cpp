@@ -7,6 +7,7 @@ module;
 #include <map>
 #include <random>
 #include <set>
+#include <span>
 #include <sstream>
 
 #include "../error.h"
@@ -58,7 +59,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return result_random;
     }
 
-    void init_numbers_of_mup(std::vector<Room>& map) {
+    void init_numbers_of_map(std::vector<Room>& map) {
         auto set = get_set_range();
         for (auto& el: map) {
             int result_random = get_random_value_in_set(set);
@@ -92,7 +93,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
         map[18].next_1 = &map[10];    map[18].next_2 = &map[17];    map[18].next_3 = &map[19]; // 19
         map[19].next_1 = &map[12];    map[19].next_2 = &map[18];    map[19].next_3 = &map[15]; // 20
 
-        init_numbers_of_mup(map);
+        init_numbers_of_map(map);
 
         return;
     }
@@ -107,7 +108,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return map.front();
     }
 
-    void Cave::init_bats(std::set<int> &sibel_values, int count) {
+    void Cave::init_bats(std::set<int> &sibel_values, const int count) {
         for (int i = 0; i < count; ++i) {
             int random_room_number = sibel_values.extract(
                 get_random_value_in_set(sibel_values)).value();
@@ -142,16 +143,109 @@ namespace ch16::exercises::Hunt_the_wumpus {
         this->antagonist = new Antagonist{room_for_antagonist};
     }
 
+    void Bat::contact_action() {
+    }
+
+    Bat::~Bat() {
+    }
+
+    void Bat::die() {
+    }
+
+    void Wumpus::move() {
+        int choise = random_int(1,3);
+        switch (choise) {
+            case 1:
+                location = location->next_1;
+                break;
+
+            case 2:
+                location = location->next_2;
+                break;
+
+            case 3:
+                location = location->next_3;
+                break;
+
+            default:
+                error("bad random move wumpus");
+        }
+    }
+
+    Wumpus::~Wumpus() {
+    }
+
+    void Wumpus::die() {
+    }
+
+    // TODO maybe room must contain pit-bat-wumpus-antagonist, not cave how actually?
+
+    bool Antagonist::shoot(std::span<int> trajectory){ //, const std::map<int,const Room*>& mobs_location) {
+        /*locations_mobs
+
+        for (int point : trajectory) {
+            const Room* antagonist_loc = this->antagonist->location;
+            bool result = false;
+
+            if (antagonist_loc->next_1->number_this == point) {
+                antagonist->location = antagonist_loc->next_1;
+                result = true;
+            }
+
+            if (antagonist_loc->next_2->number_this == point) {
+                antagonist->location = antagonist_loc->next_2;
+                result = true;
+            }
+
+            if (antagonist_loc->next_3->number_this == point) {
+                antagonist->location = antagonist_loc->next_3;
+                result = true;
+            }
+        }*/
+    }
+
+    bool Antagonist::move(int next_room) {
+        const Room* antagonist_loc = location;
+        bool result = false;
+
+        if (antagonist_loc->next_1->number_this == next_room) {
+            location = antagonist_loc->next_1;
+            result = true;
+        }
+
+        if (antagonist_loc->next_2->number_this == next_room) {
+            location = antagonist_loc->next_2;
+            result = true;
+        }
+
+        if (antagonist_loc->next_3->number_this == next_room) {
+            location = antagonist_loc->next_3;
+            result = true;
+        }
+
+        return result;
+    }
+
+    Antagonist::~Antagonist() {
+    }
+
+    void Antagonist::die() {
+    }
+
     Cave::Cave() {
         init_map(this->map);
-        auto set_sibel_rooms = get_set_range();
+        auto sibel_rooms_for_game_elements = get_set_range();
 
-        init_pits(set_sibel_rooms);
-        init_bats(set_sibel_rooms);
-        init_antagonist(set_sibel_rooms);
-        init_wumpus(set_sibel_rooms);
+        init_pits(sibel_rooms_for_game_elements);
+        init_bats(sibel_rooms_for_game_elements);
+        init_antagonist(sibel_rooms_for_game_elements);
+        init_wumpus(sibel_rooms_for_game_elements);
         
     }
+
+
+
+
 
 }
 

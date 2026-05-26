@@ -11,6 +11,7 @@ module;
 #include <iostream>
 #include <random>
 #include <set>
+#include <span>
 
 
 export module chapter16;
@@ -52,7 +53,7 @@ export namespace ch16::exercises {
 }
 
 export namespace ch16::exercises::Hunt_the_wumpus {
-
+    struct Mortal;
     struct Room;
     struct Cave;
     struct Antagonist;
@@ -63,6 +64,10 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     
     void init_map(std::vector<Room>&);
 
+    struct Mortal {
+        virtual ~Mortal() = 0;
+        virtual void die() = 0;
+    };
 
     struct Room {
         int number_this = -1;
@@ -78,27 +83,38 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         const Room& location;
     };
 
-    struct Bat {
+    struct Bat : Mortal{
+        Bat (const Room& loc) : location(loc){};
         void contact_action();
+
+        ~Bat() override;
+        void die() override;
 
         const Room& location;
     };
 
-    struct Wumpus {
+    struct Wumpus : Mortal{
         Wumpus(const Room& loc) : location(&loc){}
 
         void contact_action() {}
         void move(); // random move on 1 step in range from 3 connected rooms
 
+
+        ~Wumpus() override;
+        void die() override;
+
         const Room *location;
 
     };
 
-    struct Antagonist {
+    struct Antagonist : Mortal{
         Antagonist(const Room& loc) : location(&loc){}
 
-        bool shoot(std::span<int,5> trajectory);
+        bool shoot(std::span<int> trajectory); // return true if kill wumpus
         bool move(int next_room);
+
+        ~Antagonist() override;
+        void die() override;
 
         int arrows_capacity = 5;
         const Room* location;
@@ -107,9 +123,6 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
     struct Cave {
         Cave();
-        void random_move_wumpus();
-        bool move_antagonist(int location);
-        void shoot(std::span<int,5> trajectory);
 
         std::vector<Room> map{20};
 
