@@ -108,7 +108,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return map.front();
     }
 
-    void Cave::init_bats(std::set<int> &sibel_values, const int count) {
+    void Game::init_bats(std::set<int> &sibel_values, const int count) {
         for (int i = 0; i < count; ++i) {
             int random_room_number = sibel_values.extract(
                 get_random_value_in_set(sibel_values)).value();
@@ -120,7 +120,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
 
 
-    void Cave::init_pits(std::set<int> &sibel_values, const int count) {
+    void Game::init_pits(std::set<int> &sibel_values, const int count) {
         for (int i = 0; i < count; ++i) {
             int random_room_number = sibel_values.extract(
                 get_random_value_in_set(sibel_values)).value();
@@ -129,18 +129,30 @@ namespace ch16::exercises::Hunt_the_wumpus {
         }
     }
 
-    void Cave::init_wumpus(std::set<int> &sibel_values) {
+    void Game::init_wumpus(std::set<int> &sibel_values) {
         int random_room_number = sibel_values.extract(
                 get_random_value_in_set(sibel_values)).value();
         const Room& room_for_wumpus = get_room_from_map_by_number(random_room_number,this->map);
         this->wumpus = new Wumpus{room_for_wumpus};
     }
 
-    void Cave::init_antagonist(std::set<int> &sibel_values) {
+    void Game::init_antagonist(std::set<int> &sibel_values) {
         int random_room_number = sibel_values.extract(
          get_random_value_in_set(sibel_values)).value();
         const Room& room_for_antagonist = get_room_from_map_by_number(random_room_number,this->map);
         this->antagonist = new Antagonist{room_for_antagonist};
+    }
+
+    std::vector<Mortal*> Game::get_mobs_vector() {
+        std::vector<Mortal*> result;
+        for (Mortal& bat : bats) {
+            result.push_back(&bat);
+        }
+
+        result.push_back(antagonist);
+        result.push_back(wumpus);
+
+        return result;
     }
 
     void Bat::contact_action() {
@@ -180,28 +192,36 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
     // TODO maybe room must contain pit-bat-wumpus-antagonist, not cave how actually?
 
-    bool Antagonist::shoot(std::span<int> trajectory){ //, const std::map<int,const Room*>& mobs_location) {
-        /*locations_mobs
+    const Room* get_next_room_from_number(int room_number, const Room* current_room) {
+        std::vector<const Room*> available_rooms {
+            current_room->next_1,
+            current_room->next_2,
+            current_room->next_3};
 
-        for (int point : trajectory) {
-            const Room* antagonist_loc = this->antagonist->location;
-            bool result = false;
+        for (const Room* true_room : available_rooms ) {
+            if (true_room->number_this == room_number)
+                return true_room;
+        }
 
-            if (antagonist_loc->next_1->number_this == point) {
-                antagonist->location = antagonist_loc->next_1;
-                result = true;
-            }
+        return nullptr;
+    }
 
-            if (antagonist_loc->next_2->number_this == point) {
-                antagonist->location = antagonist_loc->next_2;
-                result = true;
-            }
+    void kill_mobs_in_room(const std::vector<Mortal*>& mobs,const Room* room) {
+        for (const auto mob : mobs) {
+            if (room == mob->get_location())
+                mob->die();
+        }
+    }
 
-            if (antagonist_loc->next_3->number_this == point) {
-                antagonist->location = antagonist_loc->next_3;
-                result = true;
-            }
-        }*/
+    void Antagonist::shoot(std::span<int> trajectory, const std::vector<Mortal*>& mobs){
+        const Room* current_room = this->location;
+        for (int room_number : trajectory) {
+            current_room = get_next_room_from_number(room_number,current_room);
+
+            if (current_room == nullptr) {}// TODO implement random
+
+            kill_mobs_in_room(mobs,current_room);
+        }
     }
 
     bool Antagonist::move(int next_room) {
@@ -232,7 +252,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
     void Antagonist::die() {
     }
 
-    Cave::Cave() {
+    Game::Game() {
         init_map(this->map);
         auto sibel_rooms_for_game_elements = get_set_range();
 
@@ -243,10 +263,35 @@ namespace ch16::exercises::Hunt_the_wumpus {
         
     }
 
+    void Game::start_game() {
 
+    }
 
+    void Game::shoot() {
+        if (antagonist->arrows_capacity == 0) {
+            std::cout << "You can't shooting, capacity arrows is 0! But you can move)";
+            return;
+        }
 
+        std::cout << "Shooting..." << std::endl
+            << "Enter how much rooms arrow must reached (less then 5): ";
 
+        int count_rooms_reaching;
+        std::cin >> count_rooms_reaching;
+        std::vector<int> trace(count_rooms_reaching);
+
+        std::cout << "Inputting trace...";
+        for (int i = 0; i < count_rooms_reaching; ++i) {
+            std::cout << "Enter trace[" <<  i<< "]: ";
+            std::cin >> trace[i];
+            std::cout << std::endl;
+        }
+
+        antagonist->shoot(trace);
+    }
+
+    void Game::move_antagonist() {
+    }
 }
 
 
@@ -524,7 +569,7 @@ namespace ch16::exercises {
     void ex13() {
         using namespace ch16::exercises::Hunt_the_wumpus;
 
-        Cave cave;
+        Game cave;
 
     }
 

@@ -55,7 +55,7 @@ export namespace ch16::exercises {
 export namespace ch16::exercises::Hunt_the_wumpus {
     struct Mortal;
     struct Room;
-    struct Cave;
+    struct Game;
     struct Antagonist;
     struct Wumpus;
     struct Pit;
@@ -67,6 +67,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Mortal {
         virtual ~Mortal() = 0;
         virtual void die() = 0;
+        virtual const Room* get_location() = 0;
     };
 
     struct Room {
@@ -87,6 +88,8 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         Bat (const Room& loc) : location(loc){};
         void contact_action();
 
+        [[nodiscard]] const Room* get_location() override { return &location;}
+
         ~Bat() override;
         void die() override;
 
@@ -102,6 +105,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
         ~Wumpus() override;
         void die() override;
+        [[nodiscard]] const Room* get_location() override { return location;}
 
         const Room *location;
 
@@ -110,19 +114,32 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Antagonist : Mortal{
         Antagonist(const Room& loc) : location(&loc){}
 
-        bool shoot(std::span<int> trajectory); // return true if kill wumpus
+        void shoot(std::span<int> trajectory,const std::vector<Mortal*>& mobs);
         bool move(int next_room);
 
         ~Antagonist() override;
         void die() override;
+        [[nodiscard]] const Room* get_location() override { return location;}
 
         int arrows_capacity = 5;
         const Room* location;
     };
 
 
-    struct Cave {
-        Cave();
+    struct Game {
+        Game();
+        void start_game();
+
+
+
+    private:
+        Room hell = Room{666};
+
+        void init_bats(std::set<int>& sibel_values, int count = 2);
+        void init_pits(std::set<int>& sibel_values, int count = 2);
+        void init_wumpus(std::set<int>& sibel_values);
+        void init_antagonist(std::set<int>& sibel_values);
+        std::vector<Mortal*> get_mobs_vector();
 
         std::vector<Room> map{20};
 
@@ -131,11 +148,12 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         Wumpus* wumpus = nullptr;
         Antagonist* antagonist = nullptr;
 
-    private:
-        void init_bats(std::set<int>& sibel_values, int count = 2);
-        void init_pits(std::set<int>& sibel_values, int count = 2);
-        void init_wumpus(std::set<int>& sibel_values);
-        void init_antagonist(std::set<int>& sibel_values);
+        void shoot();
+        void move_antagonist();
+
+
+
+
     };
 
 
