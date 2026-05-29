@@ -143,7 +143,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
         this->antagonist = new Antagonist{room_for_antagonist};
     }
 
-    std::vector<Mortal*> Game::get_mobs_vector() {
+    std::vector<Mortal*> Game::get_alive_mobs() {
         std::vector<Mortal*> result;
         for (Mortal& bat : bats) {
             result.push_back(&bat);
@@ -152,42 +152,59 @@ namespace ch16::exercises::Hunt_the_wumpus {
         result.push_back(antagonist);
         result.push_back(wumpus);
 
+        // TODO must tested
+        for (auto it = result.begin(); it != result.end();) // clean dead mobs
+            if ((*it)->get_location() == &hell_room)
+                result.erase(it);
+            else
+                ++it;
+
+
         return result;
     }
 
-    void Bat::contact_action() {
+    void Bat::contact_action(Antagonist* antagonist) {
     }
 
-    Bat::~Bat() {
-    }
+    Bat::~Bat() = default;
 
     void Bat::die() {
+        location = &hell_room;
     }
 
-    void Wumpus::move() {
+    const Room* get_random_next_location(const Room* location) {
+        const Room* result = nullptr;
+
         int choise = random_int(1,3);
         switch (choise) {
             case 1:
-                location = location->next_1;
+                result = location->next_1;
                 break;
 
             case 2:
-                location = location->next_2;
+                result = location->next_2;
                 break;
 
             case 3:
-                location = location->next_3;
+                result = location->next_3;
                 break;
 
-            default:
-                error("bad random move wumpus");
+                default:
+                error("bad random engine");
+
         }
+
+        return result;
     }
 
-    Wumpus::~Wumpus() {
+    void Wumpus::move() {
+        location = get_random_next_location(location);
     }
+
+    Wumpus::~Wumpus() = default;
 
     void Wumpus::die() {
+        location = &hell_room;
     }
 
     // TODO maybe room must contain pit-bat-wumpus-antagonist, not cave how actually?
@@ -215,41 +232,49 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
     void Antagonist::shoot(std::span<int> trajectory, const std::vector<Mortal*>& mobs){
         const Room* current_room = this->location;
-        for (int room_number : trajectory) {
-            current_room = get_next_room_from_number(room_number,current_room);
+        bool is_random = false;
 
-            if (current_room == nullptr) {}// TODO implement random
+        for (int room_number : trajectory) {
+            const Room* prev = current_room;
+
+            if (!is_random) current_room = get_next_room_from_number(room_number,current_room);
+
+            if (current_room == nullptr || is_random) {
+                is_random = true;
+                current_room = get_random_next_location(prev);
+            }
 
             kill_mobs_in_room(mobs,current_room);
         }
+
+        --arrows_capacity;
     }
 
-    bool Antagonist::move(int next_room) {
-        const Room* antagonist_loc = location;
-        bool result = false;
+    void Antagonist::move(int next_room) {
+        std::vector<const Room*> available_rooms {
+            location->next_1,
+            location->next_2,
+            location->next_3};
 
-        if (antagonist_loc->next_1->number_this == next_room) {
-            location = antagonist_loc->next_1;
-            result = true;
+        for (const Room* true_room : available_rooms ) {
+            if (true_room->number_this == next_room) {
+                location = true_room;
+                break;
+            }
         }
-
-        if (antagonist_loc->next_2->number_this == next_room) {
-            location = antagonist_loc->next_2;
-            result = true;
-        }
-
-        if (antagonist_loc->next_3->number_this == next_room) {
-            location = antagonist_loc->next_3;
-            result = true;
-        }
-
-        return result;
     }
 
-    Antagonist::~Antagonist() {
+    void Antagonist::bat_move(const Room *wumpus_room, const int depth) {
+        std::set available_rooms {wumpus_room};
+        for (int i = 0; i < depth; ++i) {
+
+        }
     }
+
+    Antagonist::~Antagonist() = default;
 
     void Antagonist::die() {
+        location = &hell_room;
     }
 
     Game::Game() {
@@ -264,6 +289,10 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
     void Game::start_game() {
+
+    }
+
+    std::vector<Mortal> get_mobs(const Game& game) {
 
     }
 
@@ -287,7 +316,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
             std::cout << std::endl;
         }
 
-        antagonist->shoot(trace);
+        antagonist->shoot(trace,get_alive_mobs());
     }
 
     void Game::move_antagonist() {

@@ -61,6 +61,15 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Pit;
     struct Bat;
 
+    struct Room {
+        int number_this = -1;
+        Room* next_1 = nullptr;
+        Room* next_2 = nullptr;
+        Room* next_3 = nullptr;
+    };
+
+    constexpr Room hell_room = Room{666};
+
     
     void init_map(std::vector<Room>&);
 
@@ -70,12 +79,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         virtual const Room* get_location() = 0;
     };
 
-    struct Room {
-        int number_this = -1;
-        Room* next_1 = nullptr;
-        Room* next_2 = nullptr;
-        Room* next_3 = nullptr;
-    };
+
 
     struct Pit {
         Pit (const Room& loc) : location(loc){};
@@ -85,25 +89,27 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     };
 
     struct Bat : Mortal{
-        Bat (const Room& loc) : location(loc){};
-        void contact_action();
-
-        [[nodiscard]] const Room* get_location() override { return &location;}
-
+        Bat (const Room& loc) : location(&loc){};
         ~Bat() override;
+
+        void contact_action(Antagonist* antagonist);
+
+        [[nodiscard]] const Room* get_location() override { return location;}
+
         void die() override;
 
-        const Room& location;
+        const Room* location;
     };
 
     struct Wumpus : Mortal{
         Wumpus(const Room& loc) : location(&loc){}
+        ~Wumpus() override;
+
 
         void contact_action() {}
         void move(); // random move on 1 step in range from 3 connected rooms
 
 
-        ~Wumpus() override;
         void die() override;
         [[nodiscard]] const Room* get_location() override { return location;}
 
@@ -114,12 +120,13 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Antagonist : Mortal{
         Antagonist(const Room& loc) : location(&loc){}
 
-        void shoot(std::span<int> trajectory,const std::vector<Mortal*>& mobs);
-        bool move(int next_room);
-
         ~Antagonist() override;
         void die() override;
         [[nodiscard]] const Room* get_location() override { return location;}
+
+        void shoot(std::span<int> trajectory,const std::vector<Mortal*>& mobs);
+        void move(int next_room);
+        void bat_move(const Room* wumpus_room, const int depth = 2); // TODO move to nearby room with wumpus
 
         int arrows_capacity = 5;
         const Room* location;
@@ -133,13 +140,11 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
 
     private:
-        Room hell = Room{666};
-
         void init_bats(std::set<int>& sibel_values, int count = 2);
         void init_pits(std::set<int>& sibel_values, int count = 2);
         void init_wumpus(std::set<int>& sibel_values);
         void init_antagonist(std::set<int>& sibel_values);
-        std::vector<Mortal*> get_mobs_vector();
+        std::vector<Mortal*> get_alive_mobs();
 
         std::vector<Room> map{20};
 
