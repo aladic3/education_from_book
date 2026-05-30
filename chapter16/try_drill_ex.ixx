@@ -74,7 +74,6 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     void init_map(std::vector<Room>&);
 
     struct Mortal {
-        virtual ~Mortal() = 0;
         virtual void die() = 0;
         virtual const Room* get_location() = 0;
     };
@@ -90,7 +89,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
     struct Bat : Mortal{
         Bat (const Room& loc) : location(&loc){};
-        ~Bat() override;
+
 
         void contact_action(Antagonist* antagonist);
 
@@ -103,7 +102,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
     struct Wumpus : Mortal{
         Wumpus(const Room& loc) : location(&loc){}
-        ~Wumpus() override;
+
 
 
         void contact_action() {}
@@ -120,13 +119,13 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Antagonist : Mortal{
         Antagonist(const Room& loc) : location(&loc){}
 
-        ~Antagonist() override;
+
         void die() override;
         [[nodiscard]] const Room* get_location() override { return location;}
 
         void shoot(std::span<int> trajectory,const std::vector<Mortal*>& mobs);
         void move(int next_room);
-        void bat_move(const Room* wumpus_room, const int depth = 2); // TODO move to nearby room with wumpus
+        void bat_move(const Room* wumpus_room, const int depth = 1); // TODO move to nearby room with wumpus
 
         int arrows_capacity = 5;
         const Room* location;

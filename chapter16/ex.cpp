@@ -166,7 +166,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
     void Bat::contact_action(Antagonist* antagonist) {
     }
 
-    Bat::~Bat() = default;
+
 
     void Bat::die() {
         location = &hell_room;
@@ -201,7 +201,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
         location = get_random_next_location(location);
     }
 
-    Wumpus::~Wumpus() = default;
+
 
     void Wumpus::die() {
         location = &hell_room;
@@ -265,13 +265,39 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
     void Antagonist::bat_move(const Room *wumpus_room, const int depth) {
-        std::set available_rooms {wumpus_room};
+        std::set<const Room *> available_rooms    {wumpus_room,wumpus_room->next_1,
+            wumpus_room->next_2,wumpus_room->next_3};
+        std::set last_level {available_rooms};
         for (int i = 0; i < depth; ++i) {
+            std::set<const Room *> next_level;
+            for (const auto& room : last_level) {
+                const auto & first = room->next_1;
+                const auto & second = room->next_2;
+                const auto & third = room->next_3;
 
+                if (!available_rooms.contains(first)) next_level.emplace(first);
+                if (!available_rooms.contains(second)) next_level.emplace(second);
+                if (!available_rooms.contains(third)) next_level.emplace(third);
+            }
+            last_level = next_level;
+            available_rooms.insert_range(last_level);
         }
+
+        available_rooms.extract(wumpus_room);
+        const int random_room = random_int(0,available_rooms.size());
+        int i = 0;
+
+        for (const auto& room : available_rooms) {
+            if (i == random_room) {
+                location = room;
+                break;
+            }
+            ++i;
+        }
+
     }
 
-    Antagonist::~Antagonist() = default;
+
 
     void Antagonist::die() {
         location = &hell_room;
@@ -289,6 +315,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
     void Game::start_game() {
+        antagonist->bat_move(wumpus->location,0);
 
     }
 
@@ -599,6 +626,8 @@ namespace ch16::exercises {
         using namespace ch16::exercises::Hunt_the_wumpus;
 
         Game cave;
+
+        cave.start_game();
 
     }
 
