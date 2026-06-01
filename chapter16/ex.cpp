@@ -145,6 +145,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
     std::vector<Mortal*> Game::get_alive_mobs() {
         std::vector<Mortal*> result;
+        result.reserve(bats.size()+2);
         for (Mortal& bat : bats) {
             result.push_back(&bat);
         }
@@ -162,10 +163,6 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
         return result;
     }
-
-    void Bat::contact_action(Antagonist* antagonist) {
-    }
-
 
 
     void Bat::die() {
@@ -207,7 +204,6 @@ namespace ch16::exercises::Hunt_the_wumpus {
         location = &hell_room;
     }
 
-    // TODO maybe room must contain pit-bat-wumpus-antagonist, not cave how actually?
 
     const Room* get_next_room_from_number(int room_number, const Room* current_room) {
         std::vector<const Room*> available_rooms {
@@ -250,7 +246,8 @@ namespace ch16::exercises::Hunt_the_wumpus {
         --arrows_capacity;
     }
 
-    void Antagonist::move(int next_room) {
+    bool Antagonist::move(int next_room) {
+        bool result_operation = false;
         std::vector<const Room*> available_rooms {
             location->next_1,
             location->next_2,
@@ -259,12 +256,15 @@ namespace ch16::exercises::Hunt_the_wumpus {
         for (const Room* true_room : available_rooms ) {
             if (true_room->number_this == next_room) {
                 location = true_room;
+                result_operation = true;
                 break;
             }
         }
+
+        return result_operation;
     }
 
-    void Antagonist::bat_move(const Room *wumpus_room, const int depth) {
+    std::set<const Room *> get_available_rooms_bat_moving(const Room *wumpus_room, const int depth) {
         std::set<const Room *> available_rooms    {wumpus_room,wumpus_room->next_1,
             wumpus_room->next_2,wumpus_room->next_3};
         std::set last_level {available_rooms};
@@ -284,17 +284,27 @@ namespace ch16::exercises::Hunt_the_wumpus {
         }
 
         available_rooms.extract(wumpus_room);
-        const int random_room = random_int(0,available_rooms.size());
+
+        return available_rooms;
+    }
+
+    const Room* get_random_room_from_set(const std::set<const Room *>& available_rooms ) {
+        const int random_room = random_int(0,static_cast<int>(available_rooms.size()));
         int i = 0;
 
         for (const auto& room : available_rooms) {
             if (i == random_room) {
-                location = room;
-                break;
+                return room;
             }
             ++i;
         }
 
+        return nullptr;
+    }
+
+    void Antagonist::bat_move(const Room *wumpus_room, const int depth) {
+        auto available_rooms = get_available_rooms_bat_moving(wumpus_room,depth);
+        location = get_random_room_from_set(available_rooms);
     }
 
 
@@ -315,11 +325,8 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
     void Game::start_game() {
+        move_antagonist();
         antagonist->bat_move(wumpus->location,0);
-
-    }
-
-    std::vector<Mortal> get_mobs(const Game& game) {
 
     }
 
@@ -346,7 +353,31 @@ namespace ch16::exercises::Hunt_the_wumpus {
         antagonist->shoot(trace,get_alive_mobs());
     }
 
+    void print_numbers_of_vector_rooms(std::vector<const Room*>& rooms) {
+        for (auto& el : rooms) {
+            std::cout << el->number_this << ' ';
+        }
+        std::cout << std::endl;
+    }
+
     void Game::move_antagonist() {
+        using namespace std;
+        vector<const Room*> available_rooms {antagonist->location->next_1,  antagonist->location->next_2,
+                antagonist->location->next_3};
+        cout << "Next available rooms for moving: ";
+        print_numbers_of_vector_rooms(available_rooms);
+
+        cout << "Enter number of room for move: ";
+
+        int input_number;
+        cin >> input_number;
+        while (!antagonist->move(input_number)){
+            cout << "Bad input number! Please, enter rooms from this list: ";
+            print_numbers_of_vector_rooms(available_rooms);
+            cout << "Enter number of room for move: ";
+            cin >> input_number;
+        }
+
     }
 }
 

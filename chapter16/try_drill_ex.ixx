@@ -91,8 +91,6 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         Bat (const Room& loc) : location(&loc){};
 
 
-        void contact_action(Antagonist* antagonist);
-
         [[nodiscard]] const Room* get_location() override { return location;}
 
         void die() override;
@@ -124,7 +122,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         [[nodiscard]] const Room* get_location() override { return location;}
 
         void shoot(std::span<int> trajectory,const std::vector<Mortal*>& mobs);
-        void move(int next_room);
+        bool move(int next_room);
         void bat_move(const Room* wumpus_room, const int depth = 1); // TODO move to nearby room with wumpus
 
         int arrows_capacity = 5;
