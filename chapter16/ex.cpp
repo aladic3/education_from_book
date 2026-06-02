@@ -332,11 +332,8 @@ namespace ch16::exercises::Hunt_the_wumpus {
         
     }
 
-    std::vector<std::string> Game::get_next_rooms_info_from_antagonist() {
-        std::vector<std::string> info;
+    std::vector<Enemy &> Game::get_list_of_alive_enemies() {
         std::vector<Enemy&> enemies;
-        std::vector next_rooms {antagonist->location->next_1,
-            antagonist->location->next_2, antagonist->location->next_3};
 
         enemies.emplace_back(*wumpus);
         for (Enemy& bat : bats) {
@@ -346,23 +343,67 @@ namespace ch16::exercises::Hunt_the_wumpus {
         for (Enemy& pit : pits)
             enemies.emplace_back(pit);
 
-        for (auto& room : next_rooms) {
+        return enemies;
+    }
+
+    std::vector<std::string> Game::get_next_rooms_info_from_antagonist() {
+        std::vector<std::string> info;
+        std::vector<Enemy&> enemies = get_list_of_alive_enemies();
+
+        std::vector next_rooms {antagonist->location->next_1,
+            antagonist->location->next_2, antagonist->location->next_3};
+
+        for (auto& room : next_rooms)
             for (Enemy& enemy: enemies)
                 if (enemy.is_current_location(room))
                     info.push_back(enemy.get_message_preview());
-        }
 
         return info;
     }
 
+
+
+    void print_info_about_next_rooms(const std::vector<std::string>& info) {
+        if (info.empty())
+            std::cout << "No menaces around you.\n";
+
+        for (auto& msg : info) {
+            std::cout << msg << std::endl;
+        }
+    }
+
     void Game::play() {
-        std::cout << "Current capacity of your arrows: " << antagonist->arrows_capacity << std::endl;
-        move_antagonist();
-        antagonist->bat_move(wumpus->location,0);
+        while (antagonist->is_alive() && wumpus->is_alive()) {
+            std::cout << "Current capacity of your arrows: " << antagonist->arrows_capacity << std::endl;
+            print_info_about_next_rooms(get_next_rooms_info_from_antagonist());
+
+            std::cout << "What would you do? Enter 'm' if you want move, 's' if you want shoot: ";
+            char answer = 0;
+            std::cin.get(answer);
+
+            switch (answer) {
+                case 'm':
+                    move_antagonist();
+                    // TODO contact action after move (get_list_of_alive_enemies()).
+                    // TODO Add method to Enemy (smth ContactAction()). Mb another logic
+                    break;
+
+                case 's':
+                    shoot_antagonist();
+                    break;
+
+                default:
+                    std::cout << "Bad answer!";
+                    continue;
+            }
+
+
+        }
+
 
     }
 
-    void Game::shoot() {
+    void Game::shoot_antagonist() {
         if (antagonist->arrows_capacity == 0) {
             std::cout << "You can't shooting, capacity arrows is 0! But you can move)";
             return;
@@ -387,7 +428,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
 
 
-    void Game::move_antagonist() {
+    void Game::move_antagonist() const {
         using namespace std;
         vector<const Room*> available_rooms {antagonist->location->next_1,  antagonist->location->next_2,
                 antagonist->location->next_3};

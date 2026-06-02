@@ -139,6 +139,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Antagonist : Mortal{
         Antagonist(const Room& loc) : location(&loc){}
 
+        [[nodiscard]] bool is_alive() const {return location != &hell_room;}
 
         void die() override;
         [[nodiscard]] const Room* get_location() override { return location;}
@@ -166,6 +167,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         std::vector<Mortal*> get_alive_mobs();
 
         std::vector<std::string> get_next_rooms_info_from_antagonist();
+        std::vector<Enemy&> get_list_of_alive_enemies();
 
         std::vector<Room> map{20};
 
@@ -174,8 +176,8 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         Wumpus* wumpus = nullptr;
         Antagonist* antagonist = nullptr;
 
-        void shoot();
-        void move_antagonist();
+        void shoot_antagonist();
+        void move_antagonist() const;
 
 
 
