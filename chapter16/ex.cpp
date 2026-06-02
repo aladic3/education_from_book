@@ -5,6 +5,7 @@ module;
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <numbers>
 #include <random>
 #include <set>
 #include <span>
@@ -15,6 +16,13 @@ module;
 module chapter16;
 
 namespace ch16::exercises::Hunt_the_wumpus {
+
+    void print_numbers_of_vector_rooms(std::vector<const Room*>& rooms) {
+        for (auto& el : rooms) {
+            std::cout << el->number_this << ' ';
+        }
+        std::cout << std::endl;
+    }
 
     std::default_random_engine& get_rand()
     {
@@ -324,7 +332,31 @@ namespace ch16::exercises::Hunt_the_wumpus {
         
     }
 
-    void Game::start_game() {
+    std::vector<std::string> Game::get_next_rooms_info_from_antagonist() {
+        std::vector<std::string> info;
+        std::vector<Enemy&> enemies;
+        std::vector next_rooms {antagonist->location->next_1,
+            antagonist->location->next_2, antagonist->location->next_3};
+
+        enemies.emplace_back(*wumpus);
+        for (Enemy& bat : bats) {
+            if (bat.is_alive())
+                enemies.emplace_back(bat);
+        }
+        for (Enemy& pit : pits)
+            enemies.emplace_back(pit);
+
+        for (auto& room : next_rooms) {
+            for (Enemy& enemy: enemies)
+                if (enemy.is_current_location(room))
+                    info.push_back(enemy.get_message_preview());
+        }
+
+        return info;
+    }
+
+    void Game::play() {
+        std::cout << "Current capacity of your arrows: " << antagonist->arrows_capacity << std::endl;
         move_antagonist();
         antagonist->bat_move(wumpus->location,0);
 
@@ -353,12 +385,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
         antagonist->shoot(trace,get_alive_mobs());
     }
 
-    void print_numbers_of_vector_rooms(std::vector<const Room*>& rooms) {
-        for (auto& el : rooms) {
-            std::cout << el->number_this << ' ';
-        }
-        std::cout << std::endl;
-    }
+
 
     void Game::move_antagonist() {
         using namespace std;
@@ -658,7 +685,7 @@ namespace ch16::exercises {
 
         Game cave;
 
-        cave.start_game();
+        cave.play();
 
     }
 

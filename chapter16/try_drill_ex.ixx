@@ -53,13 +53,17 @@ export namespace ch16::exercises {
 }
 
 export namespace ch16::exercises::Hunt_the_wumpus {
-    struct Mortal;
     struct Room;
+
+    struct Enemy;
+    struct Mortal;
     struct Game;
     struct Antagonist;
     struct Wumpus;
     struct Pit;
     struct Bat;
+
+
 
     struct Room {
         int number_this = -1;
@@ -68,47 +72,65 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         Room* next_3 = nullptr;
     };
 
+    struct Enemy {
+        virtual ~Enemy() = default;
+
+        virtual bool is_alive() = 0;
+        virtual bool is_current_location(const Room*) = 0;
+        virtual std::string get_message_preview() = 0;
+    };
+
     constexpr Room hell_room = Room{666};
 
     
     void init_map(std::vector<Room>&);
 
     struct Mortal {
+        virtual ~Mortal() = default;
+
         virtual void die() = 0;
         virtual const Room* get_location() = 0;
     };
 
 
 
-    struct Pit {
+    struct Pit : Enemy {
         Pit (const Room& loc) : location(loc){};
-        void contact_action();
+
+        bool is_alive() override {return true;}
+        bool is_current_location(const Room* room) override;
+        std::string get_message_preview() override {return "I feel a draft!";}
+
 
         const Room& location;
     };
 
-    struct Bat : Mortal{
+    struct Bat : Mortal, Enemy{
         Bat (const Room& loc) : location(&loc){};
 
 
         [[nodiscard]] const Room* get_location() override { return location;}
-
         void die() override;
+
+        bool is_alive() override {return location != &hell_room;}
+        bool is_current_location(const Room* room) override {return location == room;}
+        std::string get_message_preview() override {return "Bats nearby!";}
 
         const Room* location;
     };
 
-    struct Wumpus : Mortal{
+    struct Wumpus : Mortal, Enemy{
         Wumpus(const Room& loc) : location(&loc){}
 
-
-
-        void contact_action() {}
         void move(); // random move on 1 step in range from 3 connected rooms
 
 
         void die() override;
         [[nodiscard]] const Room* get_location() override { return location;}
+
+        bool is_alive() override {return location != &hell_room;}
+        bool is_current_location(const Room* room) override {return location == room;};
+        std::string get_message_preview() override {return "I smell a Wumpus!";};
 
         const Room *location;
 
@@ -132,7 +154,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
     struct Game {
         Game();
-        void start_game();
+        void play();
 
 
 
@@ -142,6 +164,8 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         void init_wumpus(std::set<int>& sibel_values);
         void init_antagonist(std::set<int>& sibel_values);
         std::vector<Mortal*> get_alive_mobs();
+
+        std::vector<std::string> get_next_rooms_info_from_antagonist();
 
         std::vector<Room> map{20};
 
