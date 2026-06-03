@@ -173,6 +173,10 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
 
+    void Pit::contact_with_antagonist(Antagonist *antagonist, const Room *wumpus_room) const {
+        antagonist->die();
+    }
+
     void Bat::die() {
         location = &hell_room;
     }
@@ -200,6 +204,10 @@ namespace ch16::exercises::Hunt_the_wumpus {
         }
 
         return result;
+    }
+
+    void Bat::contact_with_antagonist(Antagonist * antagonist, const Room *wumpus_room) const {
+        antagonist->bat_move(wumpus_room);
     }
 
     void Wumpus::move() {
@@ -316,6 +324,9 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
 
+    void Wumpus::contact_with_antagonist(Antagonist *antagonist, const Room *wumpus_room) const {
+        antagonist->die();
+    }
 
     void Antagonist::die() {
         location = &hell_room;
@@ -332,15 +343,15 @@ namespace ch16::exercises::Hunt_the_wumpus {
         
     }
 
-    std::vector<Enemy &> Game::get_list_of_alive_enemies() {
-        std::vector<Enemy&> enemies;
+    std::vector<const Enemy &> Game::get_list_of_alive_enemies() const {
+        std::vector<const Enemy&> enemies;
 
         enemies.emplace_back(*wumpus);
-        for (Enemy& bat : bats) {
+        for (const Enemy& bat : bats) {
             if (bat.is_alive())
                 enemies.emplace_back(bat);
         }
-        for (Enemy& pit : pits)
+        for (const Enemy& pit : pits)
             enemies.emplace_back(pit);
 
         return enemies;
@@ -348,7 +359,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
     std::vector<std::string> Game::get_next_rooms_info_from_antagonist() {
         std::vector<std::string> info;
-        std::vector<Enemy&> enemies = get_list_of_alive_enemies();
+        auto enemies = get_list_of_alive_enemies();
 
         std::vector next_rooms {antagonist->location->next_1,
             antagonist->location->next_2, antagonist->location->next_3};
@@ -384,8 +395,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
             switch (answer) {
                 case 'm':
                     move_antagonist();
-                    // TODO contact action after move (get_list_of_alive_enemies()).
-                    // TODO Add method to Enemy (smth ContactAction()). Mb another logic
+                    after_move_antagonist(); // TODO see to Antagonist::bat_move
                     break;
 
                 case 's':
@@ -446,6 +456,16 @@ namespace ch16::exercises::Hunt_the_wumpus {
             cin >> input_number;
         }
 
+    }
+
+    void Game::after_move_antagonist() const {
+        auto enemies = get_list_of_alive_enemies();
+
+        for (const Enemy& enemy : enemies)
+            if (enemy.is_current_location(antagonist->location)) {
+                enemy.contact_with_antagonist(antagonist,wumpus->location);
+                break;
+            }
     }
 }
 

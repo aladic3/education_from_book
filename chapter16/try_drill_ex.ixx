@@ -75,9 +75,10 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Enemy {
         virtual ~Enemy() = default;
 
-        virtual bool is_alive() = 0;
-        virtual bool is_current_location(const Room*) = 0;
-        virtual std::string get_message_preview() = 0;
+        [[nodiscard]] virtual bool is_alive() const = 0;
+        virtual bool is_current_location(const Room*) const = 0;
+        [[nodiscard]] virtual std::string get_message_preview() const = 0;
+        virtual void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const = 0;
     };
 
     constexpr Room hell_room = Room{666};
@@ -97,9 +98,10 @@ export namespace ch16::exercises::Hunt_the_wumpus {
     struct Pit : Enemy {
         Pit (const Room& loc) : location(loc){};
 
-        bool is_alive() override {return true;}
-        bool is_current_location(const Room* room) override;
-        std::string get_message_preview() override {return "I feel a draft!";}
+        [[nodiscard]] bool is_alive() const override {return true;}
+        bool is_current_location(const Room* room) const override { return &location == room;};
+        [[nodiscard]] std::string get_message_preview() const override {return "I feel a draft!";}
+        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const override;
 
 
         const Room& location;
@@ -112,9 +114,10 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         [[nodiscard]] const Room* get_location() override { return location;}
         void die() override;
 
-        bool is_alive() override {return location != &hell_room;}
-        bool is_current_location(const Room* room) override {return location == room;}
-        std::string get_message_preview() override {return "Bats nearby!";}
+        [[nodiscard]] bool is_alive() const override {return location != &hell_room;}
+        bool is_current_location(const Room* room) const override {return location == room;}
+        [[nodiscard]] std::string get_message_preview() const override {return "Bats nearby!";}
+        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const override;
 
         const Room* location;
     };
@@ -128,9 +131,10 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         void die() override;
         [[nodiscard]] const Room* get_location() override { return location;}
 
-        bool is_alive() override {return location != &hell_room;}
-        bool is_current_location(const Room* room) override {return location == room;};
-        std::string get_message_preview() override {return "I smell a Wumpus!";};
+        [[nodiscard]] bool is_alive() const override {return location != &hell_room;}
+        bool is_current_location(const Room* room) const override {return location == room;};
+        [[nodiscard]] std::string get_message_preview() const override {return "I smell a Wumpus!";}
+        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const override;
 
         const Room *location;
 
@@ -146,7 +150,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
         void shoot(std::span<int> trajectory,const std::vector<Mortal*>& mobs);
         bool move(int next_room);
-        void bat_move(const Room* wumpus_room, const int depth = 1); // TODO move to nearby room with wumpus
+        void bat_move(const Room* wumpus_room, int depth = 1); // TODO must verif room is empty
 
         int arrows_capacity = 5;
         const Room* location;
@@ -167,7 +171,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         std::vector<Mortal*> get_alive_mobs();
 
         std::vector<std::string> get_next_rooms_info_from_antagonist();
-        std::vector<Enemy&> get_list_of_alive_enemies();
+        [[nodiscard]] std::vector<const Enemy&> get_list_of_alive_enemies() const;
 
         std::vector<Room> map{20};
 
@@ -178,6 +182,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
         void shoot_antagonist();
         void move_antagonist() const;
+        void after_move_antagonist() const; // change loc or die antagonist or nothing (wumpus, bat, pit)
 
 
 
