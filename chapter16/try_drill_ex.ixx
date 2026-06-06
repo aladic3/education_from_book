@@ -78,7 +78,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         [[nodiscard]] virtual bool is_alive() const = 0;
         virtual bool is_current_location(const Room*) const = 0;
         [[nodiscard]] virtual std::string get_message_preview() const = 0;
-        virtual void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const = 0;
+        virtual void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const = 0;
     };
 
     constexpr Room hell_room = Room{666};
@@ -101,7 +101,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         [[nodiscard]] bool is_alive() const override {return true;}
         bool is_current_location(const Room* room) const override { return &location == room;};
         [[nodiscard]] std::string get_message_preview() const override {return "I feel a draft!";}
-        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const override;
+        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const override;
 
 
         const Room& location;
@@ -117,7 +117,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         [[nodiscard]] bool is_alive() const override {return location != &hell_room;}
         bool is_current_location(const Room* room) const override {return location == room;}
         [[nodiscard]] std::string get_message_preview() const override {return "Bats nearby!";}
-        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const override;
+        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const override;
 
         const Room* location;
     };
@@ -134,7 +134,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         [[nodiscard]] bool is_alive() const override {return location != &hell_room;}
         bool is_current_location(const Room* room) const override {return location == room;};
         [[nodiscard]] std::string get_message_preview() const override {return "I smell a Wumpus!";}
-        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room) const override;
+        void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const override;
 
         const Room *location;
 
@@ -150,7 +150,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
 
         void shoot(std::span<int> trajectory,const std::vector<Mortal*>& mobs);
         bool move(int next_room);
-        void bat_move(const Room* wumpus_room, int depth = 1); // TODO must verif room is empty
+        void bat_move(const Room* wumpus_room, const Game* engine, int depth = 1);
 
         int arrows_capacity = 5;
         const Room* location;
@@ -161,7 +161,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         Game();
         void play();
 
-
+        [[nodiscard]] std::vector<const Enemy&> get_list_of_alive_enemies() const;
 
     private:
         void init_bats(std::set<int>& sibel_values, int count = 2);
@@ -171,7 +171,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         std::vector<Mortal*> get_alive_mobs();
 
         std::vector<std::string> get_next_rooms_info_from_antagonist();
-        [[nodiscard]] std::vector<const Enemy&> get_list_of_alive_enemies() const;
+
 
         std::vector<Room> map{20};
 

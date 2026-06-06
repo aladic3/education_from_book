@@ -173,7 +173,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
     }
 
 
-    void Pit::contact_with_antagonist(Antagonist *antagonist, const Room *wumpus_room) const {
+    void Pit::contact_with_antagonist(Antagonist *antagonist, const Room *wumpus_room, const Game *engine) const {
         antagonist->die();
     }
 
@@ -206,8 +206,8 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return result;
     }
 
-    void Bat::contact_with_antagonist(Antagonist * antagonist, const Room *wumpus_room) const {
-        antagonist->bat_move(wumpus_room);
+    void Bat::contact_with_antagonist(Antagonist * antagonist, const Room *wumpus_room, const Game *engine) const {
+        antagonist->bat_move(wumpus_room, engine);
     }
 
     void Wumpus::move() {
@@ -280,6 +280,8 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return result_operation;
     }
 
+
+
     std::set<const Room *> get_available_rooms_bat_moving(const Room *wumpus_room, const int depth) {
         std::set<const Room *> available_rooms    {wumpus_room,wumpus_room->next_1,
             wumpus_room->next_2,wumpus_room->next_3};
@@ -299,7 +301,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
             available_rooms.insert_range(last_level);
         }
 
-        available_rooms.extract(wumpus_room);
+        // available_rooms.extract(wumpus_room);
 
         return available_rooms;
     }
@@ -318,13 +320,24 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return nullptr;
     }
 
-    void Antagonist::bat_move(const Room *wumpus_room, const int depth) {
+    void remove_rooms_with_enemies_from_set(const std::vector<const Enemy&>& enemies, std::set<const Room *>& rooms ) {
+        for (const Room* room : rooms)
+            for (const Enemy& enemy : enemies)
+                if (enemy.is_current_location(room))
+                    rooms.extract(room);
+
+    }
+
+    void Antagonist::bat_move(const Room *wumpus_room, const Game* engine, const int depth) {
         auto available_rooms = get_available_rooms_bat_moving(wumpus_room,depth);
+        std::vector<const Enemy&> enemies = engine->get_list_of_alive_enemies();
+        remove_rooms_with_enemies_from_set(enemies,available_rooms); // for legal moving
+
         location = get_random_room_from_set(available_rooms);
     }
 
 
-    void Wumpus::contact_with_antagonist(Antagonist *antagonist, const Room *wumpus_room) const {
+    void Wumpus::contact_with_antagonist(Antagonist *antagonist, const Room *wumpus_room, const Game *engine) const {
         antagonist->die();
     }
 
@@ -463,7 +476,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
         for (const Enemy& enemy : enemies)
             if (enemy.is_current_location(antagonist->location)) {
-                enemy.contact_with_antagonist(antagonist,wumpus->location);
+                enemy.contact_with_antagonist(antagonist,wumpus->location, this);
                 break;
             }
     }
