@@ -320,17 +320,20 @@ namespace ch16::exercises::Hunt_the_wumpus {
         return nullptr;
     }
 
-    void remove_rooms_with_enemies_from_set(const std::vector<const Enemy&>& enemies, std::set<const Room *>& rooms ) {
+    void remove_rooms_with_enemies_from_set(const std::vector<const Enemy*>& enemies, std::set<const Room *>& rooms ) {
+        std::vector<const Room*> rooms_for_extract;
         for (const Room* room : rooms)
-            for (const Enemy& enemy : enemies)
-                if (enemy.is_current_location(room))
-                    rooms.extract(room);
+            for (const Enemy* enemy : enemies)
+                if (enemy->is_current_location(room))
+                    rooms_for_extract.emplace_back(room);
 
+         for (const Room* room : rooms_for_extract) // extract
+            rooms.extract(room);
     }
 
     void Antagonist::bat_move(const Room *wumpus_room, const Game* engine, const int depth) {
         auto available_rooms = get_available_rooms_bat_moving(wumpus_room,depth);
-        std::vector<const Enemy&> enemies = engine->get_list_of_alive_enemies();
+        std::vector<const Enemy*> enemies = engine->get_list_of_alive_enemies();
         remove_rooms_with_enemies_from_set(enemies,available_rooms); // for legal moving
 
         location = get_random_room_from_set(available_rooms);
@@ -356,42 +359,50 @@ namespace ch16::exercises::Hunt_the_wumpus {
         
     }
 
-    std::vector<const Enemy &> Game::get_list_of_alive_enemies() const {
-        std::vector<const Enemy&> enemies;
+    std::vector<const Enemy *> Game::get_list_of_alive_enemies() const {
+        std::vector<const Enemy*> enemies;
 
-        enemies.emplace_back(*wumpus);
+        enemies.emplace_back(wumpus);
         for (const Enemy& bat : bats) {
             if (bat.is_alive())
-                enemies.emplace_back(bat);
+                enemies.emplace_back(&bat);
         }
         for (const Enemy& pit : pits)
-            enemies.emplace_back(pit);
+            enemies.emplace_back(&pit);
 
         return enemies;
     }
 
-    std::vector<std::string> Game::get_next_rooms_info_from_antagonist() {
-        std::vector<std::string> info;
+    std::set<std::string> Game::get_next_rooms_info_from_antagonist() {
+        std::set<std::string> info;
         auto enemies = get_list_of_alive_enemies();
 
         std::vector next_rooms {antagonist->location->next_1,
             antagonist->location->next_2, antagonist->location->next_3};
 
         for (auto& room : next_rooms)
-            for (Enemy& enemy: enemies)
-                if (enemy.is_current_location(room))
-                    info.push_back(enemy.get_message_preview());
+            for (const Enemy* enemy: enemies)
+                if (enemy->is_current_location(room))
+                    info.insert(enemy->get_message_preview());
+
+        std::ostringstream info_about_locations ;
+        info_about_locations << "Current location: " << antagonist->location->number_this << ", rooms around: ";
+
+        for (auto& room : next_rooms)
+            info_about_locations << room->number_this << " ";
+
+        info.insert(info_about_locations.str());
 
         return info;
     }
 
 
 
-    void print_info_about_next_rooms(const std::vector<std::string>& info) {
-        if (info.empty())
+    void print_info_about_next_rooms(const std::set<std::string>& info_about_enemies) {
+        if (info_about_enemies.empty())
             std::cout << "No menaces around you.\n";
 
-        for (auto& msg : info) {
+        for (auto& msg : info_about_enemies) {
             std::cout << msg << std::endl;
         }
     }
@@ -403,7 +414,7 @@ namespace ch16::exercises::Hunt_the_wumpus {
 
             std::cout << "What would you do? Enter 'm' if you want move, 's' if you want shoot: ";
             char answer = 0;
-            std::cin.get(answer);
+            std::cin >> answer;
 
             switch (answer) {
                 case 'm':
@@ -474,9 +485,9 @@ namespace ch16::exercises::Hunt_the_wumpus {
     void Game::after_move_antagonist() const {
         auto enemies = get_list_of_alive_enemies();
 
-        for (const Enemy& enemy : enemies)
-            if (enemy.is_current_location(antagonist->location)) {
-                enemy.contact_with_antagonist(antagonist,wumpus->location, this);
+        for (const Enemy* enemy : enemies)
+            if (enemy->is_current_location(antagonist->location)) {
+                enemy->contact_with_antagonist(antagonist,wumpus->location, this);
                 break;
             }
     }

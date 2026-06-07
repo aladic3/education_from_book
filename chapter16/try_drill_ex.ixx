@@ -161,7 +161,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         Game();
         void play();
 
-        [[nodiscard]] std::vector<const Enemy&> get_list_of_alive_enemies() const;
+        [[nodiscard]] std::vector<const Enemy *> get_list_of_alive_enemies() const;
 
     private:
         void init_bats(std::set<int>& sibel_values, int count = 2);
@@ -170,7 +170,7 @@ export namespace ch16::exercises::Hunt_the_wumpus {
         void init_antagonist(std::set<int>& sibel_values);
         std::vector<Mortal*> get_alive_mobs();
 
-        std::vector<std::string> get_next_rooms_info_from_antagonist();
+        std::set<std::string> get_next_rooms_info_from_antagonist();
 
 
         std::vector<Room> map{20};
