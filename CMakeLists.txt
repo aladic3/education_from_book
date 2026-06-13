@@ -31,6 +31,8 @@ add_executable(hello_world main.cpp
         chapter16/try.cpp
         chapter16/drill.cpp
         chapter16/try_drill_ex.ixx
+        chapter17/try_drill_ex.ixx
+        chapter17/try.cpp
 
 
 )
@@ -44,6 +46,7 @@ target_sources(hello_world PUBLIC
         chapter10/ex.ixx
         chapter15/try_drill_ex.ixx
         chapter16/try_drill_ex.ixx
+        chapter17/try_drill_ex.ixx
 )
 
 # Только для MSVC
