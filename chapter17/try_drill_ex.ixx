@@ -25,10 +25,27 @@ export namespace ch17::try_ {
 
         ~X() {out("~X()",0);}
 
-
-
-
     };
+
+    X glob {2};
+
+    X copy(X a) {cout << "copy()\n"; return a;}
+    X copy2(X a) {cout << "copy2()\n"; X aa = a; return aa;}
+    X& ref_to(X &a) {cout << "ref_to()\n"; return a;}
+    X* make(int i ) {cout << "make()\n"; X a(i); return new X(a);}
+
+    struct XX {X a; X b; };
+
 
     void test();
 }
+
+
+
+
+
+
+
+
+
+
