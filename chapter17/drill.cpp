@@ -2,13 +2,13 @@
 // Created by Dmytrenko Kyrylo on 18.06.2026.
 //
 module;
-
-module chapter17;
 #include "../error.h"
+module chapter17;
+
 
 namespace ch17::drill {
     Ptr::Ptr() {
-      elem = new double;
+      elem = new double(0);
     }
     Ptr::Ptr(double val) {
        elem = new double(val);
@@ -22,7 +22,7 @@ namespace ch17::drill {
       elem = new double(*ptr.elem);
     }
 
-    Ptr::Ptr(Ptr &&ptr)  noexcept {
+    Ptr::Ptr(Ptr &&ptr) {
       elem = ptr.elem;
       ptr.elem = nullptr;
     }
@@ -33,7 +33,7 @@ namespace ch17::drill {
       elem = new double(*ptr.elem);
       return *this;
     }
-    Ptr &Ptr::operator=(Ptr &&ptr)  noexcept {
+    Ptr &Ptr::operator=(Ptr &&ptr)  {
       if (this == &ptr) return *this;
       delete elem;
       elem = ptr.elem;
