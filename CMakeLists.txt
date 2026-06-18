@@ -33,6 +33,7 @@ add_executable(hello_world main.cpp
         chapter16/try_drill_ex.ixx
         chapter17/try_drill_ex.ixx
         chapter17/try.cpp
+        chapter17/drill.cpp
 
 
 )

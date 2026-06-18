@@ -21,7 +21,7 @@ export namespace ch17::try_ {
         X(X&& obj) { out("X(X&&)",obj.val); val = obj.val; obj.val=0;} // move constructor
 
         X& operator=(const X& obj) { out("X copy assigment", obj.val); val = obj.val; return *this;} // copy
-        X& operator=(X&& obj) { out("X move assigment",obj.val); val = obj.val; obj.val=0; return *this;} // move
+        X& operator=(X&& obj)  noexcept { out("X move assigment",obj.val); val = obj.val; obj.val=0; return *this;} // move
 
         ~X() {out("~X()",0);}
 
@@ -36,8 +36,37 @@ export namespace ch17::try_ {
 
     struct XX {X a; X b; };
 
+    struct Vector {
+        explicit Vector(int sz);
+        double& operator[](int i);
+        ~Vector();
+    private:
+        int size = 0;
+        double* elem = nullptr;
+    };
 
     void test();
+    void test2();
+}
+
+export namespace ch17::drill {
+    struct  Ptr{
+        Ptr();
+        Ptr(double val);
+        ~Ptr();
+
+        Ptr(Ptr& ptr);
+        Ptr(Ptr&& ptr);
+
+        Ptr& operator=(const Ptr& ptr);
+        Ptr& operator=(Ptr&& ptr);
+
+    private:
+        double* elem = nullptr;
+    };
+
+    void test();
+
 }
 
 

@@ -2,6 +2,8 @@
 // Created by Dmytrenko Kyrylo on 13.06.2026.
 //
 module;
+#include "../error.h"
+
 #include <iostream>
 #include <vector>
 
@@ -9,6 +11,31 @@ module chapter17;
 
 namespace ch17::try_ {
     using namespace std;
+
+    Vector::~Vector() {
+        delete[] elem;
+    }
+
+    Vector::Vector(int sz) {
+        if (sz < 0)
+            error("bad size");
+        size = sz;
+        elem = new double[size];
+    }
+
+    double& Vector::operator[](int i) {
+        if (i < 0 || i >= size)
+            error("bad iterator");
+
+        return elem[i];
+    }
+
+    void test2() {
+        Vector b(10);
+        double x = b[3];
+        b[2] = x;
+    }
+
     void test() {
         X loc{4}; // local variable
         X loc2{loc}; // copy construction
