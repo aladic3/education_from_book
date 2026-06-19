@@ -37,17 +37,40 @@ export namespace ch17::try_ {
     struct XX {X a; X b; };
 
     struct Vector {
+        Vector();
         explicit Vector(int sz);
+        Vector(initializer_list<double> lst);
+
+        Vector(const Vector& v);
+        Vector(Vector&& v) noexcept;
+
+        Vector& operator=(const Vector& v);
+        Vector& operator=(Vector&& v) noexcept;
+
+        void reserve(int new_alloc);
+        void resize(int new_size);
+        void push_back(double new_el);
+
+        [[nodiscard]] int size() const {return sz;}
+
+
         double& operator[](int i);
+        const double& operator[](int i) const;
+
+        [[nodiscard]] double* begin() const {return elem;} // iteration support
+        [[nodiscard]] double* end() const {return elem+sz;}
+
         ~Vector();
     private:
-        int size = 0;
+        int sz = 0;
+        int cap = 0;
         double* elem = nullptr;
     };
 
     void test();
     void test2();
-}
+    void test3();
+    } // namespace ch17::try_
 
 export namespace ch17::drill {
     struct  Ptr{
