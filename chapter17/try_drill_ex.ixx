@@ -84,6 +84,8 @@ export namespace ch17::drill {
         Ptr& operator=(const Ptr& ptr);
         Ptr& operator=(Ptr&& ptr);
 
+        double* element();
+
     private:
         double* elem = nullptr;
     };

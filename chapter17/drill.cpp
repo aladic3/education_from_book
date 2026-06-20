@@ -16,10 +16,11 @@ namespace ch17::drill {
 
     Ptr::~Ptr() {
       delete elem;
+      elem = nullptr;
     }
 
     Ptr::Ptr(Ptr &ptr) {
-      elem = new double(*ptr.elem);
+      elem = new double(*ptr.element());
     }
 
     Ptr::Ptr(Ptr &&ptr) {
@@ -40,10 +41,15 @@ namespace ch17::drill {
       ptr.elem = nullptr;
       return *this;
     }
+    double *Ptr::element() {
+      return elem;
+    }
 
     void test() {
       Ptr* p = new Ptr(3);
-
+      Ptr j = *p;
+      *j.element() = 10;
+      *p->element() = 2;
       delete p;
     }
 
