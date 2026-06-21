@@ -2,9 +2,34 @@
 // Created by Dmytrenko Kyrylo on 13.06.2026.
 //
 module;
+#include "../error.h"
+
 #include <iostream>
+#include <vector>
 
 export module chapter17;
+
+export namespace ch17::ex {
+using namespace std;
+
+struct Matrix {
+    Matrix(int rr, int cc);
+
+    double& operator[](int row,int coll);
+
+    vector<double>*& begin();
+    vector<double>*& end();
+
+    ~Matrix();
+private:
+    vector<vector<double>*> rows;
+};
+
+void print_matrix( Matrix& m);
+
+void test();
+}
+
 
 export namespace ch17::try_ {
     using namespace std;
@@ -93,6 +118,9 @@ export namespace ch17::drill {
     void test();
 
 }
+
+
+
 
 
 

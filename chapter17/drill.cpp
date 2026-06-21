@@ -20,7 +20,11 @@ namespace ch17::drill {
     }
 
     Ptr::Ptr(Ptr &ptr) {
-      elem = new double(*ptr.element());
+      if (ptr.elem == nullptr) {
+        elem = ptr.elem;
+        return;
+      }
+      elem = new double(*ptr.elem);
     }
 
     Ptr::Ptr(Ptr &&ptr) {
