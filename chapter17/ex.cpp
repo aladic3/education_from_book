@@ -8,29 +8,26 @@ module chapter17;
 
 namespace ch17::ex {
 
-Matrix::Matrix(int rr, int cc){
+Matrix::Matrix(int rr, int cc): rs(rr), cs(cc){
   rows.resize(rr);
 
-  for (vector<double>*& row : rows)
-    row = new vector<double>(cc);
+  for (vector<double>& row : rows)
+    row.resize(cc);
 }
 double &Matrix::operator[](int rr, int cc) {
-  vector<double>*& row = rows[rr];
-  return (*row)[cc];
+  vector<double>& row = rows[rr];
+  return row[cc];
 }
-vector<double> *&Matrix::begin() {
-  return *rows.begin();
+__wrap_iter<vector<vector<double>>::__alloc_traits::pointer> Matrix::begin() {
+  return rows.begin();
 }
-vector<double> *&Matrix::end() {
-  return *rows.end();
-}
-
-Matrix::~Matrix(){
-  for (auto row: rows)
-    delete row;
+__wrap_iter<vector<vector<double>>::__alloc_traits::pointer> Matrix::end() {
+  return rows.end();
 }
 
-// TODO must leart iterator topic
+Matrix::~Matrix() = default;
+
+
 void print_matrix( Matrix &m) {
    for ( auto& row : m) {
      for ( auto& el : row) {
@@ -42,8 +39,12 @@ void print_matrix( Matrix &m) {
 
 void test() {
   Matrix m(10,4);
-  m[0,0] = 10;
+  for (int i = 0; i < m.row_size(); ++i)
+    for (int j = 0; j < m.column_size(); ++j) {
+      m[i,j] = j + i*m.column_size();
+    }
   print_matrix(m);
+
   return;
 }
 }

@@ -15,14 +15,18 @@ using namespace std;
 struct Matrix {
     Matrix(int rr, int cc);
 
+    int row_size() const{return rs;}
+    int column_size() const {return cs;}
     double& operator[](int row,int coll);
 
-    vector<double>*& begin();
-    vector<double>*& end();
+    __wrap_iter<vector<vector<double>>::__alloc_traits::pointer> begin();
+    __wrap_iter<vector<vector<double>>::__alloc_traits::pointer> end();
 
     ~Matrix();
 private:
-    vector<vector<double>*> rows;
+    int rs;
+    int cs;
+    vector<vector<double>> rows;
 };
 
 void print_matrix( Matrix& m);
