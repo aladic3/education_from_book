@@ -14,19 +14,31 @@ using namespace std;
 
 struct Matrix {
     Matrix(int rr, int cc);
+    Matrix(const Matrix& m);
+    Matrix(Matrix&& m);
 
-    int row_size() const{return rs;}
-    int column_size() const {return cs;}
+    int row_size() const{return rows_count;}
+    int column_size() const {return column_count;}
+
     double& operator[](int row,int coll);
+    double operator[](int row,int coll) const;
+
+    Matrix operator+(const Matrix& m) const;
+    bool operator==(const Matrix &) const;
+
+    Matrix& operator=(const Matrix& m);
+    Matrix&& operator=(Matrix&& m);
 
     __wrap_iter<vector<vector<double>>::__alloc_traits::pointer> begin();
     __wrap_iter<vector<vector<double>>::__alloc_traits::pointer> end();
 
     ~Matrix();
 private:
-    int rs;
-    int cs;
+    int rows_count;
+    int column_count;
     vector<vector<double>> rows;
+
+
 };
 
 void print_matrix( Matrix& m);
