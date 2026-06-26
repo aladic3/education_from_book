@@ -17,8 +17,8 @@ struct Matrix {
     Matrix(const Matrix& m);
     Matrix(Matrix&& m);
 
-    int row_size() const{return rows_count;}
-    int column_size() const {return column_count;}
+    int rows_count_() const{return rows_count;}
+    int column_count_() const {return column_count;}
 
     double& operator[](int row,int coll);
     double operator[](int row,int coll) const;
@@ -27,16 +27,18 @@ struct Matrix {
     bool operator==(const Matrix &) const;
 
     Matrix& operator=(const Matrix& m);
-    Matrix&& operator=(Matrix&& m);
+    Matrix& operator=(Matrix&& m);
 
-    __wrap_iter<vector<vector<double>>::__alloc_traits::pointer> begin();
-    __wrap_iter<vector<vector<double>>::__alloc_traits::pointer> end();
+    __wrap_iter<vector<double*>::__alloc_traits::pointer> begin();
+    __wrap_iter<vector<double*>::__alloc_traits::pointer> end();
 
     ~Matrix();
 private:
     int rows_count;
     int column_count;
-    vector<vector<double>> rows;
+    vector<double*> rows;
+
+    void clear_matrix();
 
 
 };

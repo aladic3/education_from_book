@@ -12,29 +12,65 @@ namespace ch17::ex {
 Matrix::Matrix(int rr, int cc): rows_count(rr), column_count(cc){
   rows.resize(rr);
 
-  for (vector<double>& row : rows)
-    row.resize(cc);
+  for (int i = 0; i < rr; ++i)
+    rows[i] = new double[cc];
 }
-Matrix::Matrix(const Matrix &m): rows(m.rows), column_count(m.column_count), rows_count(m.rows_count){}
+Matrix::Matrix(const Matrix &m): column_count(m.column_count), rows_count(m.rows_count) {
+  rows.resize(rows_count);
+  for (int i = 0; i < rows_count; ++i) {
+    rows[i] = new double[column_count];
 
-Matrix::Matrix(Matrix &&m): column_count(m.column_count), rows_count(m.rows_count), rows(std::move(m.rows)) {
+    for (int j = 0; j < column_count; ++j) {
+      rows[i][j] = m.rows[i][j];
+    }
+  }
+}
+
+Matrix::Matrix(Matrix &&m): column_count(m.column_count), rows_count(m.rows_count) {
+  rows.resize(rows_count);
+  for (int i = 0; i < m.rows_count; ++i) {
+    rows[i] = m.rows[i];
+    m.rows[i] = nullptr;
+  }
   m.column_count = m.rows_count = 0;
+  m.rows.clear();
 }
 
 Matrix &Matrix::operator=(const Matrix &m) {
-  rows = m.rows;
+  clear_matrix();
   column_count = m.column_count;
   rows_count = m.rows_count;
+  rows.resize(rows_count);
+
+  for (int i = 0; i < rows_count; ++i) {
+    rows[i] = new double[column_count];
+
+    for (int j = 0; j < column_count; ++j) {
+      rows[i][j] = m.rows[i][j];
+    }
+  }
+
+  return *this;
 }
 
-Matrix &&Matrix::operator=(Matrix &&m) {
-  rows = std::move(m.rows);
+Matrix& Matrix::operator=(Matrix &&m) {
+  clear_matrix();
+  rows.resize(m.rows_count);
   column_count = m.column_count;
   rows_count = m.rows_count;
+
+  for (int i = 0; i < m.rows_count; ++i) {
+    rows[i] = m.rows[i];
+    m.rows[i] = nullptr;
+  }
+
+  m.rows.clear();
   m.column_count = m.rows_count = 0;
+
+  return *this;
 }
 double &Matrix::operator[](int rr, int cc) {
-  vector<double>& row = rows[rr];
+  double*& row = rows[rr];
   return row[cc];
 }
 double Matrix::operator[](int row, int coll) const {
@@ -56,22 +92,46 @@ Matrix Matrix::operator+(const Matrix &m) const {
   return result;
 }
 
-bool Matrix::operator==(const Matrix &) const {}
+bool Matrix::operator==(const Matrix & m) const {
+  if (this == &m)
+    return true;
+  if (column_count != m.column_count || rows_count != m.rows_count)
+    return false;
 
-__wrap_iter<vector<vector<double>>::__alloc_traits::pointer> Matrix::begin() {
+  for (int i = 0; i < rows_count; ++i)
+    for (int j = 0; j < column_count; ++j)
+      if (rows[i][j] != m.rows[i][j])
+        return false;
+
+  return true;
+}
+
+__wrap_iter<vector<double*>::__alloc_traits::pointer> Matrix::begin() {
   return rows.begin();
 }
-__wrap_iter<vector<vector<double>>::__alloc_traits::pointer> Matrix::end() {
+__wrap_iter<vector<double*>::__alloc_traits::pointer> Matrix::end() {
   return rows.end();
 }
 
-Matrix::~Matrix() = default;
+Matrix::~Matrix() {
+  for (auto& row : rows) {
+    delete [] row;
+  }
+}
 
+void Matrix::clear_matrix() {
+  for (auto& row : rows) {
+    delete[] row;
+    row = nullptr;
+  }
+  rows.clear();
+  column_count = rows_count = 0;
+}
 
 void print_matrix( Matrix &m) {
    for ( auto& row : m) {
-     for ( auto& el : row) {
-       std::cout << el << " ";
+     for (int j = 0; j < m.column_count_(); ++j) {
+       std::cout << row[j] << " ";
      }
      std::cout << "\n";
    }
@@ -80,9 +140,9 @@ void print_matrix( Matrix &m) {
 Matrix move_test() {
   Matrix m(5,5);
 
-  for (int i = 0; i < m.row_size(); ++i)
-    for (int j = 0; j < m.column_size(); ++j) {
-      m[i,j] = j + i*m.column_size();
+  for (int i = 0; i < m.rows_count_(); ++i)
+    for (int j = 0; j < m.column_count_(); ++j) {
+      m[i,j] = j + i*m.column_count_();
     }
 
   return m;
@@ -99,9 +159,9 @@ void test() {
   std::cout << "addition_test:\n";
   print_matrix(addition_test);
 
-  for (int i = 0; i < m.row_size(); ++i)
-    for (int j = 0; j < m.column_size(); ++j) {
-      m[i,j] = j + i*m.column_size();
+  for (int i = 0; i < m.rows_count_(); ++i)
+    for (int j = 0; j < m.column_count_(); ++j) {
+      m[i,j] = j + i*m.column_count_();
     }
 
   Matrix copy_test2 {m};
@@ -119,6 +179,9 @@ void test() {
 
   std::cout << "copy_test2:\n";
   print_matrix(copy_test2);
+
+  std::cout << "operator== test:" << (copy_test2 == copy_test) << " " <<
+    (copy_test2 == m) <<  (m == m) <<'\n';
 
   return;
 }
