@@ -20,6 +20,8 @@ struct Matrix {
     int rows_count_() const{return rows_count;}
     int column_count_() const {return column_count;}
 
+
+
     double& operator[](int row,int coll);
     double operator[](int row,int coll) const;
 
@@ -32,6 +34,9 @@ struct Matrix {
     __wrap_iter<vector<double*>::__alloc_traits::pointer> begin();
     __wrap_iter<vector<double*>::__alloc_traits::pointer> end();
 
+    __wrap_iter<vector<double *>::__alloc_traits::const_pointer> begin() const;
+    __wrap_iter<vector<double *>::__alloc_traits::const_pointer> end() const;
+
     ~Matrix();
 private:
     int rows_count;
@@ -43,7 +48,10 @@ private:
 
 };
 
-void print_matrix( Matrix& m);
+std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
+std::istream& operator>>(std::istream& is, Matrix& matrix);
+
+void print_matrix(std::ostream& os, const Matrix& m);
 
 void test();
 }
