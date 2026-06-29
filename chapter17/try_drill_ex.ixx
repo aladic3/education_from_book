@@ -13,14 +13,26 @@ export namespace ch17::ex {
 using namespace std;
 
 struct Matrix {
+    Matrix();
+    Matrix(initializer_list<initializer_list<double>> init_list);
+    Matrix(int rows, int cols, double val);
     Matrix(int rr, int cc);
     Matrix(const Matrix& m);
     Matrix(Matrix&& m);
 
-    int rows_count_() const{return rows_count;}
-    int column_count_() const {return column_count;}
+    std::vector<double> row(int i) const ;
+    std::vector<double> column(int i) const ;
 
+    int rows_count() const{return r_count;}
+    int column_count() const {return c_count;}
 
+    Matrix& operator+=(const Matrix& m);
+    Matrix& operator-=(const Matrix& m);
+
+    Matrix& operator+=(double el);
+    Matrix& operator-=(double el);
+
+    bool operator!=(const Matrix &) const;
 
     double& operator[](int row,int coll);
     double operator[](int row,int coll) const;
@@ -31,17 +43,21 @@ struct Matrix {
     Matrix& operator=(const Matrix& m);
     Matrix& operator=(Matrix&& m);
 
+    void resize(int new_rows, int new_columns);
+    void transpose();
+    void fill(double el);
+
     __wrap_iter<vector<double*>::__alloc_traits::pointer> begin();
     __wrap_iter<vector<double*>::__alloc_traits::pointer> end();
 
-    __wrap_iter<vector<double *>::__alloc_traits::const_pointer> begin() const;
-    __wrap_iter<vector<double *>::__alloc_traits::const_pointer> end() const;
+    [[nodiscard]] __wrap_iter<vector<double *>::__alloc_traits::const_pointer> begin() const;
+    [[nodiscard]] __wrap_iter<vector<double *>::__alloc_traits::const_pointer> end() const;
 
     ~Matrix();
 private:
-    int rows_count;
-    int column_count;
-    vector<double*> rows;
+    int r_count;
+    int c_count;
+    vector<double*> _rows;
 
     void clear_matrix();
 
