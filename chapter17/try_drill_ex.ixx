@@ -94,7 +94,7 @@ export namespace ch17::try_ {
 
     };
 
-    X glob {2};
+    //X glob {2};
 
     X copy(X a) {cout << "copy()\n"; return a;}
     X copy2(X a) {cout << "copy2()\n"; X aa = a; return aa;}
