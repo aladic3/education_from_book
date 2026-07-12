@@ -11,55 +11,80 @@ module chapter18;
 
 
 namespace ch18::vector{
+template <typename T>
+T* allocator<T>::allocate(int size) {
+    T* el = new T[size];
+    return el;
+}
 
-    Vector::~Vector() {
-        delete[] elem;
+template <typename T>
+void allocator<T>::deallocate(T* elements, int size) {
+    for (int i = 0; i < size; ++i) {
+        delete elements[i];
+    }
+}
+
+template <typename T, typename A = allocator<T>>
+Vector<T,A>::~Vector() {
+        allocator.deallocate(elem,cap);
     }
 
-    Vector::Vector() : sz(4), cap(sz*2) {
-        elem = new double[cap];
-        for (int i = 0; i < sz; ++i) {
-            elem[i] = 0;
-        }
-    };
 
-    Vector::Vector(std::initializer_list<double> lst) : sz(static_cast<int>(lst.size())),
+template <typename T, typename A = allocator<T>>
+Vector<T,A>::Vector() : sz(4), cap(sz*2) {
+        elem = allocator.allocate(cap);
+        for (int i = 0; i < sz; ++i) {
+            elem[i] = T{};
+        }
+    }
+
+template <typename T, typename A = allocator<T>>
+Vector<T,A>::Vector(std::initializer_list<T> lst) : sz(static_cast<int>(lst.size())),
         cap(sz), elem(new double[cap]){
             int iterator = 0;
 
-            for (double val : lst) {
+            for (T val : lst) {
                 elem[iterator] = val;
                 ++iterator;
             }
     }
-    Vector::Vector(const Vector &v): sz(v.size()), cap(v.cap), elem(new double[cap]) {
+
+template <typename T, typename A = allocator<T>>
+Vector<T,A>::Vector(const Vector &v): sz(v.size()), cap(v.cap),
+elem(allocator.allocate(cap)) {
         for (int i = 0; i < sz; ++i)
             elem[i] = v.elem[i];
     }
 
-    Vector::Vector(Vector &&v) noexcept : sz(v.size()), cap(v.cap), elem(v.elem) {
+template <typename T, typename A = allocator<T>>
+Vector<T,A>::Vector(Vector &&v) noexcept : sz(v.size()), cap(v.cap), elem(v.elem) {
         v.elem = nullptr;
         v.sz = 0;
         v.cap = 0;
     }
 
-    Vector &Vector::operator=(const Vector &v) {
-        auto* new_array = new double[v.cap];
+template <typename T, typename A = allocator<T>>
+    Vector<T,A>& Vector<T,A>::operator=(const Vector &v) {
+        T* new_array = allocator.allocate(v.cap);
 
         for (int i = 0; i < v.sz; ++i)
              new_array[i] = v.elem[i];
 
+        allocator.deallocate(elem,cap);
         cap = v.cap;
         sz = v.sz;
-        delete[] elem;
+
         elem = new_array;
 
         return *this;
     }
-    Vector &Vector::operator=(Vector &&v) noexcept{
+
+template <typename T, typename A = allocator<T>>
+    Vector<T,A>& Vector<T,A>::operator=(Vector &&v) noexcept{
+        allocator.deallocate(elem,cap);
         sz = v.sz;
         cap = v.cap;
-        delete[] elem;
+
         elem = v.elem;
 
         v.elem = nullptr;
@@ -69,29 +94,36 @@ namespace ch18::vector{
         return *this;
     }
 
-    void Vector::reserve(int new_alloc) {
+template <typename T, typename A = allocator<T>>
+    void Vector<T,A>::reserve(int new_alloc) {
         if (new_alloc <= cap) return;
 
-        auto* new_array = new double[new_alloc];
+        T* new_array = allocator.allocate(new_alloc);
 
         for (int i = 0; i < size(); ++i) {
             new_array[i] = elem[i];
         }
-        delete[] elem;
+        allocator.deallocate(elem,cap);
 
         elem = new_array;
         cap = new_alloc;
 
     }
-    void Vector::resize(int new_size) {
+
+
+template <typename T, typename A = allocator<T>>
+    void Vector<T,A>::resize(int new_size, T def) {
         reserve(new_size);
 
         for (int i = sz; i < new_size; ++i)
-            elem[i] = 0;
+            elem[i] = def;
 
         sz = new_size;
     }
-    void Vector::push_back(double new_el) {
+
+
+template <typename T, typename A = allocator<T>>
+    void Vector<T,A>::push_back(T new_el) {
         if (sz == cap)
             reserve(sz*2);
 
@@ -99,36 +131,46 @@ namespace ch18::vector{
         ++sz;
     }
 
-    const double &Vector::operator[](int i) const {
+
+template <typename T, typename A = allocator<T>>
+    const T& Vector<T,A>::operator[](int i) const {
         if (i >= sz || i < 0 )
             error("bad iterator");
 
         return elem[i];
     }
-    Vector::Vector(int s) {
+
+
+template <typename T, typename A = allocator<T>>
+    Vector<T,A>::Vector(int s) {
         if (s < 0)
             error("bad size");
         sz = s;
-        elem = new double[sz];
+        elem = allocator.allocate(sz);
         cap = s;
     }
 
-    double& Vector::operator[](int i) {
+
+template <typename T, typename A = allocator<T>>
+    T& Vector<T,A>::operator[](int i) {
         if (i >= sz || i < 0 )
             error("bad iterator");
 
         return elem[i];
     }
 
-    Vector create_v(initializer_list<double> elements) {
+
+template <typename T, typename A = allocator<T>>
+    Vector<T,A> create_v(std::initializer_list<T> elements) {
         return Vector(elements);
     }
 
-    void print_v(const Vector& v, const string& intro = "") {
-        cout << intro;
-        for (auto el : v) {
-            cout << el << '\t';
+template <typename T, typename A = allocator<T>>
+    void print_v(const Vector<T,A>& v, const std::string & intro = "") {
+        std::cout << intro;
+        for (const auto& el : v) {
+            std::cout << el << '\t';
         }
-        cout << '\n';
+        std::cout << '\n';
     }
 }

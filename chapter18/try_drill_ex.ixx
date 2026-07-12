@@ -15,19 +15,21 @@ export namespace ch18::try_ {
 }
 
 
-export namespace ch18::vector {
+namespace ch18::vector {
 
 template <typename  T>
 struct  allocator {
-
+  T* allocate(int size);
+  void deallocate(T* elements, int size);
 };
 
-template<typename  T, typename A = allocator<T>>
+
+export template <typename  T, typename A = allocator<T>>
 
     struct Vector {
       Vector();
       explicit Vector(int sz);
-      Vector(std::initializer_list<double> lst);
+      Vector(std::initializer_list<T> lst);
 
       Vector(const Vector& v);
       Vector(Vector&& v) noexcept;
@@ -36,23 +38,24 @@ template<typename  T, typename A = allocator<T>>
       Vector& operator=(Vector&& v) noexcept;
 
       void reserve(int new_alloc);
-      void resize(int new_size);
-      void push_back(double new_el);
+      void resize(int new_size, T def = T{});
+      void push_back(T new_el);
 
       [[nodiscard]] int size() const {return sz;}
 
 
-      double& operator[](int i);
-      const double& operator[](int i) const;
+      T& operator[](int i);
+      const T& operator[](int i) const;
 
-      [[nodiscard]] double* begin() const {return elem;} // iteration support
-      [[nodiscard]] double* end() const {return elem+sz;}
+      [[nodiscard]] T* begin() const {return elem;} // iteration support
+      [[nodiscard]] T* end() const {return elem+sz;}
 
       ~Vector();
     private:
       int sz = 0;
       int cap = 0;
-      double* elem = nullptr;
+      T* elem = nullptr;
+      A allocator;
 
     };
 
