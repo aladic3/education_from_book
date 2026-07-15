@@ -39,7 +39,6 @@ add_executable(hello_world main.cpp
         chapter18/drill.cpp
         chapter18/ex.cpp
         chapter18/try_drill_ex.ixx
-        chapter18/vector.cpp
 
 
 )
