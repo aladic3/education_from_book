@@ -19,7 +19,9 @@ export namespace ch18::vector {
 
 template <typename T> struct allocator {
   T *allocate(int size);
-  void deallocate(T *elements);
+
+  void destroy(T* element);
+  void deallocate(T *elements, int size_initialized_elements);
 };
 
  template <typename T, typename A = allocator<T>>
@@ -37,7 +39,7 @@ struct Vector {
   void reserve(int new_alloc);
    void reverse();
   void resize(int new_size, T def = T{});
-  void push_back(T new_el);
+  void push_back(const T& new_el);
 
   [[nodiscard]] int size() const { return sz; }
 
@@ -64,22 +66,30 @@ Vector<T,A> create_v(std::initializer_list<T> elements);
 
 namespace ch18::vector {
 template <typename T> T *allocator<T>::allocate(int size) {
-  T *el = new T[size];
-  return el;
+  return static_cast<T*>(::operator new(size * sizeof(T)));
+}
+template <typename T> void allocator<T>::destroy(T *element) {
+  element->~T();;
 }
 
-template <typename T> void allocator<T>::deallocate(T *elements) {
-    delete[] elements;
+// TODO may be deallocate must be shorter(without "if constexpr" block)
+template <typename T> void allocator<T>::deallocate(T *elements, int  size_initialized_elements) {
+  if constexpr (!std::is_trivially_destructible_v<T>)
+    for (int i = size_initialized_elements-1; i >=0 ; --i)
+      destroy(&elements[i]);
+
+
+  ::operator delete(elements);
 }
 
 template <typename T, typename A> Vector<T, A>::~Vector() {
-  allocator.deallocate(elem);
+  allocator.deallocate(elem,sz);
 }
 
 template <typename T, typename A> Vector<T, A>::Vector() : sz(4), cap(sz * 2) {
   elem = allocator.allocate(cap);
   for (int i = 0; i < sz; ++i) {
-    elem[i] = T{};
+    std::construct_at(elem+i);
   }
 }
 
@@ -89,8 +99,8 @@ Vector<T, A>::Vector(std::initializer_list<T> lst)
 elem(allocator.allocate(cap)) {
   int iterator = 0;
 
-  for (T val : lst) {
-    elem[iterator] = val;
+  for (const T& val : lst) {
+    std::construct_at(elem+iterator,val);
     ++iterator;
   }
 }
@@ -98,8 +108,7 @@ elem(allocator.allocate(cap)) {
 template <typename T, typename A>
 Vector<T, A>::Vector(const Vector &v)
     : sz(v.size()), cap(v.cap), elem(allocator.allocate(cap)) {
-  for (int i = 0; i < sz; ++i)
-    elem[i] = v.elem[i];
+  std::uninitialized_copy(v.elem, v.elem+v.size(), elem);
 }
 
 template <typename T, typename A>
@@ -113,11 +122,9 @@ Vector<T, A>::Vector(Vector &&v) noexcept
 template <typename T, typename A>
 Vector<T, A> &Vector<T, A>::operator=(const Vector &v) {
   T *new_array = allocator.allocate(v.cap);
+  std::uninitialized_copy(v.elem,v.elem+v.sz,new_array);
 
-  for (int i = 0; i < v.sz; ++i)
-    new_array[i] = v.elem[i];
-
-  allocator.deallocate(elem, cap);
+  allocator.deallocate(elem, sz);
   cap = v.cap;
   sz = v.sz;
 
@@ -128,7 +135,7 @@ Vector<T, A> &Vector<T, A>::operator=(const Vector &v) {
 
 template <typename T, typename A>
 Vector<T, A> &Vector<T, A>::operator=(Vector &&v) noexcept {
-  allocator.deallocate(elem, cap);
+  allocator.deallocate(elem, sz);
   sz = v.sz;
   cap = v.cap;
 
@@ -147,10 +154,10 @@ template <typename T, typename A> void Vector<T, A>::reserve(int new_alloc) {
 
   T *new_array = allocator.allocate(new_alloc);
 
-  for (int i = 0; i < size(); ++i) {
-    new_array[i] = elem[i];
-  }
-  allocator.deallocate(elem);
+  std::uninitialized_move(elem,elem+sz,new_array);
+
+  // TODO may be errors because elements have been uninitialized after move
+  allocator.deallocate(elem,sz);
 
   elem = new_array;
   cap = new_alloc;
@@ -160,10 +167,10 @@ template <typename T, typename A> void Vector<T, A>::reverse() {
   T* result = allocator.allocate(cap);
 
   for (int i = 0; i < this->sz; ++i) {
-    result[sz-(i+1)] = elem[i];
+     std::construct_at(result+(sz-(i+1)),elem[i]);
   }
 
-  allocator.deallocate(elem);
+  allocator.deallocate(elem, sz);
   elem = result;
 
 }
@@ -173,16 +180,17 @@ void Vector<T, A>::resize(int new_size, T def) {
   reserve(new_size);
 
   for (int i = sz; i < new_size; ++i)
-    elem[i] = def;
+    std::construct_at(elem+i, def);
+
 
   sz = new_size;
 }
 
-template <typename T, typename A> void Vector<T, A>::push_back(T new_el) {
+template <typename T, typename A> void Vector<T, A>::push_back(const T& new_el) {
   if (sz == cap)
-    reserve(sz * 2);
+    reserve(cap==0 ? 1 : sz * 2);
 
-  elem[sz] = new_el;
+  std::construct_at(elem+sz, new_el);
   ++sz;
 }
 
@@ -203,7 +211,8 @@ template <typename T, typename A> Vector<T, A>::Vector(int s, T def) {
   elem = allocator.allocate(sz);
   cap = s;
 
-  for (int i = 0; i < sz; ++i) elem[i] = def;
+  for (int i = 0; i < sz; ++i)
+    std::construct_at(elem+i,def);
 
 }
 

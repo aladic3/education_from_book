@@ -4,6 +4,8 @@ project(hello_world CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
 
 
 
