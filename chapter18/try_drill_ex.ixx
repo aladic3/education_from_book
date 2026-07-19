@@ -12,6 +12,21 @@ export module chapter18;
 
 
 export namespace ch18::try_ {
+struct Somethink {
+  Somethink();
+  ~Somethink();
+  Somethink(const Somethink&);
+  Somethink( Somethink&&);
+
+  Somethink& operator=(const Somethink&);
+  Somethink& operator=( Somethink&&);
+
+
+private:
+  char* field1;
+  std::string field2;
+};
+
 void test1();
 }
 
@@ -29,6 +44,7 @@ struct Vector {
   Vector();
    Vector(int sz, T def = T{});
   Vector(std::initializer_list<T> lst);
+   ~Vector();
 
   Vector(const Vector &v);
   Vector(Vector &&v) noexcept;
@@ -40,6 +56,7 @@ struct Vector {
    void reverse();
   void resize(int new_size, T def = T{});
   void push_back(const T& new_el);
+   void push_back(T&& new_el);
 
   [[nodiscard]] int size() const { return sz; }
 
@@ -49,7 +66,7 @@ struct Vector {
   [[nodiscard]] T *begin() const { return elem; } // iteration support
   [[nodiscard]] T *end() const { return elem + sz; }
 
-  ~Vector();
+
 
 private:
   int sz = 0;
@@ -190,7 +207,14 @@ template <typename T, typename A> void Vector<T, A>::push_back(const T& new_el) 
   if (sz == cap)
     reserve(cap==0 ? 1 : sz * 2);
 
-  std::construct_at(elem+sz, new_el);
+   std::construct_at(elem+sz, new_el);
+  ++sz;
+}
+template <typename T, typename A> void Vector<T, A>::push_back(T &&new_el) {
+  if (sz == cap)
+    reserve(cap==0 ? 1 : sz * 2);
+
+  *(elem+sz) = std::move(new_el);
   ++sz;
 }
 

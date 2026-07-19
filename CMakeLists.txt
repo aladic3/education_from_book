@@ -8,7 +8,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #add_link_options(-fsanitize=address)
 
 
-
 add_executable(hello_world main.cpp
         error.cpp
 

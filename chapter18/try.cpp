@@ -8,9 +8,60 @@ module;
 module chapter18;
 
 namespace ch18::try_ {
+Somethink::Somethink() {
+  char ch []  = "Somethink";
+  field1 = static_cast<char*>( operator new(sizeof(char) * (std::strlen(ch) + 1)));
+  std::uninitialized_move_n(ch,std::strlen(ch) + 1,field1);
+
+  field2 = std::string(field1);
+  std::cerr << "struct 'Somethink' constructor\n";
+}
+
+Somethink::~Somethink() {
+  ::operator delete(field1);
+
+  std::cerr << "struct 'Somethink' destructor\n";
+}
+Somethink::Somethink(const Somethink & el) :
+field1(static_cast<char*>(::operator new((std::strlen(el.field1)+1) * sizeof(char)))),
+field2(el.field2) {
+  std::uninitialized_copy(el.field1,el.field1+std::strlen(el.field1)+1,field1);
+  std::cerr << "struct 'Somethink' copy constructor\n";
+}
+Somethink::Somethink( Somethink && el)  :
+field1(el.field1),
+field2(std::move(el.field2))
+{
+  el.field1 = nullptr;
+  std::cerr << "struct 'Somethink' move constructor\n";
+}
+Somethink &Somethink::operator=(const Somethink & el) {
+  operator delete(field1);
+  field1 = static_cast<char*>(operator new((std::strlen(el.field1) + 1) * sizeof(char)));
+  std::uninitialized_copy(el.field1,el.field1+std::strlen(el.field1) + 1,field1);
+  field2 = el.field2;
+
+  std::cerr << "struct 'Somethink' copy assigment\n";
+  return *this;
+}
+Somethink &Somethink::operator=(Somethink && el) {
+  operator delete(field1);
+  field1 = el.field1;
+  el.field1 = nullptr;
+  field2 = std::move(el.field2);
+
+  std::cerr << "struct 'Somethink' move assigment\n";
+
+  return *this;
+}
 void test1() {
   using namespace ch18::vector;
   using std::string;
+  {
+    Vector<Somethink> constructor_destructor_test;
+    constructor_destructor_test.push_back(Somethink());
+  }
+
 
   std::cout << "Good!\n";
   Vector<double> default_resize_test;

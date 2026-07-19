@@ -7,9 +7,9 @@ import chapter18;
 
 int main() {
 
-
     try {
         ch18::try_::test1();
+
     }
     catch (std::exception& err) {
         std::cerr << err.what();
