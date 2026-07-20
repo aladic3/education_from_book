@@ -86,6 +86,46 @@ template <typename T, typename A = allocator<T>>
 Vector<T,A> create_v(std::initializer_list<T> elements);
 } // namespace ch18::vector
 
+export namespace ch18::drill {
+void test();
+
+template <class T>
+struct S {
+  S() : val(){}
+  S(const T& v) : val(v){}
+  ~S(){val.~T();}
+  T& access();
+  const T& access() const;
+
+  S& operator=(const T&);
+
+private:
+  T val;
+};
+
+template<typename T>
+void read_val(T& v);
+
+
+} // namespace ch18::drill
+
+namespace ch18::drill {
+template <class T> T &S<T>::access() {
+  return val;
+}
+template <class T> const T &S<T>::access() const {
+  return val;
+}
+template <class T> S<T>& S<T>::operator=(const T & for_copy) {
+  T temp = for_copy;
+  std::swap(temp,val);
+  return *this;
+}
+template <typename T> void read_val(T &v) {
+  std::cin >> v;
+}
+}
+
 namespace ch18::try_ {
 template <typename T, typename U>
 void suspicious() {
@@ -149,6 +189,7 @@ template <typename T> void allocator<T>::deallocate(T *elements, int  size_initi
 
 template <typename T, typename A> Vector<T, A>::~Vector() {
   allocator.deallocate(elem,sz);
+  elem = nullptr;
 }
 
 template <typename T, typename A> Vector<T, A>::Vector() : sz(4), cap(sz * 2) {
