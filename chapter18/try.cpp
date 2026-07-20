@@ -8,6 +8,9 @@ module;
 module chapter18;
 
 namespace ch18::try_ {
+
+
+
 Somethink::Somethink() {
   char ch []  = "Somethink";
   field1 = static_cast<char*>( operator new(sizeof(char) * (std::strlen(ch) + 1)));

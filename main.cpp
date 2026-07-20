@@ -8,14 +8,14 @@ import chapter18;
 int main() {
 
     try {
-        ch18::try_::test1();
+        ch18::try_::suspicious<int, double>();
 
     }
     catch (std::exception& err) {
         std::cerr << err.what();
-        return -1;
+        return -2;
     } catch (...) {
-        return -666;
+        return -3;
     }
 
     return 0;

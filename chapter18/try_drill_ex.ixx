@@ -12,6 +12,11 @@ export module chapter18;
 
 
 export namespace ch18::try_ {
+
+template <typename T, typename U>
+void suspicious();
+
+
 struct Somethink {
   Somethink();
   ~Somethink();
@@ -69,16 +74,59 @@ struct Vector {
 
 
 private:
+   A allocator;
   int sz = 0;
   int cap = 0;
   T *elem = nullptr;
-  A allocator;
+
 };
 template <typename T, typename A = allocator<T>>
 void print_v(const Vector<T, A> &v, const std::string &intro = "");
 template <typename T, typename A = allocator<T>>
 Vector<T,A> create_v(std::initializer_list<T> elements);
 } // namespace ch18::vector
+
+namespace ch18::try_ {
+template <typename T, typename U>
+void suspicious() {
+  constexpr int count = 10;
+  T* p = static_cast<T*>(operator new (sizeof(T) * count));
+  U* q = static_cast<U*>(operator new (sizeof(U) * count));
+
+  try {
+    for (int i = 0 ; i < count; ++i) {
+      std::construct_at(p+i,static_cast<T>(i+1));
+      std::construct_at(q+i, static_cast<U>(i*i));
+
+      std::cout << "p[" << i << "] = " << p[i] << "   "
+        << "q[" << i << "] = " << q[i] << std::endl;
+    }
+    throw std::runtime_error("Error");
+  }
+  catch (const std::exception& ex) {
+    std::cerr << "Caught!";
+    operator delete (p);
+    operator delete(q);
+    throw;
+  }
+
+  catch (...) {
+    std::destroy(p, p+count);
+    std::destroy(q,q+count);
+    std::cerr << "Caught!";
+    operator delete (p);
+    operator delete(q);
+    throw;
+  }
+
+
+  std::destroy(p, p+count);
+  std::destroy(q,q+count);
+  operator delete (p);
+  operator delete(q);
+
+}
+}
 
 
 namespace ch18::vector {
