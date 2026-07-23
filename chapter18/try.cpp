@@ -6,6 +6,7 @@ module;
 #include <iostream>
 
 module chapter18;
+import chapter18.vector;
 
 namespace ch18::try_ {
 

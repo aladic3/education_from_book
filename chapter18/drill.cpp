@@ -57,5 +57,9 @@ void test() {
   read_val(f4.access());
   std::cout << f4.access();
   std::cout << "\n";
+
+  S<Vector<int>> f44 (Vector<int>(3,10));
+  add(f4.access(),f44.access());
+  std::cout << f4.access();
 }
 }
