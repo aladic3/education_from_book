@@ -80,10 +80,20 @@ private:
   T *elem = nullptr;
 
 };
+
 template <typename T, typename A = allocator<T>>
 void print_v(const Vector<T, A> &v, const std::string &intro = "");
+
 template <typename T, typename A = allocator<T>>
 Vector<T,A> create_v(std::initializer_list<T> elements);
+
+template <typename T, typename A = allocator<T>>
+std::ostream& operator<<(std::ostream& os, const Vector<T,A> &v);
+
+template <typename T, typename A = allocator<T>>
+std::istream& operator>>(std::istream& is, Vector<T,A> &v);
+
+
 } // namespace ch18::vector
 
 export namespace ch18::drill {
@@ -348,6 +358,33 @@ void print_v(const Vector<T, A> &v, const std::string &intro) {
     std::cout << el << ' ';
   }
   std::cout << '\n';
+}
+
+template <typename T, typename A>
+std::ostream &operator<<(std::ostream &os, const Vector<T, A> &v) {
+  os << "{ ";
+  for (const T& element : v) {
+    os << element << ", ";
+  }
+  os << "\b\b }";
+
+  return os;
+}
+
+
+template <typename T, typename A>
+std::istream &operator>>(std::istream &is, Vector<T, A> &v) { // { val, val, val} format.
+  char separator;
+  is >> separator;
+  T temp;
+
+  while (is && separator != '}') {
+    is >> temp >> separator;
+    v.push_back(temp);
+  }
+
+  return is;
+
 }
 
 } // namespace

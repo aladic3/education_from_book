@@ -18,7 +18,8 @@ void test() {
   S<char> f2('x');
   S<double> f3;
   S<Vector<int>> f4;
-  f4 = Vector<int>(Vector<int>(100,3));
+  S<std::string> f5;
+  f4 = Vector<int>(Vector<int>(5,3));
   f2 = '3';
   f3 = 2.33;
 
@@ -32,7 +33,29 @@ void test() {
   }
   std::cout << "\n";
 
+  std::cout << "Enter double: ";
+  read_val(f3.access());
+  std::cout << f3.access();
+  std::cout << "\n";
 
+  std::cout << "Enter char: ";
+  read_val(f2.access());
+  std::cout << f2.access();
+  std::cout << "\n";
 
+  std::cout << "Enter string: ";
+  read_val(f5.access());
+  std::cout << f5.access();
+  std::cout << "\n";
+
+  std::cout << "Enter int: ";
+  read_val(f1.access());
+  std::cout << f1.access();
+  std::cout << "\n";
+
+  std::cout << "Enter Vector<int>: ";
+  read_val(f4.access());
+  std::cout << f4.access();
+  std::cout << "\n";
 }
 }
