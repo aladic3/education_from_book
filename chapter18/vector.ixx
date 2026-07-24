@@ -73,6 +73,8 @@ template <typename T>
 void add(Vector<T>& v1, const Vector<T>& v2);
 
 template <typename T, typename U>
+requires std::convertible_to<T, double> &&
+std::convertible_to<U,double>
 double sum_multiply(const Vector<T>& vt, const Vector<U>& vu); // ex 2
 
 } // namespace ch18::vector
@@ -101,7 +103,7 @@ template <typename T, typename A> Vector<T, A>::~Vector() {
   elem = nullptr;
 }
 
-template <typename T, typename A> Vector<T, A>::Vector() : sz(4), cap(sz * 2) {
+template <typename T, typename A> Vector<T, A>::Vector() : sz(0), cap(4 * 2) {
   elem = allocator.allocate(cap);
   for (int i = 0; i < sz; ++i) {
     std::construct_at(elem+i);
@@ -296,6 +298,8 @@ void add(Vector<T>& v1, const Vector<T>& v2) {
 
 
 template <typename T, typename U>
+requires std::convertible_to<T, double> &&
+std::convertible_to<U,double>
 double sum_multiply(const Vector<T> &vt, const Vector<U> &vu) {
   double result = 0;
   const int upper_limit = vt.size() <= vu.size() ? vt.size() : vu.size();

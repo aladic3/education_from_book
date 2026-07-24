@@ -62,6 +62,70 @@ void read_val(T& v);
 
 } // namespace ch18::drill
 
+
+export namespace ch18::ex {
+
+void test();
+
+template <typename T, typename U>
+requires (std::convertible_to<T,std::string> || std::convertible_to<T,char>) &&
+  std::convertible_to<U,double>
+struct Pair {
+  T name;
+  U val;
+};
+
+template<typename T, typename U>
+std::istream& operator>>(std::istream& is, vector::Vector<Pair<T,U>>& var_table);
+
+template<typename T, typename U>
+std::ostream& operator<<(std::ostream& os, const vector::Vector<Pair<T,U>>& var_table);
+
+} // namespace ch18::ex
+
+namespace ch18::ex {
+
+
+void test() {
+  using vector::Vector;
+
+  Vector<Pair<char, unsigned short int>> var_table;
+
+  std::cout << "Enter var_table as { name val, name2 val2 }:";
+  std::cin >> var_table;
+
+  std::cout << var_table;
+}
+
+template <typename T, typename U>
+std::istream& operator>>(std::istream& is, vector::Vector<Pair<T,U>>& var_table) {
+  //input format: { name val, name2 val2 , name3 val3 }
+  char separator;
+  Pair<T,U> temp;
+  is >> separator;
+
+  while (is >> temp.name >> temp.val >> separator) {
+    var_table.push_back(temp);
+
+    if (separator == '}') {
+      break;
+    }
+  }
+  return is;
+}
+
+
+template <typename T, typename U>
+std::ostream &operator<<(std::ostream &os,
+                         const vector::Vector<Pair<T, U>> &var_table) {
+  for (const auto& el : var_table) {
+    os << el.name << " = " << el.val << std::endl;
+  }
+
+  return os;
+}
+}
+
 namespace ch18::drill {
 template <class T> T &S<T>::access() {
   return val;

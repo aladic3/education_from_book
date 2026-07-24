@@ -14,15 +14,27 @@ namespace ch18::drill {
 
 void test() {
   using namespace ch18::vector;
+
+
   S<int> f1(10);
   S<char> f2('x');
   S<double> f3;
-  S<Vector<int>> f4;
+
   S<std::string> f5;
-  f4 = Vector<int>(Vector<int>(5,3));
+  //f4 = Vector<int>(Vector<int>(5,3));
   f2 = '3';
   f3 = 2.33;
 
+  S<Vector<char>> f4 (Vector<char>(5,3));
+  S<Vector<int>> f44 (Vector<int>(3,10));
+  S<Vector<double>> f444 (Vector<double>(4,2.5));
+  //add(f4.access(),f44.access());
+  std::cout << f4.access() << std::endl;
+  std::cout << f444.access() << std::endl;
+
+  std::cout << "sum_multiply = " << sum_multiply(f4.access(),f444.access()) << std::endl;
+
+  return;
   std::cout << f1.access() << "\n";
   std::cout << f2.access() << "\n";
   std::cout << f3.access() << "\n";
@@ -58,12 +70,6 @@ void test() {
   std::cout << f4.access();
   std::cout << "\n";
 
-  S<Vector<int>> f44 (Vector<int>(3,10));
-  S<Vector<double>> f444 (Vector<double>(4,2.5));
-  add(f4.access(),f44.access());
-  std::cout << f4.access() << std::endl;
-  std::cout << f444.access() << std::endl;
 
-  std::cout << sum_multiply(f4.access(),f444.access());
 }
 }
