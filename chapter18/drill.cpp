@@ -59,7 +59,11 @@ void test() {
   std::cout << "\n";
 
   S<Vector<int>> f44 (Vector<int>(3,10));
+  S<Vector<double>> f444 (Vector<double>(4,2.5));
   add(f4.access(),f44.access());
-  std::cout << f4.access();
+  std::cout << f4.access() << std::endl;
+  std::cout << f444.access() << std::endl;
+
+  std::cout << sum_multiply(f4.access(),f444.access());
 }
 }

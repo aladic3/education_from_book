@@ -70,12 +70,11 @@ template <typename T, typename A = allocator<T>>
 std::istream& operator>>(std::istream& is, Vector<T,A> &v);
 
 template <typename T>
-void add(Vector<T>& v1, const Vector<T>& v2) {
-  const int upper_limit = v1.size() <= v2.size() ? v1.size() : v2.size();
-  for (int i = 0; i < upper_limit; ++i)
-    v1[i] += v2[i];
+void add(Vector<T>& v1, const Vector<T>& v2);
 
-}
+template <typename T, typename U>
+double sum_multiply(const Vector<T>& vt, const Vector<U>& vu); // ex 2
+
 } // namespace ch18::vector
 
 
@@ -287,4 +286,23 @@ std::istream &operator>>(std::istream &is, Vector<T, A> &v) { // { val, val, val
 
 }
 
+template <typename T>
+void add(Vector<T>& v1, const Vector<T>& v2) {
+  const int upper_limit = v1.size() <= v2.size() ? v1.size() : v2.size();
+  for (int i = 0; i < upper_limit; ++i)
+    v1[i] += v2[i];
+
+}
+
+
+template <typename T, typename U>
+double sum_multiply(const Vector<T> &vt, const Vector<U> &vu) {
+  double result = 0;
+  const int upper_limit = vt.size() <= vu.size() ? vt.size() : vu.size();
+
+  for (int i = 0; i < upper_limit; ++i)
+    result += static_cast<double>(vt[i]) * static_cast<double>(vu[i]);
+
+  return result;
+}
 } // namespace
