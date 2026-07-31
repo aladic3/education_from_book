@@ -8,83 +8,320 @@ module;
 #include <ranges>
 #include <vector>
 
-
-
 export module chapter18;
 export import chapter18.vector;
 
-
 export namespace ch18::try_ {
 
-template <typename T, typename U>
-void suspicious();
-
+template <typename T, typename U> void suspicious();
 
 struct Somethink {
   Somethink();
   ~Somethink();
-  Somethink(const Somethink&);
-  Somethink( Somethink&&);
+  Somethink(const Somethink &);
+  Somethink(Somethink &&);
 
-  Somethink& operator=(const Somethink&);
-  Somethink& operator=( Somethink&&);
-
+  Somethink &operator=(const Somethink &);
+  Somethink &operator=(Somethink &&);
 
 private:
-  char* field1;
+  char *field1;
   std::string field2;
 };
 
 void test1();
-}
-
+} // namespace ch18::try_
 
 export namespace ch18::drill {
 void test();
 
-template <class T>
-struct S {
-  S() : val(){}
-  S(const T& v) : val(v){}
-  ~S(){val.~T();}
-  T& access();
-  const T& access() const;
+template <class T> struct S {
+  S() : val() {}
+  S(const T &v) : val(v) {}
+  ~S() { val.~T(); }
+  T &access();
+  const T &access() const;
 
-  S& operator=(const T&);
+  S &operator=(const T &);
 
 private:
   T val;
 };
 
-template<typename T>
-void read_val(T& v);
-
+template <typename T> void read_val(T &v);
 
 } // namespace ch18::drill
-
 
 export namespace ch18::ex {
 
 void test();
+void test_4();
 
 template <typename T, typename U>
-requires (std::convertible_to<T,std::string> || std::convertible_to<T,char>) &&
-  std::convertible_to<U,double>
+  requires(std::convertible_to<T, std::string> ||
+           std::convertible_to<T, char>) &&
+          std::convertible_to<U, double>
 struct Pair {
   T name;
   U val;
 };
 
-template<typename T, typename U>
-std::istream& operator>>(std::istream& is, vector::Vector<Pair<T,U>>& var_table);
+template <typename T, typename U>
+std::istream &operator>>(std::istream &is,
+                         vector::Vector<Pair<T, U>> &var_table);
 
-template<typename T, typename U>
-std::ostream& operator<<(std::ostream& os, const vector::Vector<Pair<T,U>>& var_table);
+template <typename T, typename U>
+std::ostream &operator<<(std::ostream &os,
+                         const vector::Vector<Pair<T, U>> &var_table);
+
+template <class God>
+requires std::equality_comparable<God>
+struct Link {
+  Link &operator=(const Link &) = delete;
+  Link(const Link &) = delete;
+  Link() : element("BEGIN") {}
+
+  ~Link();
+
+  Link *insert(const God &, Link *right_link) const; // create and insert by
+  Link *insert(const God &, int index);     // create and insert by index
+  Link *erase(const God&);         // by obj
+  Link *move_on_this(Link *element, int n); // move backward or forward
+  void add(const God &);
+
+  [[nodiscard]] Link *find(const God &); // by name
+  [[nodiscard]] const Link *find(const God &) const;
+  [[nodiscard]] const God &get_value() const;
+
+  Link *operator[](int iterator) const;
+  God * operator[](int iterator);
+
+
+  [[nodiscard]] int size() const;
+
+private:
+  Link(God);             // create without left and right pointers
+  Link(God, Link *left); // in end link
+  Link(God, Link *left, Link *right);
+
+  Link *move_right(Link *el);
+  Link *move_left(Link *el);
+
+  God element;
+  Link *left = nullptr;
+  Link *right = nullptr;
+};
 
 } // namespace ch18::ex
 
+/***********************
+ ***********************
+ ***********************
+ *    IMPLEMENTATIONS   *
+ ***********************
+ ***********************
+ ***********************/
+
 namespace ch18::ex {
 
+template <class God> requires std::equality_comparable<God> Link<God>::Link(God val) : element(std::move(val)) {}
+
+template <class God> requires std::equality_comparable<God>
+Link<God>::Link(God val, Link *left) : element(std::move(val)), left(left) {}
+template <class God> requires std::equality_comparable<God>
+Link<God>::Link(God val, Link *left, Link *right)
+    : element(std::move(val)), left(left), right(right) {}
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::move_right(Link *el) {
+  if (el->right == nullptr)
+    return nullptr;
+
+  el->left->right = el->right;
+  el->right->left = el->left;
+
+  Link *right_el = el->right;
+  el->left = right_el;
+  el->right = right_el->right;
+  right_el->right = el;
+
+  if (el->right)
+    el->right->left = el;
+
+  return el;
+}
+
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::move_left(Link *el) {
+  if (el->left == this)
+    return nullptr;
+
+  el->left->right = el->right;
+  if (el->right)
+    el->right->left = el->left;
+
+  Link *left_el = el->left;
+  el->right = left_el;
+  el->left = left_el->left;
+  left_el->left = el;
+
+  el->left->right = el;
+
+  return el;
+}
+
+template <class God> requires std::equality_comparable<God>
+Link<God>::~Link() {
+  if (left)
+    left->right = nullptr;
+
+  delete right;
+}
+
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::insert(const God &val, Link *right_link) const {
+  if (right_link == nullptr)
+    return nullptr;
+
+  Link *temp = right_link->left;
+  right_link->left = new Link(val, right_link->left, right_link);
+  temp->right = right_link->left;
+
+  return right_link->left;
+}
+
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::insert(const God &val, int index) {
+  Link *right_link = this->operator[](index);
+  return insert(val, right_link);
+}
+
+
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::erase(const God &val) {
+  Link *element = find(val);
+
+  if (element == nullptr)
+    return nullptr;
+
+  if (element->right)
+    element->right->left = element->left;
+
+  if (element->left)
+    element->left->right = element->right;
+
+  element->left = nullptr;
+  element->right = nullptr;
+
+  return element;
+}
+
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::move_on_this(Link *element, int n) {
+  if (element == nullptr || n == 0)
+    return nullptr;
+
+  Link *res_moving = element;
+  int increment_i = 1;
+
+  if (n < 0)
+    increment_i = -1;
+
+  if (increment_i > 0)
+    for (int i = 0; i != n && res_moving; i += increment_i)
+      res_moving = move_right(element);
+  else
+    for (int i = 0; i != n && res_moving; i += increment_i)
+      res_moving = move_left(element);
+
+  return element;
+}
+
+template <class God> requires std::equality_comparable<God>
+void Link<God>::add(const God &val) {
+
+  // ReSharper disable once CppDFANotInitializedField
+  if (right)
+    return right->add(val);
+
+  right = new Link(val, this);
+}
+
+
+
+
+
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::find(const God &val) {
+  Link *temp = this->right;
+
+  for (int i = 0; i < size(); i++) {
+    if (val == temp->get_value())
+      return temp;
+    temp = temp->right;
+  }
+
+  return nullptr;
+}
+
+template <class God> requires std::equality_comparable<God>
+const Link<God> *Link<God>::find(const God &val) const {
+  Link *temp = this->right;
+
+  for (int i = 0; i < size(); i++) {
+    if (val == temp->get_value())
+      return temp;
+    temp = temp->right;
+  }
+
+  return nullptr;
+}
+
+template <class God> requires std::equality_comparable<God>
+const God &Link<God>::get_value() const {
+  return element;
+}
+
+template <class God> requires std::equality_comparable<God>
+Link<God> *Link<God>::operator[](int iterator) const {
+  if (iterator >= size())
+    error("out of range");
+
+  Link *temp = this->right;
+
+  for (int i = 0; i < iterator; i++)
+    temp = temp->right;
+
+  return temp;
+}
+
+template <class God> requires std::equality_comparable<God>
+God * Link<God>::operator[](int iterator) {
+  if (iterator >= size())
+    error("out of range");
+
+  Link *temp = this->right;
+
+  for (int i = 0; i < iterator; i++)
+    temp = temp->right;
+
+  return temp->element;
+}
+
+
+template <class God> requires std::equality_comparable<God>
+int Link<God>::size() const {
+  const Link *temp = this;
+  int count = 0;
+
+  while (temp->right) {
+    ++count;
+    temp = temp->right;
+  }
+
+  return count;
+}
 
 void test() {
   using vector::Vector;
@@ -97,11 +334,25 @@ void test() {
   std::cout << var_table;
 }
 
+
+void test_4() {
+  Link<std::string> bam;
+  bam.add("Biba");
+  bam.add("Albam");
+  bam.add("Boba");
+  bam.erase("Albam");
+  bam.erase("Albam");
+
+}
+
+
+
 template <typename T, typename U>
-std::istream& operator>>(std::istream& is, vector::Vector<Pair<T,U>>& var_table) {
-  //input format: { name val, name2 val2 , name3 val3 }
+std::istream &operator>>(std::istream &is,
+                         vector::Vector<Pair<T, U>> &var_table) {
+  // input format: { name val, name2 val2 , name3 val3 }
   char separator;
-  Pair<T,U> temp;
+  Pair<T, U> temp;
   is >> separator;
 
   while (is >> temp.name >> temp.val >> separator) {
@@ -114,75 +365,62 @@ std::istream& operator>>(std::istream& is, vector::Vector<Pair<T,U>>& var_table)
   return is;
 }
 
-
 template <typename T, typename U>
 std::ostream &operator<<(std::ostream &os,
                          const vector::Vector<Pair<T, U>> &var_table) {
-  for (const auto& el : var_table) {
+  for (const auto &el : var_table) {
     os << el.name << " = " << el.val << std::endl;
   }
 
   return os;
 }
-}
+} // namespace ch18::ex
 
 namespace ch18::drill {
-template <class T> T &S<T>::access() {
-  return val;
-}
-template <class T> const T &S<T>::access() const {
-  return val;
-}
-template <class T> S<T>& S<T>::operator=(const T & for_copy) {
+template <class T> T &S<T>::access() { return val; }
+template <class T> const T &S<T>::access() const { return val; }
+template <class T> S<T> &S<T>::operator=(const T &for_copy) {
   T temp = for_copy;
-  std::swap(temp,val);
+  std::swap(temp, val);
   return *this;
 }
-template <typename T> void read_val(T &v) {
-  std::cin >> v;
-}
-}
+template <typename T> void read_val(T &v) { std::cin >> v; }
+} // namespace ch18::drill
 
 namespace ch18::try_ {
-template <typename T, typename U>
-void suspicious() {
+template <typename T, typename U> void suspicious() {
   constexpr int count = 10;
-  T* p = static_cast<T*>(operator new (sizeof(T) * count));
-  U* q = static_cast<U*>(operator new (sizeof(U) * count));
+  T *p = static_cast<T *>(operator new(sizeof(T) * count));
+  U *q = static_cast<U *>(operator new(sizeof(U) * count));
 
   try {
-    for (int i = 0 ; i < count; ++i) {
-      std::construct_at(p+i,static_cast<T>(i+1));
-      std::construct_at(q+i, static_cast<U>(i*i));
+    for (int i = 0; i < count; ++i) {
+      std::construct_at(p + i, static_cast<T>(i + 1));
+      std::construct_at(q + i, static_cast<U>(i * i));
 
       std::cout << "p[" << i << "] = " << p[i] << "   "
-        << "q[" << i << "] = " << q[i] << std::endl;
+                << "q[" << i << "] = " << q[i] << std::endl;
     }
     throw std::runtime_error("Error");
-  }
-  catch (const std::exception& ex) {
+  } catch (const std::exception &ex) {
     std::cerr << "Caught!";
-    operator delete (p);
+    operator delete(p);
     operator delete(q);
     throw;
   }
 
   catch (...) {
-    std::destroy(p, p+count);
-    std::destroy(q,q+count);
+    std::destroy(p, p + count);
+    std::destroy(q, q + count);
     std::cerr << "Caught!";
-    operator delete (p);
+    operator delete(p);
     operator delete(q);
     throw;
   }
 
-
-  std::destroy(p, p+count);
-  std::destroy(q,q+count);
-  operator delete (p);
+  std::destroy(p, p + count);
+  std::destroy(q, q + count);
+  operator delete(p);
   operator delete(q);
-
 }
-}
-
-
+} // namespace ch18::try_
