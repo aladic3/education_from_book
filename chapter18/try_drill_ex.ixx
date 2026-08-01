@@ -4,6 +4,7 @@
 module;
 #include "../error.h"
 
+#include <iomanip>
 #include <iostream>
 #include <ranges>
 #include <vector>
@@ -53,10 +54,10 @@ template <typename T> void read_val(T &v);
 } // namespace ch18::drill
 
 export namespace ch18::ex {
-
 void test();
 void test_4();
 void test_5();
+void test_6();
 
 template <typename T, typename U>
   requires(std::convertible_to<T, std::string> ||
@@ -137,6 +138,32 @@ private:
   int element = 0;
 };
 
+
+template<typename T>
+requires std::floating_point<T> || std::integral<T>
+struct Number {
+  Number() = default;
+  Number(T tt);
+  Number(const Number& nn);
+
+
+  Number& operator=(const Number& nn);
+
+  Number& operator=(T tt);
+
+  T operator*(T tt) const;
+  T operator/(T tt) const;
+  T operator-(T tt) const;
+  T operator+(T tt) const;
+  T operator%(T tt) const;
+
+  std::ostream& operator<<(std::ostream& os) const;
+  std::istream& operator>>(std::istream& is);
+
+private:
+  T element = 0;
+};
+
 } // namespace ch18::ex
 
 /***********************
@@ -148,6 +175,122 @@ private:
  ***********************/
 
 namespace ch18::ex {
+
+
+
+
+
+
+
+
+
+/*****************************
+ *****************************
+ *****************************
+ *begin Number class impl*****
+ *****************************
+ *****************************
+ *****************************/
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+Number<T>::Number(T tt) : element(tt){}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+Number<T>::Number(const Number &nn) : element(nn.element) {}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+Number<T> &Number<T>::operator=(const Number &nn) {
+  element = nn.element;
+  return *this;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+Number<T> &Number<T>::operator=(T tt) {
+  element = tt;
+  return *this;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+T Number<T>::operator*(T tt) const {
+  return element * tt;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+T Number<T>::operator/(T tt) const {
+  return element / tt;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+T Number<T>::operator-(T tt) const {
+  return element - tt;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+T Number<T>::operator+(T tt) const {
+  return element + tt;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+T percent_operator_for_double(T first_el, T second_el) {
+  int iterator = 0;
+  while (first_el != static_cast<int>(first_el)) {
+    first_el*=10;
+    second_el*=10;
+    ++iterator;
+  }
+
+  T result = static_cast<int>(first_el) % static_cast<int>(second_el);
+
+  for (int i = 0; i < iterator; ++i) {
+    result/=10;
+  }
+
+  return result;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+T Number<T>::operator%(T tt) const {
+  if constexpr (std::integral<T>)
+    return element % tt;
+
+  return percent_operator_for_double(element,tt);
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+std::ostream &Number<T>::operator<<(std::ostream &os) const {
+  os << element;
+  return os;
+}
+
+template <typename T>
+  requires std::floating_point<T> || std::integral<T>
+std::istream &Number<T>::operator>>(std::istream &is) {
+  is >> element;
+  return is;
+}
+
+
+
+/*****************************
+ *****************************
+ *****************************
+ *  end Number class impl ****
+ *****************************
+ *****************************
+ *****************************/
+
+
 
 /***********************
  ***********************
@@ -455,15 +598,45 @@ std::istream& operator>>(std::istream & is, Int & int_) {
   return int_.operator>>(is);
 }
 
+template<typename T>
+requires std::floating_point<T> || std::integral<T>
+std::ostream& operator<<(std::ostream & lhs, const Number<T> & int_) {
+  return int_.operator<<(lhs);
+}
+
+template<typename T>
+requires std::floating_point<T> || std::integral<T>
+std::istream& operator>>(std::istream & is, Number<T> & int_) {
+  return int_.operator>>(is);
+}
+
+
+
+void test_6() {
+  Number<double> dd (3.5);
+  Number<int> ii(10);
+
+  using  namespace  std;
+
+  cout << dd << '\t' << ii << '\n';
+
+  cout << dd % 2 << '\t';
+  cout << ii % 3;
+}
+
 void test_5() {
-  Int i;
+  Int i(Int(10));
   using namespace std;
 
   cout << i << endl;
   cin >> i;
   cout << i << endl;
 
-  cout << i + 3 << '\t' << i * 4 << '\t' << i / 3 << '\t' << i - 5<< '\t' ;
+  cout << i + 3 << '\t' << i * 4 << '\t' << i / 3 << '\t' << i - 5<< '\n' ;
+
+  i = Int(10);
+
+  cout << i;
 
 }
 
