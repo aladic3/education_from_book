@@ -56,6 +56,7 @@ export namespace ch18::ex {
 
 void test();
 void test_4();
+void test_5();
 
 template <typename T, typename U>
   requires(std::convertible_to<T, std::string> ||
@@ -113,23 +114,24 @@ private:
 };
 
 
-template<typename Number>
-requires std::convertible_to<Number,int>
+
 struct Int {
-  Int(Number);
+  Int() = default;
+  Int(int);
   Int(const Int&);
-  Int(Int&&);
+
 
   Int& operator=(const Int&);
-  Int& operator=(Int&&);
-  Int& operator=(Number);
 
-  Number operator*(Number);
-  Number operator/(Number);
-  Number operator-(Number);
-  Number operator+(Number);
+  Int& operator=(int);
 
+  int operator*(int) const;
+  int operator/(int) const;
+  int operator-(int) const;
+  int operator+(int) const;
 
+  std::ostream& operator<<(std::ostream& os) const;
+  std::istream& operator>>(std::istream& is);
 
 private:
   int element = 0;
@@ -155,65 +157,40 @@ namespace ch18::ex {
  ***********************
  ***********************/
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Int<Number>::Int(Number n) : element(static_cast<int>(n)) {}
+Int::Int(int ii) : element(ii) {}
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Int<Number>::Int(const Int& ii) : element(ii.element) {}
+Int::Int(const Int & ii): element(ii.element) {}
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Int<Number>::Int(Int && ii)  noexcept : element(ii.element) { ii.element = 0;}
+Int &Int::operator=(const Int & ii) = default;
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Int<Number> &Int<Number>::operator=(const Int & ii) {
-  element = ii.element;
-  return *this;
+Int &Int::operator=(int ii) {
+  element = ii;
+  return *this; }
+
+int Int::operator*(int ii) const {
+  return ii * element;
 }
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Int<Number> &Int<Number>::operator=(Int && ii)  noexcept {
-  element = ii.element;
-  ii.element = 0;
-  return *this;
+int Int::operator/(int ii) const {
+  return element/ii;
 }
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Int<Number> &Int<Number>::operator=(Number nn) {
-  element = static_cast<int>(nn);
-  return *this;
+int Int::operator-(int ii) const {
+  return element - ii;
 }
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Number Int<Number>::operator*(Number nn) {
-  return nn * element;
+int Int::operator+(int ii) const {
+  return element + ii;
+}
+std::ostream &Int::operator<<(std::ostream &os) const {
+  os << element;
+  return os;
 }
 
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Number Int<Number>::operator/(Number nn) {
-  return element/nn;
+std::istream &Int::operator>>(std::istream &is) {
+  is >> element;
+  return is;
 }
-
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Number Int<Number>::operator-(Number nn) {
-  return element - nn;
-}
-
-template <typename Number>
-  requires std::convertible_to<Number, int>
-Number Int<Number>::operator+(Number nn) {
-  return element + nn;
-}
-
-
 
 /***********************
  ***********************
@@ -470,7 +447,25 @@ void test_4() {
 
 }
 
+std::ostream& operator<<(std::ostream & lhs, const Int & int_) {
+  return int_.operator<<(lhs);
+}
 
+std::istream& operator>>(std::istream & is, Int & int_) {
+  return int_.operator>>(is);
+}
+
+void test_5() {
+  Int i;
+  using namespace std;
+
+  cout << i << endl;
+  cin >> i;
+  cout << i << endl;
+
+  cout << i + 3 << '\t' << i * 4 << '\t' << i / 3 << '\t' << i - 5<< '\t' ;
+
+}
 
 template <typename T, typename U>
 std::istream &operator>>(std::istream &is,
