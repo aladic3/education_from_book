@@ -112,6 +112,29 @@ private:
   Link *right = nullptr;
 };
 
+
+template<typename Number>
+requires std::convertible_to<Number,int>
+struct Int {
+  Int(Number);
+  Int(const Int&);
+  Int(Int&&);
+
+  Int& operator=(const Int&);
+  Int& operator=(Int&&);
+  Int& operator=(Number);
+
+  Number operator*(Number);
+  Number operator/(Number);
+  Number operator-(Number);
+  Number operator+(Number);
+
+
+
+private:
+  int element = 0;
+};
+
 } // namespace ch18::ex
 
 /***********************
@@ -124,10 +147,102 @@ private:
 
 namespace ch18::ex {
 
-template <class God> requires std::equality_comparable<God> Link<God>::Link(God val) : element(std::move(val)) {}
+/***********************
+ ***********************
+ ***********************
+ * begin Int class impl*
+ ***********************
+ ***********************
+ ***********************/
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Int<Number>::Int(Number n) : element(static_cast<int>(n)) {}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Int<Number>::Int(const Int& ii) : element(ii.element) {}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Int<Number>::Int(Int && ii)  noexcept : element(ii.element) { ii.element = 0;}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Int<Number> &Int<Number>::operator=(const Int & ii) {
+  element = ii.element;
+  return *this;
+}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Int<Number> &Int<Number>::operator=(Int && ii)  noexcept {
+  element = ii.element;
+  ii.element = 0;
+  return *this;
+}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Int<Number> &Int<Number>::operator=(Number nn) {
+  element = static_cast<int>(nn);
+  return *this;
+}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Number Int<Number>::operator*(Number nn) {
+  return nn * element;
+}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Number Int<Number>::operator/(Number nn) {
+  return element/nn;
+}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Number Int<Number>::operator-(Number nn) {
+  return element - nn;
+}
+
+template <typename Number>
+  requires std::convertible_to<Number, int>
+Number Int<Number>::operator+(Number nn) {
+  return element + nn;
+}
+
+
+
+/***********************
+ ***********************
+ ***********************
+ *  end Int class impl *
+ ***********************
+ ***********************
+ ***********************/
+
+
+
+
+
+
+
+/***********************
+ ***********************
+ ***********************
+ *begin Link class impl*
+ ***********************
+ ***********************
+ ***********************/
+
+template <class God> requires std::equality_comparable<God>
+Link<God>::Link(God val) : element(std::move(val)) {}
 
 template <class God> requires std::equality_comparable<God>
 Link<God>::Link(God val, Link *left) : element(std::move(val)), left(left) {}
+
 template <class God> requires std::equality_comparable<God>
 Link<God>::Link(God val, Link *left, Link *right)
     : element(std::move(val)), left(left), right(right) {}
@@ -322,6 +437,16 @@ int Link<God>::size() const {
 
   return count;
 }
+
+
+/***********************
+ ***********************
+ ***********************
+ *end Link class impl  *
+ ***********************
+ ***********************
+ ***********************/
+
 
 void test() {
   using vector::Vector;
