@@ -58,6 +58,7 @@ void test();
 void test_4();
 void test_5();
 void test_6();
+void test_7();
 
 template <typename T, typename U>
   requires(std::convertible_to<T, std::string> ||
@@ -147,6 +148,7 @@ struct Number {
   Number(const Number& nn);
 
 
+
   Number& operator=(const Number& nn);
 
   Number& operator=(T tt);
@@ -157,8 +159,17 @@ struct Number {
   T operator+(T tt) const;
   T operator%(T tt) const;
 
-  std::ostream& operator<<(std::ostream& os) const;
-  std::istream& operator>>(std::istream& is);
+
+  operator T() const{ return element;}
+
+  friend std::ostream& operator<<(std::ostream& os, const Number& nn){
+    os << nn.element;
+    return os;
+  }
+  friend std::istream& operator>>(std::istream& is, Number& nn){
+    is >> nn.element;
+    return is;
+  }
 
 private:
   T element = 0;
@@ -266,19 +277,8 @@ T Number<T>::operator%(T tt) const {
   return percent_operator_for_double(element,tt);
 }
 
-template <typename T>
-  requires std::floating_point<T> || std::integral<T>
-std::ostream &Number<T>::operator<<(std::ostream &os) const {
-  os << element;
-  return os;
-}
 
-template <typename T>
-  requires std::floating_point<T> || std::integral<T>
-std::istream &Number<T>::operator>>(std::istream &is) {
-  is >> element;
-  return is;
-}
+
 
 
 
@@ -598,19 +598,17 @@ std::istream& operator>>(std::istream & is, Int & int_) {
   return int_.operator>>(is);
 }
 
-template<typename T>
-requires std::floating_point<T> || std::integral<T>
-std::ostream& operator<<(std::ostream & lhs, const Number<T> & int_) {
-  return int_.operator<<(lhs);
+
+
+
+void test_7() {
+  using namespace ch18::vector;
+
+  Vector<Number<double>> d_vector(2,2.1);
+  Vector<Number<int>> i_vector(2,4);
+
+  std::cout << sum_multiply(d_vector,i_vector);
 }
-
-template<typename T>
-requires std::floating_point<T> || std::integral<T>
-std::istream& operator>>(std::istream & is, Number<T> & int_) {
-  return int_.operator>>(is);
-}
-
-
 
 void test_6() {
   Number<double> dd (3.5);
@@ -619,8 +617,8 @@ void test_6() {
   using  namespace  std;
 
   cout << dd << '\t' << ii << '\n';
-
-  cout << dd % 2 << '\t';
+  auto k = dd%2.;
+  cout << (dd % 2.) << '\t';
   cout << ii % 3;
 }
 
