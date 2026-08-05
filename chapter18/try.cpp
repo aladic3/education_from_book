@@ -32,7 +32,7 @@ field2(el.field2) {
   std::uninitialized_copy(el.field1,el.field1+std::strlen(el.field1)+1,field1);
   std::cerr << "struct 'Somethink' copy constructor\n";
 }
-Somethink::Somethink( Somethink && el)  :
+Somethink::Somethink( Somethink && el) noexcept :
 field1(el.field1),
 field2(std::move(el.field2))
 {
@@ -48,7 +48,7 @@ Somethink &Somethink::operator=(const Somethink & el) {
   std::cerr << "struct 'Somethink' copy assigment\n";
   return *this;
 }
-Somethink &Somethink::operator=(Somethink && el) {
+Somethink &Somethink::operator=(Somethink && el) noexcept {
   operator delete(field1);
   field1 = el.field1;
   el.field1 = nullptr;

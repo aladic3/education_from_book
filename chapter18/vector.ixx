@@ -14,13 +14,48 @@ export module chapter18.vector;
 export namespace ch18::vector {
 
 template <typename T> struct allocator {
-  T *allocate(int size);
+  virtual ~allocator() = default;
+  virtual T *allocate(int size) = 0;
 
-  void destroy(T* element);
-  void deallocate(T *elements, int size_initialized_elements);
+  virtual void destroy(T* element) { element->~T(); }
+  virtual void deallocate(T *elements, int size_initialized_elements) = 0;
 };
 
-template <typename T, typename A = allocator<T>>
+template<typename T> struct simple_allocator : allocator<T>{
+  T* allocate(int size) override {
+    return static_cast<T*>(malloc(size * sizeof(T)));
+  }
+
+  void deallocate(T *elements, int size_initialized_elements) override {
+    if constexpr (!std::is_trivially_destructible_v<T>) {
+      for (int i = size_initialized_elements-1; i >=0 ; --i) {
+        allocator<T>::destroy(&elements[i]);
+      }
+    }
+
+
+    free(elements);
+  }
+};
+
+template <typename T> struct new_allocator : allocator<T>{
+  T *allocate(int size) override{
+    return static_cast<T*>(::operator new(size * sizeof(T)));
+  }
+
+  void deallocate(T *elements, int size_initialized_elements) override {
+    if constexpr (!std::is_trivially_destructible_v<T>) {
+      for (int i = size_initialized_elements-1; i >=0 ; --i)
+        allocator<T>::destroy(&elements[i]);
+    }
+
+    ::operator delete(elements);
+  }
+};
+
+//template <typename T, typename A = new_allocator<T>>
+template <typename T, typename A = simple_allocator<T>>
+//template <typename T, typename A = allocator<T>>
 struct Vector {
   Vector();
   Vector(int sz, T def = T{});
@@ -57,16 +92,16 @@ private:
 
 };
 
-template <typename T, typename A = allocator<T>>
+template <typename T, typename A = new_allocator<T>>
 void print_v(const Vector<T, A> &v, const std::string &intro = "");
 
-template <typename T, typename A = allocator<T>>
+template <typename T, typename A = new_allocator<T>>
 Vector<T,A> create_v(std::initializer_list<T> elements);
 
-template <typename T, typename A = allocator<T>>
+template <typename T, typename A = new_allocator<T>>
 std::ostream& operator<<(std::ostream& os, const Vector<T,A> &v);
 
-template <typename T, typename A = allocator<T>>
+template <typename T, typename A = new_allocator<T>>
 std::istream& operator>>(std::istream& is, Vector<T,A> &v);
 
 template <typename T>
@@ -81,22 +116,8 @@ double sum_multiply(const Vector<T>& vt, const Vector<U>& vu); // ex 2
 
 
 namespace ch18::vector {
-template <typename T> T *allocator<T>::allocate(int size) {
-  return static_cast<T*>(::operator new(size * sizeof(T)));
-}
-template <typename T> void allocator<T>::destroy(T *element) {
-  element->~T();;
-}
-
-// TODO may be deallocate must be shorter(without "if constexpr" block)
-template <typename T> void allocator<T>::deallocate(T *elements, int  size_initialized_elements) {
-  if constexpr (!std::is_trivially_destructible_v<T>)
-    for (int i = size_initialized_elements-1; i >=0 ; --i)
-      destroy(&elements[i]);
 
 
-  ::operator delete(elements);
-}
 
 template <typename T, typename A> Vector<T, A>::~Vector() {
   allocator.deallocate(elem,sz);
@@ -249,7 +270,7 @@ template <typename T, typename A> T &Vector<T, A>::operator[](int i) {
 
 template <typename T, typename A>
 Vector<T,A> create_v(std::initializer_list<T> elements) {
-  return Vector<T>(elements);
+  return Vector<T,A>(elements);
 }
 
 template <typename T, typename A>

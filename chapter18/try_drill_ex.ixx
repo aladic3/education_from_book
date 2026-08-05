@@ -20,10 +20,10 @@ struct Somethink {
   Somethink();
   ~Somethink();
   Somethink(const Somethink &);
-  Somethink(Somethink &&);
+  Somethink(Somethink &&) noexcept ;
 
   Somethink &operator=(const Somethink &);
-  Somethink &operator=(Somethink &&);
+  Somethink &operator=(Somethink &&) noexcept ;
 
 private:
   char *field1;
@@ -59,6 +59,7 @@ void test_4();
 void test_5();
 void test_6();
 void test_7();
+void test_8();
 
 template <typename T, typename U>
   requires(std::convertible_to<T, std::string> ||
@@ -567,7 +568,6 @@ int Link<God>::size() const {
  ***********************
  ***********************/
 
-
 void test() {
   using vector::Vector;
 
@@ -599,6 +599,22 @@ std::istream& operator>>(std::istream & is, Int & int_) {
 }
 
 
+void test_8() {
+  using namespace ch18::vector;
+
+  Vector<std::string,new_allocator<std::string>> dd (5,"biba");
+  dd.push_back("gg");
+  dd.push_back("g1");
+
+  std::cout << dd << std::endl;
+  std::cerr << "begin\n";
+  {
+    Vector<try_::Somethink> f (3);
+    std::cerr << "almost end\n";
+  }
+
+  std::cerr << "end";
+}
 
 
 void test_7() {
