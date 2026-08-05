@@ -159,6 +159,14 @@ Vector<T, A>::Vector(Vector &&v) noexcept
 
 template <typename T, typename A>
 Vector<T, A> &Vector<T, A>::operator=(const Vector &v) {
+  if (&v == this) return *this;
+
+  if (v.cap <= cap) {
+    std::copy(v.elem,v.elem+v.sz,elem);
+    sz = v.sz;
+    return *this;
+  }
+
   T *new_array = allocator.allocate(v.cap);
   std::uninitialized_copy(v.elem,v.elem+v.sz,new_array);
 

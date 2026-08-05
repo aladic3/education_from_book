@@ -60,6 +60,7 @@ void test_5();
 void test_6();
 void test_7();
 void test_8();
+void test_9();
 
 template <typename T, typename U>
   requires(std::convertible_to<T, std::string> ||
@@ -596,6 +597,18 @@ std::ostream& operator<<(std::ostream & lhs, const Int & int_) {
 
 std::istream& operator>>(std::istream & is, Int & int_) {
   return int_.operator>>(is);
+}
+
+
+void test_9() {
+  using namespace ch18::vector;
+
+  Vector<std::string> dd (5,"biba");
+  Vector<std::string> dd2 (5,"boba");
+  std:: cout << dd << dd2;
+
+  dd = dd2;
+  std::cout << dd;
 }
 
 
