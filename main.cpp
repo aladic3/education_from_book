@@ -8,7 +8,7 @@ import chapter18;
 int main() {
 
     try {
-        ch18::ex::test_9();
+        ch18::ex::test_10();
 
     }
     catch (std::exception& err) {
