@@ -63,6 +63,7 @@ void test_7();
 void test_8();
 void test_9();
 void test_10();
+void test_11();
 
 template <typename T, typename U>
   requires(std::convertible_to<T, std::string> ||
@@ -609,6 +610,14 @@ std::istream& operator>>(std::istream & is, Int & int_) {
 }
 
 
+void test_11() {
+  own_unique_ptr::Counted_ptr<try_::Somethink> ss;
+  own_unique_ptr::Counted_ptr<try_::Somethink> ss2 (ss);
+  own_unique_ptr::Counted_ptr ss3(ss2);
+  std::cout << (*ss)->field1 << " \t";
+  std::cout << ss->field1;
+
+}
 
 void test_10() {
   own_unique_ptr::unique_ptr<try_::Somethink> ss;

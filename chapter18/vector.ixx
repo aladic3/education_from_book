@@ -15,13 +15,23 @@ export namespace ch18::vector {
 
 template <typename T> struct allocator {
   virtual ~allocator() = default;
+
   virtual T *allocate(int size) = 0;
+  virtual T* allocate() {return allocate(1);}
+                                                                                                                         /*virtual T* allocate(T&& init_val) { T* result = allocate();    std::construct_at(result,std::move(init_val)); return result; }*/
 
   virtual void destroy(T* element) { element->~T(); }
+
+
   virtual void deallocate(T *elements, int size_initialized_elements) = 0;
+  virtual void deallocate(T* element) {deallocate(element,1);}
+
 };
 
 template<typename T> struct simple_allocator : allocator<T>{
+  using allocator<T>::allocate;
+  using allocator<T>::deallocate;
+
   T* allocate(int size) override {
     return static_cast<T*>(malloc(size * sizeof(T)));
   }
@@ -39,6 +49,9 @@ template<typename T> struct simple_allocator : allocator<T>{
 };
 
 template <typename T> struct new_allocator : allocator<T>{
+  using allocator<T>::allocate;
+  using allocator<T>::deallocate;
+
   T *allocate(int size) override{
     return static_cast<T*>(::operator new(size * sizeof(T)));
   }
