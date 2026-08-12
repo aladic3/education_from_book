@@ -23,20 +23,22 @@ template <typename T> struct allocator {
   virtual void destroy(T* element) { element->~T(); }
 
 
-  virtual void deallocate(T *elements, int size_initialized_elements) = 0;
-  virtual void deallocate(T* element) {deallocate(element,1);}
+  virtual void deallocate_and_destroy(T *elements, int size_initialized_elements) = 0;
+  virtual void deallocate_and_destroy(T* element) {deallocate_and_destroy(element,1);}
+
+  virtual void just_deallocate(T* elements) {::operator delete(elements);}
 
 };
 
 template<typename T> struct simple_allocator : allocator<T>{
   using allocator<T>::allocate;
-  using allocator<T>::deallocate;
+  using allocator<T>::deallocate_and_destroy;
 
   T* allocate(int size) override {
     return static_cast<T*>(malloc(size * sizeof(T)));
   }
 
-  void deallocate(T *elements, int size_initialized_elements) override {
+  void deallocate_and_destroy(T *elements, int size_initialized_elements) override {
     if constexpr (!std::is_trivially_destructible_v<T>) {
       for (int i = size_initialized_elements-1; i >=0 ; --i) {
         allocator<T>::destroy(&elements[i]);
@@ -50,13 +52,13 @@ template<typename T> struct simple_allocator : allocator<T>{
 
 template <typename T> struct new_allocator : allocator<T>{
   using allocator<T>::allocate;
-  using allocator<T>::deallocate;
+  using allocator<T>::deallocate_and_destroy;
 
   T *allocate(int size) override{
     return static_cast<T*>(::operator new(size * sizeof(T)));
   }
 
-  void deallocate(T *elements, int size_initialized_elements) override {
+  void deallocate_and_destroy(T *elements, int size_initialized_elements) override {
     if constexpr (!std::is_trivially_destructible_v<T>) {
       for (int i = size_initialized_elements-1; i >=0 ; --i)
         allocator<T>::destroy(&elements[i]);
@@ -133,7 +135,7 @@ namespace ch18::vector {
 
 
 template <typename T, typename A> Vector<T, A>::~Vector() {
-  allocator.deallocate(elem,sz);
+  allocator.deallocate_and_destroy(elem,sz);
   elem = nullptr;
 }
 
@@ -183,7 +185,7 @@ Vector<T, A> &Vector<T, A>::operator=(const Vector &v) {
   T *new_array = allocator.allocate(v.cap);
   std::uninitialized_copy(v.elem,v.elem+v.sz,new_array);
 
-  allocator.deallocate(elem, sz);
+  allocator.deallocate_and_destroy(elem, sz);
   cap = v.cap;
   sz = v.sz;
 
@@ -216,7 +218,7 @@ template <typename T, typename A> void Vector<T, A>::reserve(int new_alloc) {
   std::uninitialized_move(elem,elem+sz,new_array);
 
   // TODO may be errors because elements have been uninitialized after move
-  allocator.deallocate(elem,sz);
+  allocator.deallocate_and_destroy(elem,sz);
 
   elem = new_array;
   cap = new_alloc;
@@ -229,7 +231,7 @@ template <typename T, typename A> void Vector<T, A>::reverse() {
      std::construct_at(result+(sz-(i+1)),elem[i]);
   }
 
-  allocator.deallocate(elem, sz);
+  allocator.deallocate_and_destroy(elem, sz);
   elem = result;
 
 }

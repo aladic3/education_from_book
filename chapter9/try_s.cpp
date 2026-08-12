@@ -15,11 +15,12 @@ module;
 #include <utility>
 #include "../error.h"
 #include <ranges>
-import chapter8;
+
 
 
 
 module try_drill;
+import chapter8;
 
 
 namespace ch9::ex23_24 {
@@ -351,6 +352,17 @@ namespace ch9 {
 
         return ifs;
     }
+
+
+    std::ifstream open_input_stream_file_system(const std::string &file_name_path) {
+        std::filesystem::path path = file_name_path;
+        std::ifstream ifs {path};
+        if (!ifs)
+            error("can't open file");
+
+        return ifs;
+    }
+
     [[nodiscard]]std::ofstream open_output_stream(const std::string& file_name) {
         std::ofstream ofs {file_name};
         if (!ofs)

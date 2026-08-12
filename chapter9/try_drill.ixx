@@ -10,10 +10,10 @@ module;
 #import <iostream>
 
 #include "../error.h"
-import chapter8;
+
 
 export module try_drill;
-
+export import chapter8;
 
 namespace ch9::test {
     export struct Roman_test_helper {
@@ -209,9 +209,10 @@ namespace ch9 {
     export std::ostream& operator<< (std::ostream& os, const ch8::try_drill_ex::Date& date);
 
     export [[nodiscard]] std::ifstream open_input_stream(const std::string& file_name);
+    export [[nodiscard]] std::ifstream open_input_stream_file_system(const std::string &file_name_path);
     std::pair<std::string,std::string> split_after_and_before_word_and_symbols( std::string& word);
     export [[nodiscard]] std::ofstream open_output_stream(const std::string& file_name);
-    std::vector<std::string> get_separated_words_from_stream(std::istream& is);
+    export std::vector<std::string> get_separated_words_from_stream(std::istream& is);
     std::vector<std::string> read_words_from_stream(std::istream& is); //symbols after word is separated
 
     void read_double(std::istream& is, std::vector<double>& vec);

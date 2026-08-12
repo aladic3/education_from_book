@@ -4,6 +4,7 @@
 module;
 #include "../error.h"
 
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <ranges>
@@ -12,6 +13,7 @@ module;
 export module chapter18;
 export import chapter18.vector;
 export import chapter18.own_unique_ptr;
+export import try_drill;
 
 export namespace ch18::try_ {
 
@@ -64,6 +66,38 @@ void test_8();
 void test_9();
 void test_10();
 void test_11();
+void test_12();
+
+template<typename A = vector::new_allocator<std::ifstream>>
+struct File_handle {
+  using allocator_type = A;
+
+  File_handle() = delete;
+
+  File_handle(const std::string& file_name) {
+    file = allocator.allocate();
+    try {
+      std::construct_at(file,std::move(ch9::open_input_stream_file_system(file_name)));
+    }
+    catch (std::exception& ex) {
+      allocator.just_deallocate(file);
+      file = nullptr;
+      throw;
+    }
+  }
+
+  [[nodiscard]] std::vector<std::string> get_separated_words_from_file() const {
+    return  ch9::get_separated_words_from_stream(*file);
+  }
+
+  ~File_handle() {
+    allocator.deallocate_and_destroy(file);
+  }
+
+private:
+  allocator_type allocator;
+  std::ifstream* file;
+};
 
 template <typename T, typename U>
   requires(std::convertible_to<T, std::string> ||
@@ -609,12 +643,20 @@ std::istream& operator>>(std::istream & is, Int & int_) {
   return int_.operator>>(is);
 }
 
+void test_12() {
+
+
+  File_handle<> f("/Users/mac_for_sale/CLionProjects/hello_world/text_files/AnkiGenv42.txt");
+
+  auto v = f.get_separated_words_from_file();
+
+}
 
 void test_11() {
   own_unique_ptr::Counted_ptr<try_::Somethink> ss;
   own_unique_ptr::Counted_ptr<try_::Somethink> ss2 (ss);
   own_unique_ptr::Counted_ptr ss3(ss2);
-  std::cout << (*ss)->field1 << " \t";
+  std::cout << ss->field1 << " \t";
   std::cout << ss->field1;
 
 }
@@ -629,7 +671,7 @@ void test_10() {
   std::destroy_at(ss_old);
   operator delete(ss_old);
 
-  std::cout << (*ss)->field1 << " \t";
+  std::cout << ss->field1 << " \t";
   std::cout << ss->field1;
 }
 

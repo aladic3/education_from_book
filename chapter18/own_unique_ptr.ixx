@@ -35,7 +35,7 @@ struct unique_ptr {
   }
 
   ~unique_ptr() {
-    allocator.deallocate(element);
+    allocator.deallocate_and_destroy(element);
   }
 
   T& operator*(){return element;}
