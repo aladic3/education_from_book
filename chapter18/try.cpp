@@ -13,18 +13,27 @@ namespace ch18::try_ {
 
 
 Somethink::Somethink() {
-  char ch []  = "Somethink";
+  char ch []  = "Default";
   field1 = static_cast<char*>( operator new(sizeof(char) * (std::strlen(ch) + 1)));
   std::uninitialized_move_n(ch,std::strlen(ch) + 1,field1);
 
   field2 = std::string(field1);
-  std::cerr << "struct 'Somethink' constructor\n";
+  std::cerr << "struct 'Somethink' default constructor\n";
+}
+Somethink::Somethink(const std::string &str) : field2(str){
+  field1 = static_cast<char*>( operator new(sizeof(char) * (str.length() + 1)));
+  std::uninitialized_copy(str.begin(), str.end(),field1);
+
+  std::cerr << "struct 'Somethink' constructor with field >>" << field2  <<  " <<\n";
 }
 
 Somethink::~Somethink() {
+
+  std::cerr << "struct 'Somethink' destructor with fields >>" << field2 << "<< \n";
   ::operator delete(field1);
 
-  std::cerr << "struct 'Somethink' destructor\n";
+
+
 }
 Somethink::Somethink(const Somethink & el) :
 field1(static_cast<char*>(::operator new((std::strlen(el.field1)+1) * sizeof(char)))),

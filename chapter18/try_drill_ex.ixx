@@ -21,6 +21,7 @@ template <typename T, typename U> void suspicious();
 
 struct Somethink {
   Somethink();
+  Somethink(const std::string& str);
   ~Somethink();
   Somethink(const Somethink &);
   Somethink(Somethink &&) noexcept ;
@@ -31,6 +32,7 @@ struct Somethink {
 
   char *field1;
   std::string field2;
+
 };
 
 void test1();
@@ -67,8 +69,9 @@ void test_9();
 void test_10();
 void test_11();
 void test_12();
+void test_13();
 
-template<typename A = vector::new_allocator<std::ifstream>>
+template <typename A = vector::new_allocator<std::ifstream>>
 struct File_handle {
   using allocator_type = A;
 
@@ -641,6 +644,40 @@ std::ostream& operator<<(std::ostream & lhs, const Int & int_) {
 
 std::istream& operator>>(std::istream & is, Int & int_) {
   return int_.operator>>(is);
+}
+
+template <typename A = vector::simple_allocator<try_::Somethink>>
+struct Test_something {
+  using Somethink = try_::Somethink;
+
+  Test_something() : test1("member of Test_something struct"){
+    test2 = new Somethink (Somethink("new()"));
+    test3 = allocator.allocate();
+    std::construct_at(test3,std::move(Somethink("via allocator-construct")));
+
+  }
+
+  ~Test_something() {
+    delete test2;
+    allocator.deallocate_and_destroy(test3);
+  }
+
+private:
+  A allocator;
+
+  Somethink test1;
+  Somethink* test2;
+  Somethink* test3;
+
+};
+
+try_::Somethink test_global{"Test global"};
+
+void test_13() {
+  try_::Somethink test_local;
+  Test_something test_member_allocate{};
+
+
 }
 
 void test_12() {
