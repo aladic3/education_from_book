@@ -17,60 +17,100 @@ template <typename T> struct allocator {
   virtual ~allocator() = default;
 
   virtual T *allocate(int size) = 0;
-  virtual T* allocate() {return allocate(1);}
-                                                                                                                         /*virtual T* allocate(T&& init_val) { T* result = allocate();    std::construct_at(result,std::move(init_val)); return result; }*/
+  virtual T *allocate() { return allocate(1); }
+  /*virtual T* allocate(T&& init_val) { T* result = allocate();
+   * std::construct_at(result,std::move(init_val)); return result; }*/
 
-  virtual void destroy(T* element) { element->~T(); }
+  virtual void destroy(T *element) { element->~T(); }
 
+  virtual void deallocate_and_destroy(T *elements,
+                                      int size_initialized_elements) = 0;
+  virtual void deallocate_and_destroy(T *element) {
+    deallocate_and_destroy(element, 1);
+  }
 
-  virtual void deallocate_and_destroy(T *elements, int size_initialized_elements) = 0;
-  virtual void deallocate_and_destroy(T* element) {deallocate_and_destroy(element,1);}
-
-  virtual void just_deallocate(T* elements) {::operator delete(elements);}
-
+  virtual void just_deallocate(T *elements) = 0;
 };
 
-template<typename T> struct simple_allocator : allocator<T>{
+template <typename T> struct simple_allocator : allocator<T> {
   using allocator<T>::allocate;
   using allocator<T>::deallocate_and_destroy;
 
-  T* allocate(int size) override {
-    return static_cast<T*>(malloc(size * sizeof(T)));
+  T *allocate(int size) override {
+    return static_cast<T *>(malloc(size * sizeof(T)));
   }
 
-  void deallocate_and_destroy(T *elements, int size_initialized_elements) override {
+  void deallocate_and_destroy(T *elements,
+                              int size_initialized_elements) override {
     if constexpr (!std::is_trivially_destructible_v<T>) {
-      for (int i = size_initialized_elements-1; i >=0 ; --i) {
+      for (int i = size_initialized_elements - 1; i >= 0; --i) {
         allocator<T>::destroy(&elements[i]);
       }
     }
 
-
     free(elements);
   }
+
+  void just_deallocate(T *elements) override { free(elements); }
 };
 
-template <typename T> struct new_allocator : allocator<T>{
+template <typename T> struct new_allocator : allocator<T> {
   using allocator<T>::allocate;
   using allocator<T>::deallocate_and_destroy;
 
-  T *allocate(int size) override{
-    return static_cast<T*>(::operator new(size * sizeof(T)));
+  T *allocate(int size) override {
+    return static_cast<T *>(::operator new(size * sizeof(T)));
   }
 
-  void deallocate_and_destroy(T *elements, int size_initialized_elements) override {
+  void deallocate_and_destroy(T *elements,
+                              int size_initialized_elements) override {
     if constexpr (!std::is_trivially_destructible_v<T>) {
-      for (int i = size_initialized_elements-1; i >=0 ; --i)
+      for (int i = size_initialized_elements - 1; i >= 0; --i)
         allocator<T>::destroy(&elements[i]);
     }
 
     ::operator delete(elements);
   }
+
+  void just_deallocate(T *elements) { ::operator delete(elements); }
 };
 
-//template <typename T, typename A = new_allocator<T>>
+template <typename T, typename A = simple_allocator<T>> struct Simple_vector {
+  Simple_vector();
+  Simple_vector(int sz, T def = T{});
+  Simple_vector(std::initializer_list<T> lst);
+  ~Simple_vector();
+
+  Simple_vector(const Simple_vector &v);
+  Simple_vector(Simple_vector &&v) noexcept;
+
+  Simple_vector &operator=(const Simple_vector &v);
+  Simple_vector &operator=(Simple_vector &&v) noexcept;
+
+  void reserve(int new_alloc);
+  void reverse();
+  void resize(int new_size, T def = T{});
+  void push_back(const T &new_el);
+  void push_back(T &&new_el);
+
+  [[nodiscard]] int size() const { return sz; }
+
+  T &operator[](int i);
+  const T &operator[](int i) const;
+
+  [[nodiscard]] T *begin() const { return elements; } // iteration support
+  [[nodiscard]] T *end() const { return elements + sz; }
+
+private:
+  A allocator;
+  T *elements = nullptr;
+  int sz = 0;
+  T *space = nullptr;
+};
+
+// template <typename T, typename A = new_allocator<T>>
 template <typename T, typename A = simple_allocator<T>>
-//template <typename T, typename A = allocator<T>>
+// template <typename T, typename A = allocator<T>>
 struct Vector {
   Vector();
   Vector(int sz, T def = T{});
@@ -86,8 +126,8 @@ struct Vector {
   void reserve(int new_alloc);
   void reverse();
   void resize(int new_size, T def = T{});
-  void push_back(const T& new_el);
-  void push_back(T&& new_el);
+  void push_back(const T &new_el);
+  void push_back(T &&new_el);
 
   [[nodiscard]] int size() const { return sz; }
 
@@ -97,63 +137,165 @@ struct Vector {
   [[nodiscard]] T *begin() const { return elem; } // iteration support
   [[nodiscard]] T *end() const { return elem + sz; }
 
-
-
 private:
   A allocator;
   int sz = 0;
   int cap = 0;
   T *elem = nullptr;
-
 };
 
 template <typename T, typename A = new_allocator<T>>
 void print_v(const Vector<T, A> &v, const std::string &intro = "");
 
 template <typename T, typename A = new_allocator<T>>
-Vector<T,A> create_v(std::initializer_list<T> elements);
+Vector<T, A> create_v(std::initializer_list<T> elements);
 
 template <typename T, typename A = new_allocator<T>>
-std::ostream& operator<<(std::ostream& os, const Vector<T,A> &v);
+std::ostream &operator<<(std::ostream &os, const Vector<T, A> &v);
 
 template <typename T, typename A = new_allocator<T>>
-std::istream& operator>>(std::istream& is, Vector<T,A> &v);
+std::istream &operator>>(std::istream &is, Vector<T, A> &v);
 
-template <typename T>
-void add(Vector<T>& v1, const Vector<T>& v2);
+template <typename T> void add(Vector<T> &v1, const Vector<T> &v2);
 
 template <typename T, typename U>
-requires std::convertible_to<T, double> &&
-std::convertible_to<U,double>
-double sum_multiply(const Vector<T>& vt, const Vector<U>& vu); // ex 2
+  requires std::convertible_to<T, double> && std::convertible_to<U, double>
+double sum_multiply(const Vector<T> &vt, const Vector<U> &vu); // ex 2
 
 } // namespace ch18::vector
 
-
 namespace ch18::vector {
 
-
-
 template <typename T, typename A> Vector<T, A>::~Vector() {
-  allocator.deallocate_and_destroy(elem,sz);
+  allocator.deallocate_and_destroy(elem, sz);
   elem = nullptr;
 }
+
+template <typename T, typename A>
+Simple_vector<T, A>::Simple_vector() = default;
+
+
+template <typename T, typename A>
+Simple_vector<T, A>::Simple_vector(int sz, T def)
+    : elements(allocator.allocate(sz * 2)), sz(sz), space(elements + sz) {
+  for (int i = 0; i < sz; ++i) {
+    std::construct_at(elements + i);
+  }
+}
+
+
+template <typename T, typename A>
+Simple_vector<T, A>::Simple_vector(std::initializer_list<T> lst)
+    : sz(static_cast<int>(lst.size())), elements(allocator.allocate(sz)),
+      space(elements + sz) {
+  int iterator = 0;
+
+  for (const T &val : lst) {
+    std::construct_at(elements + iterator, val);
+    ++iterator;
+  }
+}
+
+
+template <typename T, typename A> Simple_vector<T, A>::~Simple_vector() {
+  if constexpr (!std::is_trivially_destructible_v<T>) {
+    int size_initialized_elements = sz;
+    for (int i = size_initialized_elements - 1; i >= 0; --i) {
+      allocator.destroy(&elements[i]); // or &(elements + i)
+    }
+  }
+
+  allocator.just_deallocate(elements);
+  elements = nullptr;
+  space = nullptr;
+}
+
+
+template <typename T, typename A>
+Simple_vector<T, A>::Simple_vector(const Simple_vector &v) {
+  sz = v.sz;
+  int space_count = v.space - v.elements;
+  elements = allocator.allocate(space_count);
+  space = elements + space_count;
+  std::uninitialized_copy(v.elements, v.elements + sz, elements);
+}
+
+
+template <typename T, typename A>
+Simple_vector<T, A>::Simple_vector(Simple_vector &&v) noexcept
+  : elements(v.elements), sz(v.size()), space(v.space) {
+    v.elements = nullptr;
+    v.sz = 0;
+    v.space = 0;
+}
+
+
+template <typename T, typename A>
+Simple_vector<T, A> &Simple_vector<T, A>::operator=(const Simple_vector &v)
+{
+  sz = v.sz;
+  int space_count = v.space - v.elements;
+  elements = allocator.allocate(space_count);
+  space = elements + space_count;
+  std::uninitialized_copy(v.elements, v.elements + sz, elements);
+  return *this;
+}
+
+
+template <typename T, typename A>
+Simple_vector<T, A> &
+Simple_vector<T, A>::operator=(Simple_vector &&v) noexcept {
+  elements = v.elements;
+  sz = v.sz;
+  space = v.space;
+  v.elements = nullptr;
+  v.sz = 0;
+  v.space = 0;
+
+  return *this;
+}
+
+
+template <typename T, typename A>
+void Simple_vector<T, A>::reserve(int new_alloc) {}
+
+
+template <typename T, typename A> void Simple_vector<T, A>::reverse() {}
+
+
+template <typename T, typename A>
+void Simple_vector<T, A>::resize(int new_size, T def) {}
+
+
+template <typename T, typename A>
+void Simple_vector<T, A>::push_back(const T &new_el) {}
+
+
+template <typename T, typename A>
+void Simple_vector<T, A>::push_back(T &&new_el) {}
+
+
+template <typename T, typename A> T &Simple_vector<T, A>::operator[](int i) {}
+
+
+template <typename T, typename A>
+const T &Simple_vector<T, A>::operator[](int i) const {}
+
 
 template <typename T, typename A> Vector<T, A>::Vector() : sz(0), cap(4 * 2) {
   elem = allocator.allocate(cap);
   for (int i = 0; i < sz; ++i) {
-    std::construct_at(elem+i);
+    std::construct_at(elem + i);
   }
 }
 
 template <typename T, typename A>
 Vector<T, A>::Vector(std::initializer_list<T> lst)
-    : sz(static_cast<int>(lst.size())), cap(sz),
-elem(allocator.allocate(cap)) {
+    : sz(static_cast<int>(lst.size())), cap(sz), elem(allocator.allocate(cap)) {
   int iterator = 0;
 
-  for (const T& val : lst) {
-    std::construct_at(elem+iterator,val);
+  for (const T &val : lst) {
+    std::construct_at(elem + iterator, val);
     ++iterator;
   }
 }
@@ -161,7 +303,7 @@ elem(allocator.allocate(cap)) {
 template <typename T, typename A>
 Vector<T, A>::Vector(const Vector &v)
     : sz(v.size()), cap(v.cap), elem(allocator.allocate(cap)) {
-  std::uninitialized_copy(v.elem, v.elem+v.size(), elem);
+  std::uninitialized_copy(v.elem, v.elem + v.size(), elem);
 }
 
 template <typename T, typename A>
@@ -174,16 +316,17 @@ Vector<T, A>::Vector(Vector &&v) noexcept
 
 template <typename T, typename A>
 Vector<T, A> &Vector<T, A>::operator=(const Vector &v) {
-  if (&v == this) return *this;
+  if (&v == this)
+    return *this;
 
   if (v.cap <= cap) {
-    std::copy(v.elem,v.elem+v.sz,elem);
+    std::copy(v.elem, v.elem + v.sz, elem);
     sz = v.sz;
     return *this;
   }
 
   T *new_array = allocator.allocate(v.cap);
-  std::uninitialized_copy(v.elem,v.elem+v.sz,new_array);
+  std::uninitialized_copy(v.elem, v.elem + v.sz, new_array);
 
   allocator.deallocate_and_destroy(elem, sz);
   cap = v.cap;
@@ -215,25 +358,24 @@ template <typename T, typename A> void Vector<T, A>::reserve(int new_alloc) {
 
   T *new_array = allocator.allocate(new_alloc);
 
-  std::uninitialized_move(elem,elem+sz,new_array);
+  std::uninitialized_move(elem, elem + sz, new_array);
 
   // TODO may be errors because elements have been uninitialized after move
-  allocator.deallocate_and_destroy(elem,sz);
+  allocator.deallocate_and_destroy(elem, sz);
 
   elem = new_array;
   cap = new_alloc;
 }
 
 template <typename T, typename A> void Vector<T, A>::reverse() {
-  T* result = allocator.allocate(cap);
+  T *result = allocator.allocate(cap);
 
   for (int i = 0; i < this->sz; ++i) {
-     std::construct_at(result+(sz-(i+1)),elem[i]);
+    std::construct_at(result + (sz - (i + 1)), elem[i]);
   }
 
   allocator.deallocate_and_destroy(elem, sz);
   elem = result;
-
 }
 
 template <typename T, typename A>
@@ -241,24 +383,24 @@ void Vector<T, A>::resize(int new_size, T def) {
   reserve(new_size);
 
   for (int i = sz; i < new_size; ++i)
-    std::construct_at(elem+i, def);
-
+    std::construct_at(elem + i, def);
 
   sz = new_size;
 }
 
-template <typename T, typename A> void Vector<T, A>::push_back(const T& new_el) {
+template <typename T, typename A>
+void Vector<T, A>::push_back(const T &new_el) {
   if (sz == cap)
-    reserve(cap==0 ? 1 : sz * 2);
+    reserve(cap == 0 ? 1 : sz * 2);
 
-   std::construct_at(elem+sz, new_el);
+  std::construct_at(elem + sz, new_el);
   ++sz;
 }
 template <typename T, typename A> void Vector<T, A>::push_back(T &&new_el) {
   if (sz == cap)
-    reserve(cap==0 ? 1 : sz * 2);
+    reserve(cap == 0 ? 1 : sz * 2);
 
-  *(elem+sz) = std::move(new_el);
+  *(elem + sz) = std::move(new_el);
   ++sz;
 }
 
@@ -270,8 +412,6 @@ const T &Vector<T, A>::operator[](int i) const {
   return elem[i];
 }
 
-
-
 template <typename T, typename A> Vector<T, A>::Vector(int s, T def) {
   if (s < 0)
     error("bad size");
@@ -280,8 +420,7 @@ template <typename T, typename A> Vector<T, A>::Vector(int s, T def) {
   cap = s;
 
   for (int i = 0; i < sz; ++i)
-    std::construct_at(elem+i,def);
-
+    std::construct_at(elem + i, def);
 }
 
 template <typename T, typename A> T &Vector<T, A>::operator[](int i) {
@@ -292,8 +431,8 @@ template <typename T, typename A> T &Vector<T, A>::operator[](int i) {
 }
 
 template <typename T, typename A>
-Vector<T,A> create_v(std::initializer_list<T> elements) {
-  return Vector<T,A>(elements);
+Vector<T, A> create_v(std::initializer_list<T> elements) {
+  return Vector<T, A>(elements);
 }
 
 template <typename T, typename A>
@@ -308,7 +447,7 @@ void print_v(const Vector<T, A> &v, const std::string &intro) {
 template <typename T, typename A>
 std::ostream &operator<<(std::ostream &os, const Vector<T, A> &v) {
   os << "{ ";
-  for (const T& element : v) {
+  for (const T &element : v) {
     os << element << ", ";
   }
   os << "\b\b }";
@@ -316,9 +455,9 @@ std::ostream &operator<<(std::ostream &os, const Vector<T, A> &v) {
   return os;
 }
 
-
 template <typename T, typename A>
-std::istream &operator>>(std::istream &is, Vector<T, A> &v) { // { val, val, val} format.
+std::istream &operator>>(std::istream &is,
+                         Vector<T, A> &v) { // { val, val, val} format.
   char separator;
   is >> separator;
   T temp;
@@ -329,21 +468,16 @@ std::istream &operator>>(std::istream &is, Vector<T, A> &v) { // { val, val, val
   }
 
   return is;
-
 }
 
-template <typename T>
-void add(Vector<T>& v1, const Vector<T>& v2) {
+template <typename T> void add(Vector<T> &v1, const Vector<T> &v2) {
   const int upper_limit = v1.size() <= v2.size() ? v1.size() : v2.size();
   for (int i = 0; i < upper_limit; ++i)
     v1[i] += v2[i];
-
 }
 
-
 template <typename T, typename U>
-requires std::convertible_to<T, double> &&
-std::convertible_to<U,double>
+  requires std::convertible_to<T, double> && std::convertible_to<U, double>
 double sum_multiply(const Vector<T> &vt, const Vector<U> &vu) {
   double result = 0;
   const int upper_limit = vt.size() <= vu.size() ? vt.size() : vu.size();
@@ -353,4 +487,4 @@ double sum_multiply(const Vector<T> &vt, const Vector<U> &vu) {
 
   return result;
 }
-} // namespace
+} // namespace ch18::vector

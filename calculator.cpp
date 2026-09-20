@@ -69,7 +69,7 @@ grammars:
  */
 
 #include "calculator.h"
-
+#include <cmath>
 #include <sstream>
 
 class Variable;
