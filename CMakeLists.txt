@@ -42,6 +42,8 @@ add_executable(hello_world main.cpp
         chapter18/try_drill_ex.ixx
         chapter18/vector.ixx
         chapter18/own_unique_ptr.ixx
+        "UML relationships/uml_rel_ex.ixx"
+        "UML relationships/associations.cpp"
 
 
 )
@@ -59,6 +61,7 @@ target_sources(hello_world PUBLIC
         chapter18/try_drill_ex.ixx
         chapter18/vector.ixx
         chapter18/own_unique_ptr.ixx
+        "UML relationships/uml_rel_ex.ixx"
 
 )
 
