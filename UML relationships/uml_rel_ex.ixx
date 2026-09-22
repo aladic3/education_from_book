@@ -35,7 +35,7 @@ struct Researcher {
   Researcher(std::string  n):name(std::move(n)){}
   ~Researcher();
 
-  bool is_member_of(const Project &);
+  bool is_member_of(const Project &) const;
   std::vector<Project*>::iterator get_project_iterator(const Project &);
   std::vector<Project*>::iterator get_end_projects_iterator(){return projects_.end();}
 

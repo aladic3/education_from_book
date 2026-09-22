@@ -43,11 +43,9 @@ void Project::remove_researcher(std::vector<Researcher *>::iterator it) {
 }
 
 bool Project::has_researcher(const Researcher & researcher) { //
-  for (auto it = researchers_.begin(); it != researchers_.end();++it) {
-    if (*it == &researcher) {
-      return true;
-    }
-  }
+  for (auto el : researchers_)
+    if (el == &researcher) return true;
+
   return false;
 }
 
@@ -58,23 +56,20 @@ Researcher::~Researcher() {
 }
 
 
-bool Researcher::is_member_of(const Project & project) {
-  for (auto it = projects_.begin(); it != projects_.end();++it) {
-    if (*it == &project) {
-      return true;
-    }
-  }
+bool Researcher::is_member_of(const Project & project) const {
+  for (const auto el : projects_)
+    if (el == &project) return true;
+
+
   return false;
 }
 
 
 std::vector<Researcher *>::iterator
 Project::get_researcher_iterator(const Researcher & researcher) {
-    for (auto it = researchers_.begin(); it != researchers_.end();++it) {
-      if (*it == &researcher) {
-         return it;
-      }
-    }
+    for (auto it = researchers_.begin(); it != researchers_.end();++it)
+      if (*it == &researcher) return it;
+
     return researchers_.end();
 }
 
@@ -101,7 +96,7 @@ void Researcher::remove_from_project(Project & project) {
   remove_from_project(get_project_iterator(project));
   project.remove_researcher(project.get_researcher_iterator(*this));
 
-  /*for (auto it = projects_.begin(); it != projects_.end();++it) {
+  /*for (auto it = projects_.begin(); it != projects_.end();++it) { // first ver of method
     if (*it == &project) {
       projects_.erase(it);
       break;
@@ -118,7 +113,9 @@ void Researcher::remove_from_project(std::vector<Project *>::iterator it) {
   if (it != projects_.end()) projects_.erase(it);
 }
 
-void print_all(std::initializer_list<Project *> existing_proj) {}
+void print_all(std::initializer_list<Project *> existing_proj) {
+  
+}
 
 
 void print_all(std::initializer_list<Researcher *> existing_researchers) {}
