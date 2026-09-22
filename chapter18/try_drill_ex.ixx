@@ -671,7 +671,8 @@ private:
 
 };
 
-try_::Somethink test_global{"Test global"};
+// TODO just marked
+//try_::Somethink test_global{"Test global"};
 
 void test_13() {
   try_::Somethink test_local;

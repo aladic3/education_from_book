@@ -114,10 +114,64 @@ void Researcher::remove_from_project(std::vector<Project *>::iterator it) {
 }
 
 void print_all(std::initializer_list<Project *> existing_proj) {
-  
+  for (auto proj: existing_proj) {
+    std::cout << proj->get_title() << ": \n";
+    for (std::__wrap_iter<Researcher *const *> it = proj->get_begin_iterator();
+      it != proj->get_end_iterator(); ++it) {
+        std::cout << '\t' << (*it)->get_name() << '\n';
+    }
+  }
 }
 
 
-void print_all(std::initializer_list<Researcher *> existing_researchers) {}
+void print_all(std::initializer_list<Researcher *> existing_researchers) {
+  for (auto researcher: existing_researchers) {
+    std::cout << researcher->get_name() << ": \n";
+    for (std::__wrap_iter<Project *const *> it = researcher->get_begin_iterator();
+      it != researcher->get_end_iterator(); ++it) {
+      std::cout << '\t' << (*it)->get_title() << '\n';
+      }
+  }
+}
+
+
+void test() {
+  Researcher john("John");
+  Researcher belly("Belly");
+
+
+  Project prog("Prog");
+  Project project_x("Project_x");
+
+  {
+    Researcher andrew("Andrew");
+    Researcher sara("Sara");
+
+    Project green("Green");
+
+    green.add_researcher(john);
+    green.add_researcher(sara);
+    prog.add_researcher(andrew);
+    sara.add_to_project(project_x);
+    sara.add_to_project(project_x);
+
+    print_all(std::initializer_list{&john,&belly,&andrew,&sara});
+    print_all(std::initializer_list{&prog,&project_x,&green});
+    std::cout << "-------------------";
+  }
+
+
+
+
+  prog.add_researcher(belly);
+  john.add_to_project(project_x);
+
+ // sara.remove_from_project(green);
+ // sara.remove_from_project(green);
+
+
+  print_all(std::initializer_list{&john,&belly});
+  print_all(std::initializer_list{&prog,&project_x});
+}
 
 } // namespace uml_relationships::association
