@@ -70,6 +70,7 @@ void test_10();
 void test_11();
 void test_12();
 void test_13();
+void test_16();
 
 template <typename A = vector::new_allocator<std::ifstream>>
 struct File_handle {
@@ -670,6 +671,19 @@ private:
   Somethink* test3;
 
 };
+
+template <typename T>
+using vec = vector::Simplest_vector<T>;
+
+void test_16() {
+  vec<int> k;
+  k->push_back(10);
+
+
+ /* for (auto el : k ) {
+    std::cout << el;
+  }*/
+}
 
 // TODO just marked
 //try_::Somethink test_global{"Test global"};

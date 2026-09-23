@@ -1,15 +1,15 @@
 #include <iostream>
 
 
-import uml_rel_ex;
+import chapter18;
 
 
 
 int main() {
 
     try {
-        //ch18::ex::test_13();
-        uml_relationships::association::test();
+        ch18::ex::test_16();
+        //uml_relationships::association::test();
     }
     catch (std::exception& err) {
         std::cerr << err.what();

@@ -75,6 +75,9 @@ template <typename T> struct new_allocator : allocator<T> {
   void just_deallocate(T *elements) { ::operator delete(elements); }
 };
 
+
+
+
 template <typename T, typename A = simple_allocator<T>> struct Simple_vector {
   Simple_vector();
   Simple_vector(int sz, T def = T{});
@@ -106,6 +109,41 @@ private:
   T *elements = nullptr;
   int sz = 0;
   T *space = nullptr;
+};
+
+
+template <typename T>
+struct Simplest_vector {
+  Simplest_vector() = default;
+
+  ~Simplest_vector() {
+    this->impl->~Simple_vector();
+
+  }
+
+  Simple_vector<T>* operator->() {
+    try {
+      return impl;
+    } catch (...) {
+      // TODO creating 4 elements. Why?
+      impl = new Simple_vector<T>();
+    }
+
+    return impl;
+  }
+
+  Simple_vector<T>& operator*() {
+    try {
+      return impl;
+    } catch (...) {
+      impl = new Simple_vector<T>();
+    }
+
+    return impl;
+  }
+
+private:
+  Simple_vector<T>* impl;
 };
 
 // template <typename T, typename A = new_allocator<T>>
@@ -198,14 +236,7 @@ Simple_vector<T, A>::Simple_vector(std::initializer_list<T> lst)
 
 
 template <typename T, typename A> Simple_vector<T, A>::~Simple_vector() {
-  if constexpr (!std::is_trivially_destructible_v<T>) {
-    int size_initialized_elements = sz;
-    for (int i = size_initialized_elements - 1; i >= 0; --i) {
-      allocator.destroy(&elements[i]); // or &(elements + i)
-    }
-  }
-
-  allocator.just_deallocate(elements);
+  allocator.deallocate_and_destroy(elements,sz);
   elements = nullptr;
   space = nullptr;
 }
@@ -257,29 +288,87 @@ Simple_vector<T, A>::operator=(Simple_vector &&v) noexcept {
 
 
 template <typename T, typename A>
-void Simple_vector<T, A>::reserve(int new_alloc) {}
+void Simple_vector<T, A>::reserve(int new_alloc) {
+  int cap = space - elements;
+  if (new_alloc <= cap)
+    return;
+
+  T *new_array = allocator.allocate(new_alloc);
+
+  std::uninitialized_move(elements, space, new_array);
+
+  // TODO may be errors because elements have been uninitialized after move
+  allocator.deallocate_and_destroy(elements, sz);
 
 
-template <typename T, typename A> void Simple_vector<T, A>::reverse() {}
+  elements = new_array;
+  space = elements + new_alloc;
+}
+
+
+template <typename T, typename A> void Simple_vector<T, A>::reverse() {
+  T *result = allocator.allocate(space - elements);
+
+  for (int i = 0; i < this->sz; ++i) {
+    std::construct_at(result + (sz - (i + 1)), elements[i]);
+  }
+
+  allocator.deallocate_and_destroy(elements, sz);
+  elements = result;
+}
 
 
 template <typename T, typename A>
-void Simple_vector<T, A>::resize(int new_size, T def) {}
+void Simple_vector<T, A>::resize(int new_size, T def) {
+  if (new_size < (space - elements)) return;
+
+  reserve(new_size);
+
+  for (int i = sz; i < new_size; ++i)
+    std::construct_at(elements + i, def);
+
+  sz = new_size;
+  space = elements + sz;
+}
 
 
 template <typename T, typename A>
-void Simple_vector<T, A>::push_back(const T &new_el) {}
+void Simple_vector<T, A>::push_back(const T &new_el) {
+  int cap = space - elements;
+  if (sz == cap)
+    reserve(cap == 0 ? 1 : sz * 2);
+
+  std::construct_at(elements + sz, new_el);
+  ++sz;
+}
 
 
 template <typename T, typename A>
-void Simple_vector<T, A>::push_back(T &&new_el) {}
+void Simple_vector<T, A>::push_back(T &&new_el) {
+  int cap = space - elements;
+  if (sz == cap)
+    reserve(cap == 0 ? 1 : sz * 2);
+
+  *(elements + sz) = std::move(new_el);
+  ++sz;
+}
 
 
-template <typename T, typename A> T &Simple_vector<T, A>::operator[](int i) {}
+template <typename T, typename A> T &Simple_vector<T, A>::operator[](int i) {
+  if (i >= sz || i < 0)
+    error("bad iterator");
+
+  return elements[i];
+}
 
 
 template <typename T, typename A>
-const T &Simple_vector<T, A>::operator[](int i) const {}
+const T &Simple_vector<T, A>::operator[](int i) const {
+  if (i >= sz || i < 0)
+    error("bad iterator");
+
+  return elements[i];
+}
 
 
 template <typename T, typename A> Vector<T, A>::Vector() : sz(0), cap(4 * 2) {
