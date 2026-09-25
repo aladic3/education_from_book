@@ -675,9 +675,22 @@ private:
 template <typename T>
 using vec = vector::Simplest_vector<T>;
 
+template <typename T>
+using vvec = vector::Simplest_vector<vec<T>>;
+
+template <typename T>
+using vvvec = vector::Simplest_vector<vvec<T>>;
+
 void test_16() {
-  vec<int> k;
-  k->push_back(10);
+ // vec<vec<vec<vec<int>>>> k;
+  vvvec<int> k;
+  std::cout << (sizeof(int*) == sizeof(k)) << std::endl;
+  k.operator->()->push_back(vvec<int>());
+  k.operator->()->operator[](0).operator->()->push_back(vec<int>());
+  k.operator->()->operator[](0).operator->()->operator[](0).operator->()->push_back(10);
+
+  std::cout << k.operator->()->operator[](0).operator->()->operator[](0).operator->()->operator[](0);
+  // k->push_back(10);
 
 
  /* for (auto el : k ) {

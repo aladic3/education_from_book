@@ -114,36 +114,28 @@ private:
 
 template <typename T>
 struct Simplest_vector {
-  Simplest_vector() = default;
+  Simplest_vector(){}
 
   ~Simplest_vector() {
+    if (impl == nullptr) return;
     this->impl->~Simple_vector();
-
+    operator delete(impl);
   }
 
   Simple_vector<T>* operator->() {
-    try {
-      return impl;
-    } catch (...) {
+    if (impl) return impl;
+
       // TODO creating 4 elements. Why?
-      impl = new Simple_vector<T>();
-    }
+    impl = static_cast<Simple_vector<T> *>(operator new(sizeof(Simple_vector<T>)));
+    std::construct_at(impl);
+
 
     return impl;
   }
 
-  Simple_vector<T>& operator*() {
-    try {
-      return impl;
-    } catch (...) {
-      impl = new Simple_vector<T>();
-    }
-
-    return impl;
-  }
 
 private:
-  Simple_vector<T>* impl;
+  Simple_vector<T>* impl = nullptr;
 };
 
 // template <typename T, typename A = new_allocator<T>>
