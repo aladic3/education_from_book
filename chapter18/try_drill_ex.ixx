@@ -72,7 +72,7 @@ void test_11();
 void test_12();
 void test_13();
 void test_16();
-void test_18();
+void test_17();
 
 
 template <class Rp>
@@ -701,7 +701,7 @@ using vvec = vector::Simplest_vector<vec<T>>;
 template <typename T>
 using vvvec = vector::Simplest_vector<vvec<T>>;
 
-void test_18() {
+void test_17() {
   {
     int x = 10;
     auto a = final(std::function([x]() {
