@@ -5,6 +5,7 @@ module;
 #include "../error.h"
 
 #include <filesystem>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <ranges>
@@ -71,6 +72,25 @@ void test_11();
 void test_12();
 void test_13();
 void test_16();
+void test_18();
+
+
+template <class Rp>
+struct Func_object {
+  Func_object(std::function<Rp()> ff) : f(ff){}
+
+  ~Func_object() {
+    f();
+  }
+private:
+  std::function<Rp()> f;
+};
+
+template <class Rp>
+Func_object<Rp> final(std::function<Rp()> function) {
+  return Func_object{function};
+}
+
 
 template <typename A = vector::new_allocator<std::ifstream>>
 struct File_handle {
@@ -680,6 +700,20 @@ using vvec = vector::Simplest_vector<vec<T>>;
 
 template <typename T>
 using vvvec = vector::Simplest_vector<vvec<T>>;
+
+void test_18() {
+  {
+    int x = 10;
+    auto a = final(std::function([x]() {
+      std::cout << std::format("{} first destructor", x);
+    }));
+
+    auto b = final(std::function([=]() {
+      std::cout << std::format("{} second destructor", x);
+    }));
+
+  }
+}
 
 void test_16() {
  // vec<vec<vec<vec<int>>>> k;

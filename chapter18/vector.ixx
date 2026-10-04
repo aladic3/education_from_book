@@ -78,7 +78,8 @@ template <typename T> struct new_allocator : allocator<T> {
 
 
 
-template <typename T, typename A = simple_allocator<T>> struct Simple_vector {
+template <typename T, typename A = simple_allocator<T>>
+struct Simple_vector {
   Simple_vector();
   Simple_vector(int sz, T def = T{});
   Simple_vector(std::initializer_list<T> lst);
