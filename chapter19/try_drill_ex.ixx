@@ -35,7 +35,8 @@ void Try_vector<T, A>::push_front(const T &new_el) {
   if (Vector<T,A>::sz == Vector<T,A>::cap)
     Vector<T,A>::reserve(Vector<T,A>::cap == 0 ? 8 : Vector<T,A>::sz * 2);
 
-
+  for (T* el = Vector<T,A>::elem+Vector<T,A>::sz; el>=Vector<T,A>::elem ;--el)
+    *(el+1) = *std::move(el);
 
 
   std::construct_at(Vector<T,A>::elem, new_el);
@@ -53,7 +54,6 @@ void Try_vector<T, A>::push_front(T &&new_el) {
     *(el+1) = *std::move(el);
 
   *(Vector<T,A>::elem) = std::move(new_el);
-  //std::construct_at(Vector<T,A>::elem, new_el);
   ++Vector<T,A>::sz;
 }
 } // namespace ch19::try_
