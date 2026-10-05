@@ -168,7 +168,7 @@ struct Vector {
   [[nodiscard]] T *begin() const { return elem; } // iteration support
   [[nodiscard]] T *end() const { return elem + sz; }
 
-private:
+protected:
   A allocator;
   int sz = 0;
   int cap = 0;

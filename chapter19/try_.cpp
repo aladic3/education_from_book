@@ -5,6 +5,7 @@ module;
 #include <iostream>
 module chapter19;
 
+
 namespace ch19::try_ {
 
 void test() {
@@ -15,6 +16,16 @@ void test() {
 
 
   std::cout << "test successfully";
+}
+
+
+void test_2() {
+  Try_vector<int> v({1,2,3,4,5,6,7,8,9,10});
+  v.push_front(12);
+  ch18::vector::print_v(v, "pamapam");
+  v.push_front(0); print_v(v, "pamapam");
+  v.push_front(666); print_v(v, "pamapam");
+
 }
 
 void copy_xd(int *f1, const int *e1, int *f2)
