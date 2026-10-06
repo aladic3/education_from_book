@@ -46,6 +46,7 @@ add_executable(hello_world main.cpp
         "UML relationships/associations.cpp"
         chapter19/try_drill_ex.ixx
         chapter19/try_.cpp
+        chapter19/my_list.ixx
 
 
 )
@@ -63,6 +64,7 @@ target_sources(hello_world PUBLIC
         chapter18/try_drill_ex.ixx
         chapter18/vector.ixx
         chapter18/own_unique_ptr.ixx
+        chapter19/my_list.ixx
         chapter19/try_drill_ex.ixx
         "UML relationships/uml_rel_ex.ixx"
 
