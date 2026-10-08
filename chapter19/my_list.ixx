@@ -17,13 +17,42 @@ struct Link;
 
 template<typename T>
 struct List {
-  struct iterator;
+
+  struct iterator {
+    iterator( Link<T>* el): link(el){}
+
+
+    bool operator==(const iterator & i) const{return i.link == link;}
+    bool operator!=(const iterator & i) const {return i.link != link;}
+
+    T& operator*(){return link->get_value();}
+    const T& operator*() const {return link->get_value();}
+
+    iterator& operator++(){link = link->next(); return *this;}
+    iterator& operator--(){link = link->prev(); return *this;}
+    Link<T>* get_link() {return link;}
+  private:
+    Link<T>* link;
+  };
 
   List();
 
+  iterator push_back(T&&);
+  iterator push_back(const T&);
+
+  iterator push_front(T&&);
+  iterator push_front(const T&);
+
+  iterator insert(T&&, iterator next);
+  iterator insert(const T&, iterator next);
+
+
+  iterator begin();
+  iterator end();
+
 private:
 
-  Link<T>* first;
+  Link<T>* first; // first and last are empty
   Link<T>* last;
 };
 
@@ -34,9 +63,16 @@ struct Link {
 
 
 
+  [[nodiscard]] static Link* insert_static(Link* next, T&& el);
+  [[nodiscard]] static Link* insert_static(Link* next, const T& el);
   Link* insert(Link* next);
 
+  void set_next(Link* next){_next = next;}
+  void set_prev(Link* prev){_prev = prev;}
+
   Link* erase();
+  T& get_value(){return _element;}
+  const T& get_value() const {return _element;}
 
   T& element(){return _element;}
   Link* prev() {return _prev;}
@@ -52,17 +88,77 @@ template <typename T> List<T>::List() {
   this->first = new Link<T>();
   this->last = new Link<T>();
 
-  first->_next = this->last;
-  last->_prev = this->first;
+  first->set_next(this->last);
+  last->set_prev(this->first);
+}
+template <typename T>  List<T>::iterator List<T>::push_back(T && el) {
+  return Link<T>::insert_static(this->last,std::move(el));
+}
+
+template <typename T>
+ List<T>::iterator List<T>::push_back(const T & el) {
+  return Link<T>::insert_static(this->last,el);
+}
+
+template <typename T> typename List<T>::iterator List<T>::push_front(T && el) {
+  return Link<T>::insert_static((++iterator(this->first)).get_link(),
+    std::move(el));
+}
+
+template <typename T>
+typename List<T>::iterator List<T>::push_front(const T & el) {
+  T copy_el = el;
+  return Link<T>::insert_static((++iterator(this->first)).get_link(),
+    std::move(copy_el));
+}
+
+template <typename T>
+
+typename List<T>::iterator List<T>::insert(T && el, typename List<T>::iterator next) {
+  return Link<T>::insert_static(next.get_link(),
+    std::move(el));
+}
+
+template <typename T>
+typename List<T>::iterator List<T>::insert(const T & el, typename List<T>::iterator next) {
+  T copy_el = el;
+  return Link<T>::insert_static(next.get_link(),
+    std::move(copy_el));
+}
+
+template <typename T>
+List<T>::iterator List<T>::begin() {
+  return this->first->next();
+}
+
+template <typename T> typename List<T>::iterator List<T>::end() {
+  return this->last;
+}
+
+
+
+template <typename T>
+[[nodiscard]] Link<T> *Link<T>::insert_static(Link *next, T &&el) {
+  Link * result = new Link(std::move(el));
+  result->insert(next);
+  return result;
+}
+
+template <typename T>
+Link<T> *Link<T>::insert_static(Link *next, const T &el) {
+  T copy_el = el;
+  Link * result = new Link(std::move(copy_el));
+  result->insert(next);
+  return result;
 }
 
 template <typename T>
 Link<T> *Link<T>::insert(Link *next) {
   auto temp = next->prev();
-  next->prev() = this;
-  temp->next() = this;
-  this->next() = next;
-  this->prev() = temp;
+  next->set_prev(this);
+  temp->set_next(this);
+  this->set_next(next);
+  this->set_prev(temp);
   return this;
 }
 
@@ -76,17 +172,7 @@ template <typename T> Link<T> * Link<T>::erase() {
 
 
 
-template <typename T>
-struct List<T>::iterator {
-  iterator(const Link<T>* el): link(el){}
 
-  bool operator==(const iterator & i) const{return i.link == link;}
-  bool operator!=(const iterator & i) const {return i.link != link;}
 
-  iterator operator++(){return link->next();}
-  iterator operator--(){return link->prev();}
-private:
-  Link<T>* link;
-};
 
 }

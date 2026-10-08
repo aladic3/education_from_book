@@ -4,8 +4,9 @@
 module;
 #include <iostream>
 #include <list>
-module chapter19;
 
+module chapter19;
+import chapter19.list;
 
 namespace ch19::try_ {
 
@@ -17,6 +18,24 @@ void test() {
 
 
   std::cout << "test successfully";
+}
+
+
+void test_3() {
+  using it = list::List<int>::iterator;
+  list::List<int> mlst;
+  int x = 20;
+  mlst.push_back(10);
+  it e30 = mlst.push_back(30);
+  mlst.push_back(x);
+  mlst.push_front(5);
+  mlst.push_front(x);
+
+  mlst.insert(666,e30);
+
+  for (auto& el: mlst) {
+    std::cout << el << '\t';
+  }
 }
 
 

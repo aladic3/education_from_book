@@ -17,6 +17,7 @@ import chapter18.vector;
 export namespace ch19::try_ {
 void test();
 void test_2();
+void test_3();
 void copy_xd(int* f1, const int* e1, int* f2); // copy using only iterator operations
 
 using namespace ch18::vector;
