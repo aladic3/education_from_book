@@ -24,6 +24,9 @@ void test() {
 void test_3() {
   using it = list::List<int>::iterator;
   list::List<int> mlst;
+
+
+
   int x = 20;
   mlst.push_back(10);
   it e30 = mlst.push_back(30);
@@ -31,9 +34,14 @@ void test_3() {
   mlst.push_front(5);
   mlst.push_front(x);
   mlst.push_front(777);
-  std::cerr << advance(3,mlst.begin());
-  mlst.insert(666,e30);
 
+  mlst.insert(666,e30);
+  it f_ad_it = mlst.begin();
+  std::cerr << f_ad_it.get_link()->get_value() << '\t' ;
+  advance(3,f_ad_it);
+  std::cerr << f_ad_it.get_link()->get_value() << '\t' ;
+  advance(-3,f_ad_it);
+  std::cerr << f_ad_it.get_link()->get_value() << '\n' ;
   std::cerr << mlst.front() << '\t' << mlst.back();
 
   mlst.pop_back();

@@ -21,7 +21,7 @@ void test_3();
 void copy_xd(int* f1, const int* e1, int* f2); // copy using only iterator operations
 
 template<std::forward_iterator iterator>
-iterator advance(int a, iterator it);
+void advance(int a, iterator& it);
 
 using namespace ch18::vector;
 
@@ -63,19 +63,17 @@ void Try_vector<T, A>::push_front(T &&new_el) {
 
 
 template <std::forward_iterator iterator>
-iterator advance(int a, iterator it) {
-  int module = 1;
+void advance(int a, iterator& it) {
+  int module = -1;
   std::function<void()> fun ([&]{++it;});
 
   if (a < 0) {
-    module = -1;
+    module = 1;
     fun = [&]{--it;};
   }
 
   for (int i = a; i != 0; i += module) {
     fun();
   }
-
-  return it;
 }
 } // namespace ch19::try_

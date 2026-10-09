@@ -45,24 +45,30 @@ template<typename T>
 struct List {
 
   struct iterator {
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using reference = T&;
+    using pointer = T*;
+    using iterator_category = std::forward_iterator_tag;
 
-
-    iterator( Link<T>* el): link(el){}
+    iterator( Link<value_type>* el): link(el){}
+    iterator() : link(nullptr){}
 
 
     bool operator==(const iterator & i) const{return i.link == link;}
     bool operator!=(const iterator & i) const {return i.link != link;}
 
-    T& operator*(){return link->get_value();}
-    const T& operator*() const {return link->get_value();}
+    reference operator*(){return link->get_value();}
+    const reference operator*() const {return link->get_value();}
 
     iterator& operator++(){link = link->next(); return *this;}
     iterator& operator--(){link = link->prev(); return *this;}
-    iterator& operator+=(int a){if }
+    iterator operator++(int a){auto old = link; link = link->next(); return old;}
+    iterator operator--(int a){auto old = link; link = link->prev(); return old;}
 
-    Link<T>* get_link() {return link;}
+    Link<value_type>* get_link() {return link;}
   private:
-    Link<T>* link;
+    Link<value_type>* link;
   };
 
   List();
