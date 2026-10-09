@@ -9,54 +9,6 @@ export module chapter19.list;
 
 export namespace ch19::list {
 template<typename T>
-struct Link;
-
-
-
-
-
-template<typename T>
-struct List {
-
-  struct iterator {
-    iterator( Link<T>* el): link(el){}
-
-
-    bool operator==(const iterator & i) const{return i.link == link;}
-    bool operator!=(const iterator & i) const {return i.link != link;}
-
-    T& operator*(){return link->get_value();}
-    const T& operator*() const {return link->get_value();}
-
-    iterator& operator++(){link = link->next(); return *this;}
-    iterator& operator--(){link = link->prev(); return *this;}
-    Link<T>* get_link() {return link;}
-  private:
-    Link<T>* link;
-  };
-
-  List();
-
-  iterator push_back(T&&);
-  iterator push_back(const T&);
-
-  iterator push_front(T&&);
-  iterator push_front(const T&);
-
-  iterator insert(T&&, iterator next);
-  iterator insert(const T&, iterator next);
-
-
-  iterator begin();
-  iterator end();
-
-private:
-
-  Link<T>* first; // first and last are empty
-  Link<T>* last;
-};
-
-template<typename T>
 struct Link {
   Link(T&& el = T{}, Link* prev = nullptr, Link* next = nullptr) : _prev(prev),
   _next(next), _element(std::move(el)){}
@@ -84,6 +36,66 @@ private:
   T _element;
 };
 
+
+
+
+
+
+template<typename T>
+struct List {
+
+  struct iterator {
+
+
+    iterator( Link<T>* el): link(el){}
+
+
+    bool operator==(const iterator & i) const{return i.link == link;}
+    bool operator!=(const iterator & i) const {return i.link != link;}
+
+    T& operator*(){return link->get_value();}
+    const T& operator*() const {return link->get_value();}
+
+    iterator& operator++(){link = link->next(); return *this;}
+    iterator& operator--(){link = link->prev(); return *this;}
+    iterator& operator+=(int a){if }
+
+    Link<T>* get_link() {return link;}
+  private:
+    Link<T>* link;
+  };
+
+  List();
+  ~List();
+
+  void pop_back();
+  void pop_front();
+
+  T& front();
+  T& back();
+
+  iterator erase(iterator);
+
+  iterator push_back(T&&);
+  iterator push_back(const T&);
+
+  iterator push_front(T&&);
+  iterator push_front(const T&);
+
+  iterator insert(T&&, iterator next);
+  iterator insert(const T&, iterator next);
+
+
+  iterator begin();
+  iterator end();
+
+private:
+
+  Link<T>* first; // first and last are empty
+  Link<T>* last;
+};
+
+
 template <typename T> List<T>::List() {
   this->first = new Link<T>();
   this->last = new Link<T>();
@@ -91,6 +103,35 @@ template <typename T> List<T>::List() {
   first->set_next(this->last);
   last->set_prev(this->first);
 }
+
+template <typename T> List<T>::~List() {
+  Link<T>* temp = this->first;
+  for (Link<T>* current = temp; current != nullptr; current = temp) {
+    temp = temp->next();
+    delete current;
+  }
+}
+
+template <typename T> void List<T>::pop_back() {
+  delete this->end().operator--().get_link()->erase();
+}
+
+template <typename T> void List<T>::pop_front() {
+  delete this->begin().get_link()->erase();
+}
+
+template <typename T> T &List<T>::front() {
+  return begin().get_link()->get_value();
+}
+
+template <typename T> T &List<T>::back() {
+  return end().operator--().get_link()->get_value();
+}
+
+template <typename T> typename List<T>::iterator List<T>::erase(iterator it) {
+  return it.get_link()->erase();
+}
+
 template <typename T>  List<T>::iterator List<T>::push_back(T && el) {
   return Link<T>::insert_static(this->last,std::move(el));
 }
@@ -163,10 +204,10 @@ Link<T> *Link<T>::insert(Link *next) {
 }
 
 template <typename T> Link<T> * Link<T>::erase() {
-  this->next()->prev() = this->prev();
-  this->prev()->next() = this->next();
-  this->next() = nullptr;
-  this->prev() = nullptr;
+  this->next()->set_prev(this->prev());
+  this->prev()->set_next(this->next());
+  this->set_next(nullptr);
+  this->set_prev(nullptr);
   return this;
 }
 

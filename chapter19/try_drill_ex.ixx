@@ -20,6 +20,9 @@ void test_2();
 void test_3();
 void copy_xd(int* f1, const int* e1, int* f2); // copy using only iterator operations
 
+template<std::forward_iterator iterator>
+iterator advance(int a, iterator it);
+
 using namespace ch18::vector;
 
 template <typename T, typename A = simple_allocator<T>>
@@ -56,5 +59,23 @@ void Try_vector<T, A>::push_front(T &&new_el) {
 
   *(Vector<T,A>::elem) = std::move(new_el);
   ++Vector<T,A>::sz;
+}
+
+
+template <std::forward_iterator iterator>
+iterator advance(int a, iterator it) {
+  int module = 1;
+  std::function<void()> fun ([&]{++it;});
+
+  if (a < 0) {
+    module = -1;
+    fun = [&]{--it;};
+  }
+
+  for (int i = a; i != 0; i += module) {
+    fun();
+  }
+
+  return it;
 }
 } // namespace ch19::try_

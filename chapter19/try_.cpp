@@ -30,8 +30,16 @@ void test_3() {
   mlst.push_back(x);
   mlst.push_front(5);
   mlst.push_front(x);
-
+  mlst.push_front(777);
+  std::cerr << advance(3,mlst.begin());
   mlst.insert(666,e30);
+
+  std::cerr << mlst.front() << '\t' << mlst.back();
+
+  mlst.pop_back();
+  mlst.pop_front();
+
+  delete mlst.erase(e30).get_link();
 
   for (auto& el: mlst) {
     std::cout << el << '\t';
