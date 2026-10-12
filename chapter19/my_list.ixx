@@ -72,6 +72,7 @@ struct List {
   };
 
   List();
+  List(std::initializer_list<T> lst);
   ~List();
 
   void pop_back();
@@ -108,6 +109,11 @@ template <typename T> List<T>::List() {
 
   first->set_next(this->last);
   last->set_prev(this->first);
+}
+template <typename T> List<T>::List(std::initializer_list<T> lst) : List() {
+  for (const T& el : lst) {
+    push_back(el);
+  }
 }
 
 template <typename T> List<T>::~List() {

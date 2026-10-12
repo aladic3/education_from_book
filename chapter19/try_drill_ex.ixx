@@ -18,6 +18,47 @@ export namespace ch19::try_ {
 void test();
 void test_2();
 void test_3();
+void test_4();
+void test_5();
+
+template <std::forward_iterator iterator>
+bool string_compare(iterator it, size_t size, const std::string& string_compare_with);
+
+template<std::forward_iterator iterator> // return true if object iteration is first dictionary
+bool string_compare_dictionary(iterator it, size_t size, const std::string& string_compare_with);
+
+template<typename T>
+auto copy_to_new_object(const T& for_copy) {
+  if constexpr (!std::is_trivially_destructible_v<T>)
+    return for_copy;
+
+
+  if constexpr ((std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, char>
+    && std::is_array_v<T>) || std::is_same_v<T,char*>) {
+
+    const size_t len = std::strlen(for_copy) + 1;
+    auto result = std::make_unique<char[]>(len);
+    std::strcpy(result.get(),for_copy);
+
+    return result;
+  }
+
+  // for array int
+  // TODO we can impl for int*. But implemented for int[].
+  if constexpr (std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, int>
+   && std::is_array_v<T>) {
+    const size_t len = sizeof(for_copy) / sizeof(int);
+    auto result = std::make_unique<int[]>(len);
+    std::copy(std::begin(for_copy),std::end(for_copy), result.get());
+
+    return result;
+   }
+
+
+
+
+}
+
 void copy_xd(int* f1, const int* e1, int* f2); // copy using only iterator operations
 
 template<std::forward_iterator iterator>
@@ -72,8 +113,39 @@ void advance(int a, iterator& it) {
     fun = [&]{--it;};
   }
 
+
   for (int i = a; i != 0; i += module) {
-    fun();
+      fun();
+
   }
+}
+
+
+template <std::forward_iterator iterator>
+bool string_compare_dictionary(iterator it, size_t size,
+                               const std::string &string_compare_with) {
+  const size_t usual_size = size > string_compare_with.size() ? string_compare_with.size() : size;
+  for (int i = 0; i < usual_size; ++i) {
+    if (*it != string_compare_with[i])
+      return *it < string_compare_with[i];
+    ++it;
+  }
+
+  return true;
+}
+
+template <std::forward_iterator iterator>
+bool string_compare(iterator it, const size_t size,
+                    const std::string &string_compare_with) {
+  if (size != string_compare_with.size())
+    return false;
+
+  for (int i = 0; i < size; ++i) {
+    if (string_compare_with[i] != *it)
+      return false;
+    ++it;
+  }
+
+  return true;
 }
 } // namespace ch19::try_
