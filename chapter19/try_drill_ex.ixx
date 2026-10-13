@@ -44,7 +44,7 @@ auto copy_to_new_object(const T& for_copy) {
   }
 
   // for array int
-  // TODO we can impl for int*. But implemented for int[].
+  // TODO we can impl for int*. But implemented for int[]...
   if constexpr (std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, int>
    && std::is_array_v<T>) {
     const size_t len = sizeof(for_copy) / sizeof(int);
