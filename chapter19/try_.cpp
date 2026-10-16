@@ -5,6 +5,7 @@ module;
 #include <iostream>
 #include <list>
 #include <vector>
+#include <span>
 
 module chapter19;
 import chapter19.list;
@@ -63,6 +64,18 @@ void inspect(const T& value)
   static_assert(std::extent_v<T> == 6);
 }
 
+
+void drill() {
+  std::initializer_list init_lst  {0,1,2,3,4,5,6,7,8,9};
+  std::array<int,10> arr {0,1,2,3,4,5,6,7,8,9};
+  std::vector<int> vec {init_lst};
+  std::list<int> lst {init_lst};
+
+  auto arr2 = std::array<int,10>(arr); arr2[0] = 111;
+  auto vec2 = vec;
+  auto lst2 = lst;
+
+}
 
 void test_5() {
   int str1 [] {1, 2, 3, 4, 5};

@@ -20,6 +20,7 @@ void test_2();
 void test_3();
 void test_4();
 void test_5();
+void drill();
 
 template <std::forward_iterator iterator>
 bool string_compare(iterator it, size_t size, const std::string& string_compare_with);
@@ -43,7 +44,7 @@ auto copy_to_new_object(const T& for_copy) {
     return result;
   }
 
-  // for array int
+  // for array int (int[])
   // TODO we can impl for int*. But implemented for int[]...
   if constexpr (std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, int>
    && std::is_array_v<T>) {
@@ -53,7 +54,6 @@ auto copy_to_new_object(const T& for_copy) {
 
     return result;
    }
-
 
 
 

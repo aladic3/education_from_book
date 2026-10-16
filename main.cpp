@@ -8,7 +8,7 @@ import chapter19;
 int main() {
 
     try {
-        ch19::try_::test_5();
+        ch19::try_::drill();
         //uml_relationships::association::test();
     }
     catch (std::exception& err) {
