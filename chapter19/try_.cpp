@@ -70,10 +70,24 @@ void drill() {
   std::array<int,10> arr {0,1,2,3,4,5,6,7,8,9};
   std::vector<int> vec {init_lst};
   std::list<int> lst {init_lst};
+  int arrr [10] {0,1,2,3,4,5,6,7,8,9};
+  int* begin_a = &arrr[0];
+  int* end_a = &arrr[9]+1;
+  int arrr2 [10];
+  int* begin_a2 = &arrr2[0];
 
-  auto arr2 = std::array<int,10>(arr); arr2[0] = 111;
-  auto vec2 = vec;
-  auto lst2 = lst;
+  copy_drill(begin_a,end_a,begin_a2);
+
+  std::array<int,10> arr2{};
+  copy_drill(arr.begin(),arr.end(),arr2.begin());
+
+  std::vector<int> vec2(vec.size());
+  copy_drill(vec.begin(),vec.end(),vec2.begin());
+
+  std::list<int> lst2(lst.size());
+  copy_drill(lst.begin(),lst.end(),lst2.begin());
+
+  std::cout << "GG";
 
 }
 

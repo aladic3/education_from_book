@@ -59,6 +59,15 @@ auto copy_to_new_object(const T& for_copy) {
 
 }
 
+
+
+template<std::forward_iterator iterator>  // dest == destination, dest.size == [begin;end)
+void copy_drill(iterator begin, iterator end, iterator dest) {
+  for (iterator i = begin; i != end; ++i) {
+    *dest = *i;
+    ++dest;
+  }
+}
 void copy_xd(int* f1, const int* e1, int* f2); // copy using only iterator operations
 
 template<std::forward_iterator iterator>
@@ -105,19 +114,16 @@ void Try_vector<T, A>::push_front(T &&new_el) {
 
 template <std::forward_iterator iterator>
 void advance(int a, iterator& it) {
-  int module = -1;
   std::function<void()> fun ([&]{++it;});
+  int module = -1;
 
   if (a < 0) {
     module = 1;
     fun = [&]{--it;};
   }
 
-
-  for (int i = a; i != 0; i += module) {
+  for (int i = a; i != 0; i += module)
       fun();
-
-  }
 }
 
 
