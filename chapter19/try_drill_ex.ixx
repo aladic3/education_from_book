@@ -23,51 +23,52 @@ void test_5();
 void drill();
 
 template <std::forward_iterator iterator>
+void increase_by(iterator begin, iterator end, int increase_val);
+
+template<std::forward_iterator iterator>
+void print_range(iterator begin, iterator end);
+
+template <std::forward_iterator iterator>
 bool string_compare(iterator it, size_t size, const std::string& string_compare_with);
 
 template<std::forward_iterator iterator> // return true if object iteration is first dictionary
 bool string_compare_dictionary(iterator it, size_t size, const std::string& string_compare_with);
 
 template<typename T>
-auto copy_to_new_object(const T& for_copy) {
-  if constexpr (!std::is_trivially_destructible_v<T>)
-    return for_copy;
-
-
-  if constexpr ((std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, char>
-    && std::is_array_v<T>) || std::is_same_v<T,char*>) {
-
-    const size_t len = std::strlen(for_copy) + 1;
-    auto result = std::make_unique<char[]>(len);
-    std::strcpy(result.get(),for_copy);
-
-    return result;
-  }
-
-  // for array int (int[])
-  // TODO we can impl for int*. But implemented for int[]...
-  if constexpr (std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, int>
-   && std::is_array_v<T>) {
-    const size_t len = sizeof(for_copy) / sizeof(int);
-    auto result = std::make_unique<int[]>(len);
-    std::copy(std::begin(for_copy),std::end(for_copy), result.get());
-
-    return result;
-   }
+auto copy_to_new_object(const T& for_copy);
 
 
 
-}
-
-
-
-template<std::forward_iterator iterator>  // dest == destination, dest.size == [begin;end)
+template <std::forward_iterator iterator>  // dest == destination, dest.size == [begin;end)
 void copy_drill(iterator begin, iterator end, iterator dest) {
   for (iterator i = begin; i != end; ++i) {
     *dest = *i;
     ++dest;
   }
 }
+
+template <std::forward_iterator iterator>  // print out position
+int find_position(iterator begin, iterator end, int val) {
+  int result = 0;
+  iterator result_operation  = std::find(begin,end,val);
+
+  if (result_operation == end ) return  -1;
+
+  for (iterator it = begin;   it != result_operation; ++it)
+    ++result;
+
+  return result;
+
+}
+
+template <std::forward_iterator iterator1, std::forward_iterator iterator2>
+void copy_drill(iterator1 begin, iterator1 end, iterator2 dest) {
+  for (iterator1 i = begin; i != end; ++i) {
+    *dest = *i;
+    ++dest;
+  }
+}
+
 void copy_xd(int* f1, const int* e1, int* f2); // copy using only iterator operations
 
 template<std::forward_iterator iterator>
@@ -83,6 +84,14 @@ struct Try_vector : Vector<T,A> {
   void push_front(T &&new_el);
 
 };
+
+
+template <std::forward_iterator iterator>
+void increase_by(iterator begin, iterator end,  int increase_val) {
+  for (iterator it = begin; it != end; ++it) {
+    *it += increase_val;
+  }
+}
 
 template <typename T, typename A>
 void Try_vector<T, A>::push_front(const T &new_el) {
@@ -153,5 +162,41 @@ bool string_compare(iterator it, const size_t size,
   }
 
   return true;
+}
+
+template <typename T> auto copy_to_new_object(const T &for_copy) {
+  if constexpr (!std::is_trivially_destructible_v<T>)
+    return for_copy;
+
+
+  if constexpr ((std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, char>
+    && std::is_array_v<T>) || std::is_same_v<T,char*>) {
+
+    const size_t len = std::strlen(for_copy) + 1;
+    auto result = std::make_unique<char[]>(len);
+    std::strcpy(result.get(),for_copy);
+
+    return result;
+    }
+
+  // for array int (int[])
+  // TODO we can impl for int*. But implemented for int[]...
+  if constexpr (std::is_same_v<std::remove_cv_t<std::remove_extent_t<T>>, int>
+   && std::is_array_v<T>) {
+    const size_t len = sizeof(for_copy) / sizeof(int);
+    auto result = std::make_unique<int[]>(len);
+    std::copy(std::begin(for_copy),std::end(for_copy), result.get());
+
+    return result;
+   }
+}
+
+
+template <std::forward_iterator iterator> // but must 'requires symbol or num'
+void print_range(iterator begin, iterator end) {
+  for (iterator it = begin; it != end; ++it) {
+    std::cout << *it << ' ';
+  }
+  std::cout << std::endl;
 }
 } // namespace ch19::try_

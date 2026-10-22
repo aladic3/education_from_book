@@ -68,8 +68,11 @@ void inspect(const T& value)
 void drill() {
   std::initializer_list init_lst  {0,1,2,3,4,5,6,7,8,9};
   std::array<int,10> arr {0,1,2,3,4,5,6,7,8,9};
+  increase_by(arr.begin(),arr.end(),2);
   std::vector<int> vec {init_lst};
+  increase_by(vec.begin(),vec.end(),3);
   std::list<int> lst {init_lst};
+  increase_by(lst.begin(),lst.end(),5);
   int arrr [10] {0,1,2,3,4,5,6,7,8,9};
   int* begin_a = &arrr[0];
   int* end_a = &arrr[9]+1;
@@ -87,7 +90,18 @@ void drill() {
   std::list<int> lst2(lst.size());
   copy_drill(lst.begin(),lst.end(),lst2.begin());
 
+  copy_drill(arr.begin(),arr.end(),vec.begin());
+  copy_drill(lst.begin(),lst.end(),arr.begin());
+  print_range(vec.begin(),vec.end());
+  print_range(arr.begin(),arr.end());
+
+  std::cout << find_position(vec.begin(),vec.end(),3)
+    << find_position(lst.begin(),lst.end(), 27)
+    << find_position(arr.begin(),arr.end(),13)
+    << std::endl;
   std::cout << "GG";
+
+
 
 }
 
