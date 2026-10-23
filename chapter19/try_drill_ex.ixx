@@ -200,3 +200,27 @@ void print_range(iterator begin, iterator end) {
   std::cout << std::endl;
 }
 } // namespace ch19::try_
+
+export namespace ch19::ex {
+void ex2();
+
+template<std::forward_iterator iterator>
+iterator high(iterator begin, iterator end);
+
+
+
+template <std::forward_iterator iterator>
+    requires std::totally_ordered<std::iter_value_t<iterator>>
+iterator high(iterator begin, iterator end) {
+  if (begin == end)
+    return end;
+  iterator high = begin;
+  for (iterator it = begin + 1; it != end; ++it) {
+    if (*high < *it)
+      high = it;
+  }
+
+  return high;
+}
+
+} // namespace ch19::ex
