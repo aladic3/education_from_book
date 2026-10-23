@@ -19,5 +19,6 @@ void ex2() {
   auto ia1 = high(a1.begin(),a1.end());
   auto ia2 = high(a2.begin(),a2.end());
   //auto ia3 = high(a3.begin(),a3.end());
+  //ds
 }
 }
