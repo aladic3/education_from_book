@@ -52,6 +52,10 @@ add_executable(hello_world main.cpp
 
 )
 
+target_compile_definitions(hello_world PRIVATE
+        PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
+)
+
 
 target_sources(hello_world PUBLIC
        FILE_SET cxx_modules TYPE CXX_MODULES

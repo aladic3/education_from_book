@@ -98,6 +98,11 @@ struct File_handle {
 
   File_handle() = delete;
 
+  /*File_handle(const std::filesystem::path& path) {
+    File_handle(path.string());
+  }*/
+
+
   File_handle(const std::string& file_name) {
     file = allocator.allocate();
     try {
@@ -113,6 +118,8 @@ struct File_handle {
   [[nodiscard]] std::vector<std::string> get_separated_words_from_file() const {
     return  ch9::get_separated_words_from_stream(*file);
   }
+
+
 
   ~File_handle() {
     allocator.deallocate_and_destroy(file);
@@ -745,7 +752,7 @@ void test_13() {
 void test_12() {
 
 
-  File_handle<> f("/Users/mac_for_sale/CLionProjects/hello_world/text_files/AnkiGenv42.txt");
+  File_handle f("/Users/mac_for_sale/CLionProjects/hello_world/text_files/AnkiGenv42.txt");
 
   auto v = f.get_separated_words_from_file();
 
