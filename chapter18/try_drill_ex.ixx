@@ -79,6 +79,7 @@ template <class Rp>
 struct Func_object {
   Func_object(std::function<Rp()> ff) : f(ff){}
 
+
   ~Func_object() {
     f();
   }
