@@ -22,7 +22,7 @@ void ex2() {
     '\t' << path.filename() << '\n';*/
   //std::ifstream file(path);
 
-  ch18::ex::File_handle file1 {path.string()};
+  ch18::ex::File_handle file1 {path};
   auto a = file1.get_separated_words_from_file();
   ch19::try_::print_range(a.begin(),a.end());
   auto ia1 = high(a1.begin(),a1.end());

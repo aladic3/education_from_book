@@ -210,7 +210,7 @@ template <typename T, typename A>
 Simple_vector<T, A>::Simple_vector(int sz, T def)
     : elements(allocator.allocate(sz * 2)), sz(sz), space(elements + sz) {
   for (int i = 0; i < sz; ++i) {
-    std::construct_at(elements + i);
+    std::construct_at(elements + i, def);
   }
 }
 

@@ -98,22 +98,11 @@ struct File_handle {
 
   File_handle() = delete;
 
-  /*File_handle(const std::filesystem::path& path) {
-    File_handle(path.string());
-  }*/
 
 
-  File_handle(const std::string& file_name) {
-    file = allocator.allocate();
-    try {
-      std::construct_at(file,std::move(ch9::open_input_stream_file_system(file_name)));
-    }
-    catch (std::exception& ex) {
-      allocator.just_deallocate(file);
-      file = nullptr;
-      throw;
-    }
-  }
+  File_handle(const std::string& file_name);
+
+  File_handle(const std::filesystem::path& path);
 
   [[nodiscard]] std::vector<std::string> get_separated_words_from_file() const {
     return  ch9::get_separated_words_from_stream(*file);
@@ -750,10 +739,10 @@ void test_13() {
 }
 
 void test_12() {
+  const std::string file_name =
+    "/Users/mac_for_sale/CLionProjects/hello_world/text_files/AnkiGenv42.txt";
 
-
-  File_handle f("/Users/mac_for_sale/CLionProjects/hello_world/text_files/AnkiGenv42.txt");
-
+  File_handle<vector::new_allocator<std::ifstream>> f(file_name);
   auto v = f.get_separated_words_from_file();
 
 }
@@ -846,6 +835,34 @@ void test_5() {
 
   cout << i;
 
+}
+
+template <typename A>
+File_handle<A>::File_handle(const std::string &file_name) {
+    file = allocator.allocate();
+    try {
+      std::construct_at(file,std::move(ch9::open_input_stream_file_system(file_name)));
+    }
+    catch (std::exception& ex) {
+      allocator.just_deallocate(file);
+      file = nullptr;
+      throw ex;
+    }
+
+}
+
+template <typename A>
+File_handle<A>::File_handle(const std::filesystem::path &path) {
+  file = allocator.allocate();
+  try {
+    std::construct_at(file,std::move(
+      ch9::open_input_stream_file_system(path.string())));
+  }
+  catch (std::exception& ex) {
+    allocator.just_deallocate(file);
+    file = nullptr;
+    throw ex;
+  }
 }
 
 template <typename T, typename U>
