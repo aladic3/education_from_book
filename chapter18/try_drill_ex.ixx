@@ -101,13 +101,16 @@ struct File_handle {
 
 
 
-  File_handle(const std::string& file_name);
+  File_handle(const std::string& file_name) : file(get_file_from_string(file_name)){}
 
-  File_handle(const std::filesystem::path& path);
+  File_handle(const std::filesystem::path& path) :
+  file(get_file_from_string(path.string())){}
 
   [[nodiscard]] std::vector<std::string> get_separated_words_from_file() const {
     return  ch9::get_separated_words_from_stream(*file);
   }
+
+  std::ifstream* get_file(){return file;}
 
 
 
@@ -116,8 +119,10 @@ struct File_handle {
   }
 
 private:
+  std::ifstream* get_file_from_string(const std::string& file_name);
+
   allocator_type allocator;
-  std::ifstream* file;
+  std::ifstream* file = nullptr;
 };
 
 template <typename T, typename U>
@@ -838,32 +843,23 @@ void test_5() {
 
 }
 
-template <typename A>
-File_handle<A>::File_handle(const std::string &file_name) {
-    file = allocator.allocate();
-    try {
-      std::construct_at(file,std::move(ch9::open_input_stream_file_system(file_name)));
-    }
-    catch (std::exception& ex) {
-      allocator.just_deallocate(file);
-      file = nullptr;
-      throw ex;
-    }
 
-}
+
 
 template <typename A>
-File_handle<A>::File_handle(const std::filesystem::path &path) {
-  file = allocator.allocate();
+std::ifstream *
+File_handle<A>::get_file_from_string(const std::string &file_name) {
+  std::ifstream * file = allocator.allocate();
   try {
-    std::construct_at(file,std::move(
-      ch9::open_input_stream_file_system(path.string())));
+    std::construct_at(file,std::move(ch9::open_input_stream_file_system(file_name)));
   }
   catch (std::exception& ex) {
     allocator.just_deallocate(file);
     file = nullptr;
     throw ex;
   }
+
+  return file;
 }
 
 template <typename T, typename U>

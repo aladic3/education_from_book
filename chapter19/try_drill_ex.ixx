@@ -207,6 +207,8 @@ void ex2();
 template<std::forward_iterator iterator>
 iterator high(iterator begin, iterator end);
 
+double* get_from_jack(int& count);
+
 
 
 template <std::forward_iterator iterator>
