@@ -13,9 +13,9 @@ import chapter18;
 
 namespace ch19::ex {
 void ex2() {
-  std::vector<ch18::try_::Somethink> a3 (3);
-  std::array<int, 5> a1 {1,2,3,4,5};
-  std::vector<int> a2 {};
+  //std::vector<ch18::try_::Somethink> a3 (3);
+  //std::array<int, 5> a1 {1,2,3,4,5};
+  //std::vector<int> a2 {};
   /*const auto path =
     std::filesystem::path(PROJECT_SOURCE_DIR) / "data" / "file1.txt";*/
   /*std::cout << path.string() <<
@@ -31,11 +31,32 @@ void ex2() {
   //ds
   int count = 0;
   double* jack_array = get_from_jack(count);
+  auto jill_vector = get_from_jill();
 
+  double* jack_high = high_v2(jack_array, jack_array + count);
+  auto jill_high = high_v2(jill_vector.begin(), jill_vector.end());
+
+  std::cout << "Jack high: " << *jack_high << "\nJill high: " << *jill_high;
   delete[] jack_array;
 }
 
-double* get_from_jack(int &count) {
+std::vector<double> get_from_jill() {
+  std::vector<double> result;
+  result.reserve(10);
+  const auto path =
+    std::filesystem::path(PROJECT_SOURCE_DIR) / "data" / "jill.txt";
+  ch18::ex::File_handle file_handle {path};
+
+  auto* file = file_handle.get_file();
+  double temp = 0;
+
+  while (*file >> temp)
+    result.push_back(temp);
+
+  return result;
+}
+
+double * get_from_jack(int &count) {
   count = 0;
   const auto path =
     std::filesystem::path(PROJECT_SOURCE_DIR) / "data" / "jack.txt";

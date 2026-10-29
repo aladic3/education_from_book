@@ -205,11 +205,33 @@ export namespace ch19::ex {
 void ex2();
 
 template<std::forward_iterator iterator>
+  requires std::totally_ordered<std::iter_value_t<iterator>>
 iterator high(iterator begin, iterator end);
 
+template<std::forward_iterator iterator>
+  requires std::totally_ordered<std::iter_value_t<iterator>>
+iterator high_v2(iterator begin, iterator end); /// using palindrome method
+
 double* get_from_jack(int& count);
+std::vector<double> get_from_jill();
 
+template <std::forward_iterator iterator>
+  requires std::totally_ordered<std::iter_value_t<iterator>>
+iterator high_v2(iterator begin, iterator end) {
+  --end;
+  iterator high = begin;
+  ++begin;
 
+  while (begin < end) {
+    if (*begin > *high) high = begin;
+    if (*end > *high) high = end;
+
+    ++begin;
+    --end;
+  }
+
+  return high;
+}
 
 template <std::forward_iterator iterator>
     requires std::totally_ordered<std::iter_value_t<iterator>>
