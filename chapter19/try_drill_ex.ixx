@@ -202,9 +202,18 @@ void print_range(iterator begin, iterator end) {
 } // namespace ch19::try_
 
 export namespace ch19::ex {
-void ex2();
+void ex2_4();
+void ex5();
 
-template<std::forward_iterator iterator>
+template<typename T>
+  requires std::totally_ordered<T>
+std::ostream& operator<<(std::ostream& out, const ch18::vector::Vector<T>& vec);
+
+template<typename T>
+  requires std::totally_ordered<T>
+std::istream& operator>>(std::istream& in, ch18::vector::Vector<T>& vec);
+
+template <std::forward_iterator iterator>
   requires std::totally_ordered<std::iter_value_t<iterator>>
 iterator high(iterator begin, iterator end);
 
@@ -245,6 +254,33 @@ iterator high(iterator begin, iterator end) {
   }
 
   return high;
+}
+
+template <typename T>
+  requires std::totally_ordered<T>
+std::ostream &operator<<(std::ostream &out,
+                         const ch18::vector::Vector<T> &vec) {
+  for (const T& el : vec)
+    out << el << '\t';
+
+  return out;
+}
+template <typename T>
+  requires std::totally_ordered<T>
+std::istream &operator>>(std::istream &in, ch18::vector::Vector<T> &vec) {
+  T temp;
+  char first_ch = 1;
+  //std::cout << "gg input";
+
+  while (in.get(first_ch) && first_ch != '\n') {
+    in.putback(first_ch);
+    in >> temp;
+    vec.push_back(temp);
+
+  }
+
+
+  return in;
 }
 
 } // namespace ch19::ex

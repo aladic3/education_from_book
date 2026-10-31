@@ -12,7 +12,7 @@ module chapter19;
 import chapter18;
 
 namespace ch19::ex {
-void ex2() {
+void ex2_4() {
   //std::vector<ch18::try_::Somethink> a3 (3);
   //std::array<int, 5> a1 {1,2,3,4,5};
   //std::vector<int> a2 {};
@@ -38,6 +38,25 @@ void ex2() {
 
   std::cout << "Jack high: " << *jack_high << "\nJill high: " << *jill_high;
   delete[] jack_array;
+}
+
+void ex5() {
+
+
+
+  ch18::vector::Vector<std::string> str_v;
+  ch18::vector::Vector<int> int_v;
+  ch18::vector::Vector<float> float_v;
+
+  std::cout << "input str v: ";
+  std::cin >> str_v;
+  std::cout << str_v;
+  std::cout << "input int v: ";
+  std::cin >> int_v;
+  std::cout << int_v;
+  std::cout << "input float v: ";
+  std::cin >> float_v;
+  std::cout << float_v;
 }
 
 std::vector<double> get_from_jill() {
