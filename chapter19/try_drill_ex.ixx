@@ -269,16 +269,22 @@ template <typename T>
   requires std::totally_ordered<T>
 std::istream &operator>>(std::istream &in, ch18::vector::Vector<T> &vec) {
   T temp;
-  char first_ch = 1;
+  constexpr char terminated_char = '\n';
+  char edge_char = 10;
   //std::cout << "gg input";
 
-  while (in.get(first_ch) && first_ch != '\n') {
-    in.putback(first_ch);
+  while (in.get(edge_char) && edge_char != terminated_char
+    && in.putback(edge_char)) {
+
     in >> temp;
     vec.push_back(temp);
 
-  }
+    in.unget();
+    in.clear();
+    in.get(edge_char);
 
+    if (edge_char == terminated_char) break;
+  }
 
   return in;
 }
