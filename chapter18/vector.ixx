@@ -143,6 +143,13 @@ private:
 template <typename T, typename A = simple_allocator<T>>
 // template <typename T, typename A = allocator<T>>
 struct Vector {
+  using iterator = T*;
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using reference = T&;
+  using pointer = T*;
+  using iterator_category = std::forward_iterator_tag;
+
   Vector();
   Vector(int sz, T def = T{});
   Vector(std::initializer_list<T> lst);
@@ -165,8 +172,8 @@ struct Vector {
   T &operator[](int i);
   const T &operator[](int i) const;
 
-  [[nodiscard]] T *begin() const { return elem; } // iteration support
-  [[nodiscard]] T *end() const { return elem + sz; }
+  [[nodiscard]] iterator begin() const { return elem; } // iteration support
+  [[nodiscard]] iterator end() const { return elem + sz; }
 
 protected:
   A allocator;

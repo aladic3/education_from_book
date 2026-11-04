@@ -13,6 +13,7 @@ module;
 
 export module chapter19;
 import chapter18.vector;
+import chapter19.list;
 
 export namespace ch19::try_ {
 void test();
@@ -21,6 +22,8 @@ void test_3();
 void test_4();
 void test_5();
 void drill();
+
+
 
 template <std::forward_iterator iterator>
 void increase_by(iterator begin, iterator end, int increase_val);
@@ -199,13 +202,77 @@ void print_range(iterator begin, iterator end) {
   }
   std::cout << std::endl;
 }
-} // namespace ch19::try_
+}// namespace ch19::try_
+
+namespace ch19::document {
+using Line = ch18::vector::Vector<char>;
+
+struct iterator {
+public:
+  using value_type = Line::value_type;
+  using difference_type = std::ptrdiff_t;
+  using reference = Line::reference;
+  using pointer = Line::pointer;
+  using iterator_category = std::forward_iterator_tag;
+
+  iterator( list::List<Line>::iterator ll, char* pp): local_line_iterator(ll), pos(pp){}
+
+
+
+  bool operator==(const iterator & i) const;
+  bool operator!=(const iterator & i) const;
+
+  reference operator*(){return *pos;}
+  const reference operator*() const {return *pos;}
+
+  iterator& operator++();
+  iterator& operator--();
+  iterator operator++(int a);
+  iterator operator--(int a);
+
+
+private:
+
+  list::List<Line>::iterator local_line_iterator;
+  char* pos = nullptr;
+};
+
+
+export struct Document {
+
+  Document() : lines(std::initializer_list{Line{1,'x'}}),
+  _end{lines.begin(),lines.begin().operator*().begin()} {}
+
+  void add_char(char ch);
+
+  iterator begin() {
+    auto bb = lines.begin();
+    return {bb, bb.operator*().begin()};
+  }
+
+  iterator end() { return _end; }
+
+
+private:
+  list::List<Line> lines;
+  iterator _end;
+};
+
+
+
+std::istream& operator>>(std::istream& is, Document& doc);
+
+}
 
 export namespace ch19::ex {
 void ex2_4();
 void ex5();
 
-template<typename T>
+
+
+
+
+template <typename T>
   requires std::totally_ordered<T>
 std::ostream& operator<<(std::ostream& out, const ch18::vector::Vector<T>& vec);
 
@@ -265,6 +332,7 @@ std::ostream &operator<<(std::ostream &out,
 
   return out;
 }
+
 template <typename T>
   requires std::totally_ordered<T>
 std::istream &operator>>(std::istream &in, ch18::vector::Vector<T> &vec) {

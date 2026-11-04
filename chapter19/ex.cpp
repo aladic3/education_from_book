@@ -59,6 +59,8 @@ void ex5() {
   std::cout << float_v;
 }
 
+
+
 std::vector<double> get_from_jill() {
   std::vector<double> result;
   result.reserve(10);

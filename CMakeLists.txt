@@ -48,6 +48,7 @@ add_executable(hello_world main.cpp
         chapter19/try_.cpp
         chapter19/my_list.ixx
         chapter19/ex.cpp
+        chapter19/document.cpp
 
 
 )
