@@ -166,6 +166,8 @@ struct Vector {
   void resize(int new_size, T def = T{});
   void push_back(const T &new_el);
   void push_back(T &&new_el);
+  void insert(T* left_pos,const T &new_el);
+  void insert(T* left_pos, T &&new_el);
 
   [[nodiscard]] int size() const { return sz; }
 
@@ -492,6 +494,12 @@ template <typename T, typename A> void Vector<T, A>::push_back(T &&new_el) {
   *(elem + sz) = std::move(new_el);
   ++sz;
 }
+
+template <typename T, typename A>
+void Vector<T, A>::insert(T *left_pos, const T &new_el) {}
+
+template <typename T, typename A>
+void Vector<T, A>::insert(T *left_pos, T &&new_el) {}
 
 template <typename T, typename A>
 const T &Vector<T, A>::operator[](int i) const {

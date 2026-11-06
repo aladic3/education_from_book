@@ -15,9 +15,9 @@ struct Link {
 
 
 
-  [[nodiscard]] static Link* insert_static(Link* next, T&& el);
-  [[nodiscard]] static Link* insert_static(Link* next, const T& el);
-  Link* insert(Link* next);
+  [[nodiscard]] static Link* insert_static(Link* prev, T&& el);
+  [[nodiscard]] static Link* insert_static(Link* prev, const T& el);
+  Link* insert(Link* prev);
 
   void set_next(Link* next){_next = next;}
   void set_prev(Link* prev){_prev = prev;}
@@ -89,8 +89,8 @@ struct List {
   iterator push_front(T&&);
   iterator push_front(const T&);
 
-  iterator insert(T&&, iterator next);
-  iterator insert(const T&, iterator next);
+  iterator insert(T&&, iterator prev);
+  iterator insert(const T&, iterator prev);
 
 
   iterator begin();
@@ -167,15 +167,15 @@ typename List<T>::iterator List<T>::push_front(const T & el) {
 
 template <typename T>
 
-typename List<T>::iterator List<T>::insert(T && el, typename List<T>::iterator next) {
-  return Link<T>::insert_static(next.get_link(),
+typename List<T>::iterator List<T>::insert(T && el, typename List<T>::iterator prev) {
+  return Link<T>::insert_static(prev.get_link(),
     std::move(el));
 }
 
 template <typename T>
-typename List<T>::iterator List<T>::insert(const T & el, typename List<T>::iterator next) {
+typename List<T>::iterator List<T>::insert(const T & el, typename List<T>::iterator prev) {
   T copy_el = el;
-  return Link<T>::insert_static(next.get_link(),
+  return Link<T>::insert_static(prev.get_link(),
     std::move(copy_el));
 }
 
@@ -191,29 +191,37 @@ template <typename T> typename List<T>::iterator List<T>::end() {
 
 
 template <typename T>
-[[nodiscard]] Link<T> *Link<T>::insert_static(Link *next, T &&el) {
+[[nodiscard]] Link<T> *Link<T>::insert_static(Link *prev, T &&el) {
   Link * result = new Link(std::move(el));
-  result->insert(next);
+  result->insert(prev);
   return result;
 }
 
 template <typename T>
-Link<T> *Link<T>::insert_static(Link *next, const T &el) {
+Link<T> *Link<T>::insert_static(Link *prev, const T &el) {
   T copy_el = el;
   Link * result = new Link(std::move(copy_el));
-  result->insert(next);
+  result->insert(prev);
   return result;
 }
 
 template <typename T>
-Link<T> *Link<T>::insert(Link *next) {
-  auto temp = next->prev();
+Link<T> *Link<T>::insert(Link *prev) {
+  auto next = prev->next();
+  prev->set_next(this);
   next->set_prev(this);
-  temp->set_next(this);
   this->set_next(next);
-  this->set_prev(temp);
+  this->set_prev(prev);
   return this;
+
+
 }
+/* auto temp = node->prev();
+node->set_prev(this);
+temp->set_next(this);
+this->set_next(node);
+this->set_prev(temp);
+return this;*/
 
 template <typename T> Link<T> * Link<T>::erase() {
   this->next()->set_prev(this->prev());

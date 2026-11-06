@@ -205,10 +205,11 @@ void print_range(iterator begin, iterator end) {
 }// namespace ch19::try_
 
 namespace ch19::document {
+struct iterator;
 using Line = ch18::vector::Vector<char>;
+using Chapters = ch18::vector::Vector<iterator>;
 
 struct iterator {
-public:
   using value_type = Line::value_type;
   using difference_type = std::ptrdiff_t;
   using reference = Line::reference;
@@ -216,7 +217,7 @@ public:
   using iterator_category = std::forward_iterator_tag;
 
   iterator( list::List<Line>::iterator ll, char* pp): local_line_iterator(ll), pos(pp){}
-
+  iterator() = default;
 
 
   bool operator==(const iterator & i) const;
@@ -225,10 +226,13 @@ public:
   reference operator*(){return *pos;}
   const reference operator*() const {return *pos;}
 
+  [[nodiscard]] list::List<Line>::iterator get_line_iterator() const;
   iterator& operator++();
   iterator& operator--();
   iterator operator++(int a);
   iterator operator--(int a);
+  iterator operator-(int i) const;
+  iterator operator+(int i) const;
 
 
 private:
@@ -239,23 +243,22 @@ private:
 
 
 export struct Document {
+  const char separated_char = '\n';
 
-  Document() : lines(std::initializer_list{Line{1,'x'}}),
-  _end{lines.begin(),lines.begin().operator*().begin()} {}
+  Document();
 
-  void add_char(char ch);
+  void push_back(char ch);
+  void insert(char ch, iterator left);
 
-  iterator begin() {
-    auto bb = lines.begin();
-    return {bb, bb.operator*().begin()};
-  }
-
-  iterator end() { return _end; }
+  iterator begin();
+  [[nodiscard]] iterator back() const;
+  [[nodiscard]] iterator end() const { return _end; }
 
 
 private:
+  Chapters _chapters;
   list::List<Line> lines;
-  iterator _end;
+  const iterator _end;
 };
 
 
