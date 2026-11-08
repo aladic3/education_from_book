@@ -13,14 +13,14 @@ import chapter18;
 
 namespace ch19::document {
 
-Document::Document() : lines(std::initializer_list{Line(1,'')}),
+Document::Document() : lines(std::initializer_list{Line(1,'x')}),
   _end(lines.end(),nullptr) {}
 
 void Document::push_back(char ch) {
   this->lines.back().push_back(ch);
 
   if (ch == separated_char)
-    lines.push_back({1,''});
+    lines.push_back({});
 
 }
 
@@ -69,14 +69,14 @@ iterator &iterator::operator--() {
 }
 
 iterator iterator::operator++(int a) {
-  auto old_iterator = {local_line_iterator,pos};
+  auto old_iterator = iterator{local_line_iterator,pos};
   this->operator++();
 
   return old_iterator;
 }
 
 iterator iterator::operator--(int a) {
-  auto old_iterator = {local_line_iterator,pos};
+  auto old_iterator = iterator{local_line_iterator,pos};
   this->operator--();
 
   return old_iterator;

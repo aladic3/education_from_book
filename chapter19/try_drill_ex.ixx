@@ -40,7 +40,18 @@ bool string_compare_dictionary(iterator it, size_t size, const std::string& stri
 template<typename T>
 auto copy_to_new_object(const T& for_copy);
 
+template<typename T, size_t N>
+std::array<T,N> copy_to_new_object(T(&lpr)[N]);
 
+template <typename T, size_t N>
+std::array<T,N> copy_to_new_object(T (&lpr)[N] ) {
+  std::array<T,N> result;
+  for (int i = 0; i < N; ++i) {
+    result[i] = lpr[i];
+  }
+
+  return result;
+}
 
 template <std::forward_iterator iterator>  // dest == destination, dest.size == [begin;end)
 void copy_drill(iterator begin, iterator end, iterator dest) {
@@ -223,10 +234,11 @@ struct iterator {
   bool operator==(const iterator & i) const;
   bool operator!=(const iterator & i) const;
 
-  reference operator*(){return *pos;}
-  const reference operator*() const {return *pos;}
+  pointer operator*() const { return pos;}
+
 
   [[nodiscard]] list::List<Line>::iterator get_line_iterator() const;
+
   iterator& operator++();
   iterator& operator--();
   iterator operator++(int a);

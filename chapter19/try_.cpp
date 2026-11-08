@@ -128,9 +128,9 @@ void test_5() {
 
   //auto str111 = copy_to_new_object(p1);
   auto str11 = copy_to_new_object(str1);
-  std::cout << std::endl;
+  std::cout << std::endl << "bip\n";
   for (int i = 0; i < std::size(str1); ++i) {
-    std::cout << str11.get()[i];
+    std::cout << str11[i];
   }
 
   std::vector<int> str22 = copy_to_new_object(str2);
