@@ -13,7 +13,7 @@ import chapter18;
 
 namespace ch19::document {
 
-Document::Document() : lines(std::initializer_list{Line(1,'x')}),
+Document::Document() : lines(),//std::initializer_list{Line(1,'x')}),
   _end(lines.end(),nullptr) {}
 
 void Document::push_back(char ch) {
@@ -25,7 +25,8 @@ void Document::push_back(char ch) {
 }
 
 void Document::insert(char ch, iterator left) {
-  left.get_line_iterator().operator*().insert(left.operator*(),ch);
+  left.get_line_iterator().operator*()
+    .insert(left.operator*(),ch);
 }
 
 iterator Document::begin() {
@@ -62,7 +63,8 @@ iterator &iterator::operator++() {
 iterator &iterator::operator--() {
   if (pos-- == local_line_iterator.operator*().begin()){ // TODO must tested
     local_line_iterator.operator--();
-    pos = local_line_iterator.operator*().end() - 1;
+    pos = local_line_iterator.operator*()
+          .end() - 1;
   }
 
   return *this;
@@ -102,12 +104,12 @@ iterator iterator::operator+(int i) const{
 }
 
 std::istream &operator>>(std::istream &is, Document &doc) {
-  constexpr char term_char = '\n';
   char temp;
 
-  while (is.get(temp) && temp != term_char) {
-
+  while (is.get(temp)) {
+    doc.push_back(temp);
   }
 
+  return is;
 }
 }

@@ -208,6 +208,11 @@ Link<T> *Link<T>::insert_static(Link *prev, const T &el) {
 template <typename T>
 Link<T> *Link<T>::insert(Link *prev) {
   auto next = prev->next();
+  if (!next) {
+    next = prev;
+    prev = prev->prev();
+  } // right side edge
+
   prev->set_next(this);
   next->set_prev(this);
   this->set_next(next);

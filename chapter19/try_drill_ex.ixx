@@ -41,10 +41,10 @@ template<typename T>
 auto copy_to_new_object(const T& for_copy);
 
 template<typename T, size_t N>
-std::array<T,N> copy_to_new_object(T(&lpr)[N]);
+decltype(auto) copy_to_new_object(T(&lpr)[N]);
 
 template <typename T, size_t N>
-std::array<T,N> copy_to_new_object(T (&lpr)[N] ) {
+decltype(auto) copy_to_new_object(T (&lpr)[N] ) {
   std::array<T,N> result;
   for (int i = 0; i < N; ++i) {
     result[i] = lpr[i];
@@ -282,10 +282,7 @@ std::istream& operator>>(std::istream& is, Document& doc);
 export namespace ch19::ex {
 void ex2_4();
 void ex5();
-
-
-
-
+void ex6();
 
 template <typename T>
   requires std::totally_ordered<T>

@@ -11,6 +11,7 @@ module;
 module chapter19;
 import chapter18;
 
+
 namespace ch19::ex {
 void ex2_4() {
   //std::vector<ch18::try_::Somethink> a3 (3);
@@ -57,6 +58,20 @@ void ex5() {
   std::cout << "input float v: ";
   std::cin >> float_v;
   std::cout << float_v;
+}
+
+
+void ex6() {
+  const auto path = std::filesystem::path(PROJECT_SOURCE_DIR)
+    / "data" / "document.txt";
+  ch18::ex::File_handle file_handle {path};
+  std::ifstream* input = file_handle.get_file();
+
+  ch19::document::Document document;
+
+  *input >> document;
+
+  std::cout << "Hmm";
 }
 
 
