@@ -13,8 +13,13 @@ import chapter18;
 
 namespace ch19::document {
 
-Document::Document() : lines(),//std::initializer_list{Line(1,'x')}),
-  _end(lines.end(),nullptr) {}
+Document::Document() : lines()  { //std::initializer_list{Line(1,'x')}),
+  (*lines.end()).push_back('x');
+  _end = std::make_unique<iterator>(
+      lines.end(),
+    (*lines.end()).begin()
+    );
+}
 
 void Document::push_back(char ch) {
   this->lines.back().push_back(ch);
@@ -29,13 +34,45 @@ void Document::insert(char ch, iterator left) {
     .insert(left.operator*(),ch);
 }
 
+void Document::add_chapter(iterator lhs) {
+  _chapters.push_back(lhs);
+}
+
+void Document::find_and_replace(const std::string& lhs) {
+  iterator find_result = find(lhs);
+}
+
+bool match(iterator& start, const iterator _end, const std::string& lhs) {
+  auto str_iter = lhs.begin(); // TODO must see for refactor
+  for (iterator it = start;
+    !(it == _end && str_iter == lhs.end() && *str_iter == **it);
+    ++it) {
+    ++str_iter;
+  }
+
+  return str_iter == lhs.end();
+}
+
+iterator Document::find(const std::string& lhs) { // TODO must see for refactor
+  if (lhs.size() == 0) return end();
+  const char* first = &lhs.front();
+
+  for (iterator it = std::find(begin(),*_end,first);
+    !(it == *_end && match(it,*_end,lhs)) ; ++it);
+}
+
 iterator Document::begin() {
   auto bb = lines.begin();
   return {bb, bb.operator*().begin()};
 }
 
+iterator Document::end() {
+  auto ee = lines.begin();
+  return {ee,(*ee).begin()};
+}
+
 iterator Document::back() const {
-  return _end - 1;
+  return *_end - 1;
 }
 
 bool iterator::operator==(const iterator &i) const {
@@ -61,9 +98,9 @@ iterator &iterator::operator++() {
 }
 
 iterator &iterator::operator--() {
-  if (pos-- == local_line_iterator.operator*().begin()){ // TODO must tested
-    local_line_iterator.operator--();
-    pos = local_line_iterator.operator*()
+  if (pos-- == (*local_line_iterator).begin()){ // TODO must tested
+    --local_line_iterator;
+    pos = (*local_line_iterator)
           .end() - 1;
   }
 

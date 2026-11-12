@@ -261,16 +261,20 @@ export struct Document {
 
   void push_back(char ch);
   void insert(char ch, iterator left);
+  void add_chapter(iterator lhs);
+  void find_and_replace(const std::string& lhs);
+  iterator find(const std::string& lhs);
 
   iterator begin();
+  iterator end();
   [[nodiscard]] iterator back() const;
-  [[nodiscard]] iterator end() const { return _end; }
+  [[nodiscard]] iterator end() const { return *_end; }
 
 
 private:
   Chapters _chapters;
   list::List<Line> lines;
-  const iterator _end;
+  std::unique_ptr<iterator> _end;
 };
 
 
