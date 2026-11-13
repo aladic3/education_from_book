@@ -31,7 +31,7 @@ void Document::push_back(char ch) {
 
 void Document::insert(char ch, iterator left) {
   left.get_line_iterator().operator*()
-    .insert(left.operator*(),ch);
+    .insert(left.operator->(),ch);
 }
 
 void Document::add_chapter(const iterator lhs) {
@@ -43,8 +43,12 @@ void Document::find_and_replace(const std::string& lhs, const std::string& rhs) 
 
   if (found_result == *_end) return;
 
+
+
+  ///  TODO must refactor result find_and_replace("What", "GOD") is:
+  /// ...What is it?... -> ... GODt is it?...
   for (const char rh : rhs) {
-    found_result.operator->() = rh;
+    *found_result = rh;
     ++found_result;
   }
 }
@@ -54,8 +58,7 @@ bool match(iterator& start, const iterator _end, const std::string& comp_str) {
   auto str_iter = comp_str.begin(); // TODO must see for refactor
   iterator it = start;
   for (;it != _end && str_iter != comp_str.end() &&
-     *str_iter == **it; ++it){
-
+     *str_iter == *it; ++it){
     ++str_iter;
   }
 
@@ -66,7 +69,7 @@ bool match(iterator& start, const iterator _end, const std::string& comp_str) {
 
 iterator Document::find(const std::string& lhs) { // TODO must see for refactor
   if (lhs.empty()) return end();
-  const char* first = &lhs.front();
+  char first = lhs.front();
   iterator it = std::find(begin(),*_end,first);
 
   for (;it != *_end && !match(it,*_end,lhs);

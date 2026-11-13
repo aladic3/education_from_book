@@ -234,8 +234,8 @@ struct iterator {
   bool operator==(const iterator & i) const;
   bool operator!=(const iterator & i) const;
 
-  pointer operator*() const { return pos;} // operator* and operator-> are
-  reference operator->() const { return *pos;} // must return vice versa types
+  reference operator*() { return *pos;} // operator* and operator-> are
+  pointer operator->() { return pos;} // must return vice versa types
 
 
 
