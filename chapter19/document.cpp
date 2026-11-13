@@ -34,31 +34,48 @@ void Document::insert(char ch, iterator left) {
     .insert(left.operator*(),ch);
 }
 
-void Document::add_chapter(iterator lhs) {
+void Document::add_chapter(const iterator lhs) {
   _chapters.push_back(lhs);
 }
 
-void Document::find_and_replace(const std::string& lhs) {
-  iterator find_result = find(lhs);
+void Document::find_and_replace(const std::string& lhs, const std::string& rhs) {
+  iterator found_result = find(lhs);
+
+  if (found_result == *_end) return;
+
+  for (const char rh : rhs) {
+    found_result.operator->() = rh;
+    ++found_result;
+  }
 }
 
-bool match(iterator& start, const iterator _end, const std::string& lhs) {
-  auto str_iter = lhs.begin(); // TODO must see for refactor
-  for (iterator it = start;
-    !(it == _end && str_iter == lhs.end() && *str_iter == **it);
-    ++it) {
+// if not matched start become last comparison position
+bool match(iterator& start, const iterator _end, const std::string& comp_str) {
+  auto str_iter = comp_str.begin(); // TODO must see for refactor
+  iterator it = start;
+  for (;it != _end && str_iter != comp_str.end() &&
+     *str_iter == **it; ++it){
+
     ++str_iter;
   }
 
-  return str_iter == lhs.end();
+  start = str_iter == comp_str.end() ? start : it;
+
+  return str_iter == comp_str.end();
 }
 
 iterator Document::find(const std::string& lhs) { // TODO must see for refactor
-  if (lhs.size() == 0) return end();
+  if (lhs.empty()) return end();
   const char* first = &lhs.front();
+  iterator it = std::find(begin(),*_end,first);
 
-  for (iterator it = std::find(begin(),*_end,first);
-    !(it == *_end && match(it,*_end,lhs)) ; ++it);
+  for (;it != *_end && !match(it,*_end,lhs);
+    it = std::find(it,*_end,first)) {
+
+  }
+
+  return it;
+
 }
 
 iterator Document::begin() {

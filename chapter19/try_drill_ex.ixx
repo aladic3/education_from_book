@@ -234,7 +234,9 @@ struct iterator {
   bool operator==(const iterator & i) const;
   bool operator!=(const iterator & i) const;
 
-  pointer operator*() const { return pos;}
+  pointer operator*() const { return pos;} // operator* and operator-> are
+  reference operator->() const { return *pos;} // must return vice versa types
+
 
 
   [[nodiscard]] list::List<Line>::iterator get_line_iterator() const;
@@ -262,7 +264,7 @@ export struct Document {
   void push_back(char ch);
   void insert(char ch, iterator left);
   void add_chapter(iterator lhs);
-  void find_and_replace(const std::string& lhs);
+  void find_and_replace(const std::string& lhs, const std::string& rhs);
   iterator find(const std::string& lhs);
 
   iterator begin();

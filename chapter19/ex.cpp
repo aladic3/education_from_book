@@ -70,6 +70,7 @@ void ex6() {
   ch19::document::Document document;
 
   *input >> document;
+  document.find_and_replace("What", "GOD");
 
   std::cout << "Hmm";
 }
