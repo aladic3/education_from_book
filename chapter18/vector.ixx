@@ -153,6 +153,7 @@ struct Vector {
   Vector();
   Vector(int sz, T def = T{});
   Vector(std::initializer_list<T> lst);
+  Vector(std::span<T> sp);
   ~Vector();
 
   Vector(const Vector &v);
@@ -390,7 +391,15 @@ Vector<T, A>::Vector(std::initializer_list<T> lst)
     ++iterator;
   }
 }
+template <typename T, typename A> Vector<T, A>::Vector(std::span<T> sp) :
+  sz(static_cast<int>(sp.size())), cap(sz), elem(allocator.allocate(cap)) {
+        int iterator = 0;
 
+        for (const T &val : sp) {
+          std::construct_at(elem + iterator, val);
+          ++iterator;
+        }
+}
 template <typename T, typename A>
 Vector<T, A>::Vector(const Vector &v)
     : sz(v.size()), cap(v.cap), elem(allocator.allocate(cap)) {

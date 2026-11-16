@@ -38,6 +38,59 @@ void Document::add_chapter(const iterator lhs) {
   _chapters.push_back(lhs);
 }
 
+template <std::forward_iterator iter>
+void copy(iter begin, iter end, iter& res) {
+  for (iter it = begin; it != end; ++it) {
+    *res = *it;
+    ++res;
+  }
+}
+
+/*template<typename T = char, std::size_t N>
+int get_size(std::array<char,N> arr, int term) {
+  int size = 0;
+  for (auto ch: arr) {
+    if (ch == term) break;
+    ++size;
+  }
+
+  return size;
+}*/
+
+void replace(iterator& position, const std::string& old_, const std::string& new_) {
+  Line* old_line = &*position.get_line_iterator(); // TODO must tested
+  constexpr unsigned long buf = 128;
+  std::array<char, buf> new_line_gen{};
+  auto* p_new_line = new_line_gen.begin();
+
+  copy(old_line->begin(),position.operator->(),p_new_line);
+  std::ranges::copy(new_, p_new_line);
+  copy(position.operator->() + old_.size(),old_line->end(),p_new_line);
+
+
+  std::span<char> sp (new_line_gen.begin(),p_new_line);
+  *old_line = ch18::vector::Vector<char>(sp);
+}
+
+// copy elements from begin to found string (old_)
+/*for (char* it = old_line->begin(); it != position.operator->(); ++it){
+  *p_new_line = *it;
+  ++p_new_line;
+}
+
+// copy elements from [begin;back] new_
+for (char it : new_){
+  *p_new_line = it;
+  ++p_new_line;
+}
+
+// copy elements from end found string (old_) to back
+for (char* it = position.operator->() + old_.size();
+    it != old_line->end(); ++it){
+  *p_new_line = *it;
+  ++p_new_line;
+}*/
+
 void Document::find_and_replace(const std::string& lhs, const std::string& rhs) {
   iterator found_result = find(lhs);
 
