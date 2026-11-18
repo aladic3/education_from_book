@@ -39,11 +39,12 @@ void Document::add_chapter(const iterator lhs) {
 }
 
 template <std::forward_iterator iter>
-void copy(iter begin, iter end, iter& res) {
+iter copy(iter begin, iter end, iter res) {
   for (iter it = begin; it != end; ++it) {
     *res = *it;
     ++res;
   }
+  return res;
 }
 
 /*template<typename T = char, std::size_t N>
@@ -57,19 +58,20 @@ int get_size(std::array<char,N> arr, int term) {
   return size;
 }*/
 
-void replace(iterator& position, const std::string& old_, const std::string& new_) {
+iterator replace(iterator position, const std::string& old_str, const std::string& new_str) {
   Line* old_line = &*position.get_line_iterator(); // TODO must tested
   constexpr unsigned long buf = 128;
   std::array<char, buf> new_line_gen{};
   auto* p_new_line = new_line_gen.begin();
 
-  copy(old_line->begin(),position.operator->(),p_new_line);
-  std::ranges::copy(new_, p_new_line);
-  copy(position.operator->() + old_.size(),old_line->end(),p_new_line);
+  p_new_line = copy(old_line->begin(),position.operator->(),p_new_line);
+  p_new_line = std::ranges::copy(new_str, p_new_line).out;
+  p_new_line = copy(position.operator->() + old_str.size(),old_line->end(),p_new_line);
 
+  *old_line = ch18::vector::Vector<char>( {new_line_gen.begin(),p_new_line});
+  *position = *old_line->begin();
 
-  std::span<char> sp (new_line_gen.begin(),p_new_line);
-  *old_line = ch18::vector::Vector<char>(sp);
+  return position;
 }
 
 // copy elements from begin to found string (old_)
@@ -91,8 +93,8 @@ for (char* it = position.operator->() + old_.size();
   ++p_new_line;
 }*/
 
-void Document::find_and_replace(const std::string& lhs, const std::string& rhs) {
-  iterator found_result = find(lhs);
+void Document::find_and_replace(const std::string& old_str, const std::string& new_str) {
+  iterator found_result = find(old_str);
 
   if (found_result == *_end) return;
 
@@ -100,10 +102,12 @@ void Document::find_and_replace(const std::string& lhs, const std::string& rhs) 
 
   ///  TODO must refactor result find_and_replace("What", "GOD") is:
   /// ...What is it?... -> ... GODt is it?...
-  for (const char rh : rhs) {
+
+  auto res_replace = replace(found_result,old_str,new_str);
+  /*for (const char rh : new_str) {
     *found_result = rh;
     ++found_result;
-  }
+  }*/
 }
 
 // if not matched start become last comparison position

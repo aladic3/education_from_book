@@ -264,7 +264,7 @@ export struct Document {
   void push_back(char ch);
   void insert(char ch, iterator left);
   void add_chapter(iterator lhs);
-  void find_and_replace(const std::string& lhs, const std::string& rhs);
+  void find_and_replace(const std::string& old_str, const std::string& new_str);
   iterator find(const std::string& lhs);
 
   iterator begin();

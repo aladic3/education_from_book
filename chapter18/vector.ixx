@@ -153,7 +153,7 @@ struct Vector {
   Vector();
   Vector(int sz, T def = T{});
   Vector(std::initializer_list<T> lst);
-  Vector(std::span<T> sp);
+  Vector(std::span<T>&& sp);
   ~Vector();
 
   Vector(const Vector &v);
@@ -391,7 +391,7 @@ Vector<T, A>::Vector(std::initializer_list<T> lst)
     ++iterator;
   }
 }
-template <typename T, typename A> Vector<T, A>::Vector(std::span<T> sp) :
+template <typename T, typename A> Vector<T, A>::Vector(std::span<T>&& sp) :
   sz(static_cast<int>(sp.size())), cap(sz), elem(allocator.allocate(cap)) {
         int iterator = 0;
 
@@ -439,7 +439,8 @@ Vector<T, A> &Vector<T, A>::operator=(const Vector &v) {
 
 template <typename T, typename A>
 Vector<T, A> &Vector<T, A>::operator=(Vector &&v) noexcept {
-  allocator.deallocate(elem, sz);
+  //allocator.deallocate(elem, sz);
+  allocator.deallocate_and_destroy(elem, sz);
   sz = v.sz;
   cap = v.cap;
 
