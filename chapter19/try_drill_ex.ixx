@@ -289,6 +289,10 @@ export namespace ch19::ex {
 void ex2_4();
 void ex5();
 void ex6();
+void ex7();
+
+
+decltype(auto) get_lexico_last_str(const std::vector<std::string>& vec);
 
 template <typename T>
   requires std::totally_ordered<T>

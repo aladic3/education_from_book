@@ -75,6 +75,30 @@ void ex6() {
   std::cout << "Hmm";
 }
 
+decltype(auto) get_lexico_last_str(const std::vector<std::string>& vec) {
+  auto result = vec.begin();
+
+  for (auto it = vec.begin() + 1; it != vec.end(); ++it) {
+    if (*it > *result) result = it;
+  }
+
+  return *result;
+}
+
+void ex7() {
+  const auto path =std::filesystem::path(PROJECT_SOURCE_DIR)
+    / "data" / "document.txt";
+
+  ch18::ex::File_handle file_handle {path};
+
+  auto vec_str = file_handle.get_separated_words_from_file();
+
+  auto& lex_last = get_lexico_last_str(vec_str);
+
+  std::cout << lex_last;
+
+
+}
 
 
 std::vector<double> get_from_jill() {
