@@ -15,11 +15,21 @@ namespace ch19::document {
 
 Document::Document() : lines()  { //std::initializer_list{Line(1,'x')}),
   (*lines.end()).push_back('x');
-  _end = std::make_unique<iterator>(
+  _end = std::make_unique<document_iterator>(
       lines.end(),
     (*lines.end()).begin()
     );
 }
+Document::Concatenation_info::Concatenation_info(char *p_new_line,
+                                                 const std::string &old_str,
+                                                 const std::string &new_str,
+                                                 document_iterator pos_doc,
+                                                 Line *old_line)
+  : p_new_line(p_new_line), old_line(old_line), new_str(new_str),
+position(pos_doc), old_str(old_str)
+{}
+
+
 
 void Document::push_back(char ch) {
   this->lines.back().push_back(ch);
@@ -29,12 +39,12 @@ void Document::push_back(char ch) {
 
 }
 
-void Document::insert(char ch, iterator left) {
+void Document::insert(char ch, document_iterator left) {
   left.get_line_iterator().operator*()
     .insert(left.operator->(),ch);
 }
 
-void Document::add_chapter(const iterator lhs) {
+void Document::add_chapter(const document_iterator lhs) {
   _chapters.push_back(lhs);
 }
 
@@ -47,73 +57,65 @@ iter copy(iter begin, iter end, iter res) {
   return res;
 }
 
-/*template<typename T = char, std::size_t N>
-int get_size(std::array<char,N> arr, int term) {
-  int size = 0;
-  for (auto ch: arr) {
-    if (ch == term) break;
-    ++size;
-  }
+document_iterator Document::replace(document_iterator position,
+  const std::string& old_str, const std::string& new_str) {
+      Line* old_line = &*position.get_line_iterator();
+      constexpr unsigned long buf = 256;
+      std::array<char, buf> new_line_gen{};
+      auto* p_new_line = new_line_gen.begin();
+      Concatenation_info info {p_new_line,old_str,new_str,position,old_line};
 
-  return size;
-}*/
+      p_new_line = concatenation(info);
 
-iterator replace(iterator position, const std::string& old_str, const std::string& new_str) {
-  Line* old_line = &*position.get_line_iterator(); // TODO must tested
-  constexpr unsigned long buf = 128;
-  std::array<char, buf> new_line_gen{};
-  auto* p_new_line = new_line_gen.begin();
+      *old_line = ch18::vector::Vector<char>( {new_line_gen.begin(),p_new_line});
 
-  p_new_line = copy(old_line->begin(),position.operator->(),p_new_line);
-  p_new_line = std::ranges::copy(new_str, p_new_line).out;
-  p_new_line = copy(position.operator->() + old_str.size(),old_line->end(),p_new_line);
-
-  *old_line = ch18::vector::Vector<char>( {new_line_gen.begin(),p_new_line});
-  *position = *old_line->begin();
-
-  return position;
+      position.set_position(*old_line->begin());
+      return position;
 }
 
-// copy elements from begin to found string (old_)
-/*for (char* it = old_line->begin(); it != position.operator->(); ++it){
-  *p_new_line = *it;
-  ++p_new_line;
-}
 
-// copy elements from [begin;back] new_
-for (char it : new_){
-  *p_new_line = it;
-  ++p_new_line;
-}
-
-// copy elements from end found string (old_) to back
-for (char* it = position.operator->() + old_.size();
-    it != old_line->end(); ++it){
-  *p_new_line = *it;
-  ++p_new_line;
-}*/
 
 void Document::find_and_replace(const std::string& old_str, const std::string& new_str) {
-  iterator found_result = find(old_str);
+  document_iterator found_result = find(old_str);
 
   if (found_result == *_end) return;
 
-
-
-  ///  TODO must refactor result find_and_replace("What", "GOD") is:
-  /// ...What is it?... -> ... GODt is it?...
-
   auto res_replace = replace(found_result,old_str,new_str);
-  /*for (const char rh : new_str) {
-    *found_result = rh;
-    ++found_result;
-  }*/
+
+}
+
+void Document::delete_line(document_iterator line) {
+  this->lines.erase(line.get_line_iterator());
+}
+
+char *Document::concatenation(Concatenation_info& info) {
+  auto* p_new_line = info.p_new_line;
+  auto old_line = info.old_line;
+  const auto& new_str = info.new_str;
+  auto position = info.position;
+  const auto& old_str = info.old_str;
+
+  p_new_line = copy(old_line->begin(),position.operator->(),p_new_line);
+  p_new_line = std::ranges::copy(new_str, p_new_line).out;
+
+  auto* end_replaced_part = position.operator->() + old_str.size();
+
+  if (end_replaced_part < old_line->end()) {
+    p_new_line = copy(end_replaced_part,old_line->end(),p_new_line);
+  } else {
+    p_new_line = copy(position.next_line().operator->(),
+        position.get_line_iterator().operator*().end(),p_new_line);
+    auto to_delete = position;
+    delete_line(to_delete);
+  }
+
+  return p_new_line;
 }
 
 // if not matched start become last comparison position
-bool match(iterator& start, const iterator _end, const std::string& comp_str) {
-  auto str_iter = comp_str.begin(); // TODO must see for refactor
-  iterator it = start;
+bool match(document_iterator& start, const document_iterator _end, const std::string& comp_str) {
+  auto str_iter = comp_str.begin();
+  document_iterator it = start;
   for (;it != _end && str_iter != comp_str.end() &&
      *str_iter == *it; ++it){
     ++str_iter;
@@ -124,10 +126,10 @@ bool match(iterator& start, const iterator _end, const std::string& comp_str) {
   return str_iter == comp_str.end();
 }
 
-iterator Document::find(const std::string& lhs) { // TODO must see for refactor
+document_iterator Document::find(const std::string& lhs) { // TODO must see for refactor
   if (lhs.empty()) return end();
   char first = lhs.front();
-  iterator it = std::find(begin(),*_end,first);
+  document_iterator it = std::find(begin(),*_end,first);
 
   for (;it != *_end && !match(it,*_end,lhs);
     it = std::find(it,*_end,first)) {
@@ -138,33 +140,39 @@ iterator Document::find(const std::string& lhs) { // TODO must see for refactor
 
 }
 
-iterator Document::begin() {
+document_iterator Document::begin() {
   auto bb = lines.begin();
   return {bb, bb.operator*().begin()};
 }
 
-iterator Document::end() {
+document_iterator Document::end() {
   auto ee = lines.begin();
   return {ee,(*ee).begin()};
 }
 
-iterator Document::back() const {
+document_iterator Document::back() const {
   return *_end - 1;
 }
 
-bool iterator::operator==(const iterator &i) const {
+bool document_iterator::operator==(const document_iterator &i) const {
   return i.local_line_iterator == local_line_iterator && i.pos == pos;
 }
 
-bool iterator::operator!=(const iterator &i) const {
+bool document_iterator::operator!=(const document_iterator &i) const {
   return i.local_line_iterator != local_line_iterator || i.pos != pos;
 }
 
-list::List<Line>::iterator iterator::get_line_iterator() const  {
+list::List<Line>::iterator document_iterator::get_line_iterator() const  {
   return local_line_iterator;
 }
+document_iterator& document_iterator::next_line() {
+  ++local_line_iterator;
+  pos = local_line_iterator.operator*().begin();
 
-iterator &iterator::operator++() {
+  return *this;
+}
+
+document_iterator &document_iterator::operator++() {
   if (++pos; pos == local_line_iterator.operator*().end()) {
     ++local_line_iterator;
     pos = local_line_iterator.operator*().begin();
@@ -174,7 +182,7 @@ iterator &iterator::operator++() {
 
 }
 
-iterator &iterator::operator--() {
+document_iterator &document_iterator::operator--() {
   if (pos-- == (*local_line_iterator).begin()){ // TODO must tested
     --local_line_iterator;
     pos = (*local_line_iterator)
@@ -184,21 +192,21 @@ iterator &iterator::operator--() {
   return *this;
 }
 
-iterator iterator::operator++(int a) {
-  auto old_iterator = iterator{local_line_iterator,pos};
+document_iterator document_iterator::operator++(int a) {
+  auto old_iterator = document_iterator{local_line_iterator,pos};
   this->operator++();
 
   return old_iterator;
 }
 
-iterator iterator::operator--(int a) {
-  auto old_iterator = iterator{local_line_iterator,pos};
+document_iterator document_iterator::operator--(int a) {
+  auto old_iterator = document_iterator{local_line_iterator,pos};
   this->operator--();
 
   return old_iterator;
 }
 
-iterator iterator::operator-(int i) const {
+document_iterator document_iterator::operator-(int i) const {
   auto result = *this;
   while (i > 0) {
     result.operator--();
@@ -208,7 +216,7 @@ iterator iterator::operator-(int i) const {
   return result;
 }
 
-iterator iterator::operator+(int i) const{
+document_iterator document_iterator::operator+(int i) const{
   auto result = *this;
   while (i > 0) {
     result.operator++();

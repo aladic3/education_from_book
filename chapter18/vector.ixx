@@ -177,6 +177,7 @@ struct Vector {
 
   [[nodiscard]] iterator begin() const { return elem; } // iteration support
   [[nodiscard]] iterator end() const { return elem + sz; }
+  reference back() const {return elem + sz - 1;}
 
 protected:
   A allocator;

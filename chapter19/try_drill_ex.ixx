@@ -216,37 +216,39 @@ void print_range(iterator begin, iterator end) {
 }// namespace ch19::try_
 
 namespace ch19::document {
-struct iterator;
+struct document_iterator;
 using Line = ch18::vector::Vector<char>;
-using Chapters = ch18::vector::Vector<iterator>;
+using Chapters = ch18::vector::Vector<document_iterator>;
 
-struct iterator {
+struct document_iterator {
   using value_type = Line::value_type;
   using difference_type = std::ptrdiff_t;
   using reference = Line::reference;
   using pointer = Line::pointer;
   using iterator_category = std::forward_iterator_tag;
 
-  iterator( list::List<Line>::iterator ll, char* pp): local_line_iterator(ll), pos(pp){}
-  iterator() = default;
+  document_iterator( list::List<Line>::iterator ll, char* pp): local_line_iterator(ll), pos(pp){}
+  document_iterator() = default;
 
 
-  bool operator==(const iterator & i) const;
-  bool operator!=(const iterator & i) const;
+  bool operator==(const document_iterator & i) const;
+  bool operator!=(const document_iterator & i) const;
 
   reference operator*() { return *pos;} // operator* and operator-> are
   pointer operator->() { return pos;} // must return vice versa types
+  void set_position(reference pp) {pos = &pp;}
 
 
 
   [[nodiscard]] list::List<Line>::iterator get_line_iterator() const;
+  document_iterator& next_line();
 
-  iterator& operator++();
-  iterator& operator--();
-  iterator operator++(int a);
-  iterator operator--(int a);
-  iterator operator-(int i) const;
-  iterator operator+(int i) const;
+  document_iterator& operator++();
+  document_iterator& operator--();
+  document_iterator operator++(int a);
+  document_iterator operator--(int a);
+  document_iterator operator-(int i) const;
+  document_iterator operator+(int i) const;
 
 
 private:
@@ -261,22 +263,42 @@ export struct Document {
 
   Document();
 
-  void push_back(char ch);
-  void insert(char ch, iterator left);
-  void add_chapter(iterator lhs);
-  void find_and_replace(const std::string& old_str, const std::string& new_str);
-  iterator find(const std::string& lhs);
+  struct Concatenation_info {
+    Concatenation_info() = delete;
+    Concatenation_info(char *p_new_line,
+                        const std::string &old_str,
+                        const std::string &new_str,
+                        document_iterator pos_doc,
+                        Line *old_line);
+    char* p_new_line;
+    Line* old_line;
+    const std::string& old_str;
+    const std::string& new_str;
+    document_iterator position;
+  };
 
-  iterator begin();
-  iterator end();
-  [[nodiscard]] iterator back() const;
-  [[nodiscard]] iterator end() const { return *_end; }
+  void push_back(char ch);
+  void insert(char ch, document_iterator left);
+  void add_chapter(document_iterator lhs);
+  void find_and_replace(const std::string& old_str, const std::string& new_str);
+
+  document_iterator find(const std::string& lhs);
+
+  document_iterator begin();
+  document_iterator end();
+  [[nodiscard]] document_iterator back() const;
+  [[nodiscard]] document_iterator end() const { return *_end; }
 
 
 private:
   Chapters _chapters;
   list::List<Line> lines;
-  std::unique_ptr<iterator> _end;
+  std::unique_ptr<document_iterator> _end;
+
+  document_iterator replace(document_iterator, const std::string&, const std::string&);
+  void delete_line(document_iterator line);
+  char* concatenation(Concatenation_info& info);
+
 };
 
 
