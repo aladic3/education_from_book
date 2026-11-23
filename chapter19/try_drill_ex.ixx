@@ -263,29 +263,21 @@ export struct Document {
 
   Document();
 
-  struct Concatenation_info {
-    Concatenation_info() = delete;
-    Concatenation_info(char *p_new_line,
-                        const std::string &old_str,
-                        const std::string &new_str,
-                        document_iterator pos_doc,
-                        Line *old_line);
-    char* p_new_line;
-    Line* old_line;
-    const std::string& old_str;
-    const std::string& new_str;
-    document_iterator position;
-  };
+  struct Concatenation_info;
 
   void push_back(char ch);
   void insert(char ch, document_iterator left);
   void add_chapter(document_iterator lhs);
   void find_and_replace(const std::string& old_str, const std::string& new_str);
+  [[nodiscard]] int get_count_chars() const;
 
   document_iterator find(const std::string& lhs);
 
   document_iterator begin();
   document_iterator end();
+
+  [[nodiscard]] document_iterator begin() const;
+
   [[nodiscard]] document_iterator back() const;
   [[nodiscard]] document_iterator end() const { return *_end; }
 
@@ -301,6 +293,20 @@ private:
 
 };
 
+struct  Document::Concatenation_info {
+  Concatenation_info() = delete;
+  Concatenation_info(char *p_new_line,
+                      const std::string &old_str,
+                      const std::string &new_str,
+                      document_iterator pos_doc,
+                      Line *old_line);
+  char* p_new_line;
+  Line* old_line;
+  const std::string& old_str;
+  const std::string& new_str;
+  document_iterator position;
+  };
+
 
 
 std::istream& operator>>(std::istream& is, Document& doc);
@@ -312,7 +318,7 @@ void ex2_4();
 void ex5();
 void ex6();
 void ex7();
-
+void ex8();
 
 decltype(auto) get_lexico_last_str(const std::vector<std::string>& vec);
 

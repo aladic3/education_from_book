@@ -72,6 +72,7 @@ void ex6() {
   *input >> document;
   //document.find_and_replace("operation.\nIt", "GOD");
   //document.find_and_replace("operation.\n", "GOD");
+  //document.find_and_replace("operation.", "GOD");
   document.find_and_replace("operation.", "GOD");
 
 
@@ -86,6 +87,18 @@ decltype(auto) get_lexico_last_str(const std::vector<std::string>& vec) {
   }
 
   return *result;
+}
+
+
+void ex8() {
+  const auto path =std::filesystem::path(PROJECT_SOURCE_DIR)
+  / "data" / "document.txt";
+
+  ch18::ex::File_handle file_handle {path};
+  ch19::document::Document document;
+  *file_handle.get_file() >> document;
+
+  std::cout << "Count chars: " << document.get_count_chars();
 }
 
 void ex7() {

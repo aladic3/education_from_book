@@ -84,6 +84,15 @@ void Document::find_and_replace(const std::string& old_str, const std::string& n
 
 }
 
+int Document::get_count_chars() const {
+  int result = 0;
+  for (auto el: *this) {
+    ++result;
+  }
+
+  return result;
+}
+
 void Document::delete_line(document_iterator line) {
   this->lines.erase(line.get_line_iterator());
 }
@@ -148,6 +157,10 @@ document_iterator Document::begin() {
 document_iterator Document::end() {
   auto ee = lines.begin();
   return {ee,(*ee).begin()};
+}
+document_iterator Document::begin() const {
+  auto bb = lines.begin();
+  return {bb, bb.operator*().begin()};
 }
 
 document_iterator Document::back() const {

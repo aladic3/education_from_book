@@ -44,32 +44,7 @@ private:
 template<typename T>
 struct List {
 
-  struct iterator {
-    using value_type = T;
-    using difference_type = std::ptrdiff_t;
-    using reference = T&;
-    using pointer = T*;
-    using iterator_category = std::forward_iterator_tag;
-
-    iterator( Link<value_type>* el): link(el){}
-    iterator() : link(nullptr){}
-
-
-    bool operator==(const iterator & i) const{return i.link == link;}
-    bool operator!=(const iterator & i) const {return i.link != link;}
-
-    reference operator*(){return link->get_value();}
-    const reference operator*() const {return link->get_value();}
-
-    iterator& operator++(){link = link->next(); return *this;}
-    iterator& operator--(){link = link->prev(); return *this;}
-    iterator operator++(int a){auto old = link; link = link->next(); return old;}
-    iterator operator--(int a){auto old = link; link = link->prev(); return old;}
-
-    Link<value_type>* get_link() {return link;}
-  private:
-    Link<value_type>* link;
-  };
+  struct iterator;
 
   List();
   List(std::initializer_list<T> lst);
@@ -93,13 +68,44 @@ struct List {
   iterator insert(const T&, iterator prev);
 
 
-  iterator begin();
-  iterator end();
+  iterator begin(); // begin != first
+  //iterator end();
+
+  iterator begin() const;
+  iterator end() const;
 
 private:
 
-  Link<T>* first; // first and last are empty
+  Link<T>* first; // first and last are empty. for front/back
   Link<T>* last;
+};
+
+template<typename T>
+struct List<T>::iterator {
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using reference = T&;
+  using pointer = T*;
+  using iterator_category = std::forward_iterator_tag;
+
+  iterator( Link<value_type>* el): link(el){}
+  iterator() : link(nullptr){}
+
+
+  bool operator==(const iterator & i) const{return i.link == link;}
+  bool operator!=(const iterator & i) const {return i.link != link;}
+
+  reference operator*(){return link->get_value();}
+  const reference operator*() const {return link->get_value();}
+
+  iterator& operator++(){link = link->next(); return *this;}
+  iterator& operator--(){link = link->prev(); return *this;}
+  iterator operator++(int a){auto old = link; link = link->next(); return old;}
+  iterator operator--(int a){auto old = link; link = link->prev(); return old;}
+
+  Link<value_type>* get_link() {return link;}
+private:
+  Link<value_type>* link;
 };
 
 
@@ -137,6 +143,8 @@ template <typename T> T &List<T>::front() {
 }
 
 template <typename T> T &List<T>::back() {
+  if (first->next() == last) return *this->push_back(T{});
+
   return end().operator--().get_link()->get_value();
 }
 
@@ -145,28 +153,27 @@ template <typename T> typename List<T>::iterator List<T>::erase(iterator it) {
 }
 
 template <typename T>  List<T>::iterator List<T>::push_back(T && el) {
-  return Link<T>::insert_static(this->last,std::move(el));
+  return Link<T>::insert_static(last->prev(),std::move(el));
 }
 
 template <typename T>
  List<T>::iterator List<T>::push_back(const T & el) {
-  return Link<T>::insert_static(this->last,el);
+  return Link<T>::insert_static(last->prev(),el);
 }
 
 template <typename T> typename List<T>::iterator List<T>::push_front(T && el) {
-  return Link<T>::insert_static((++iterator(this->first)).get_link(),
+  return Link<T>::insert_static(first,
     std::move(el));
 }
 
 template <typename T>
 typename List<T>::iterator List<T>::push_front(const T & el) {
   T copy_el = el;
-  return Link<T>::insert_static((++iterator(this->first)).get_link(),
+  return Link<T>::insert_static(first,
     std::move(copy_el));
 }
 
 template <typename T>
-
 typename List<T>::iterator List<T>::insert(T && el, typename List<T>::iterator prev) {
   return Link<T>::insert_static(prev.get_link(),
     std::move(el));
@@ -184,11 +191,16 @@ List<T>::iterator List<T>::begin() {
   return this->first->next();
 }
 
-template <typename T> typename List<T>::iterator List<T>::end() {
+/*template <typename T> typename List<T>::iterator List<T>::end()  {
+  return this->last;
+}*/
+
+template <typename T> typename List<T>::iterator List<T>::begin() const {
+  return this->first->next();
+}
+template <typename T>  typename List<T>::iterator List<T>::end() const {
   return this->last;
 }
-
-
 
 template <typename T>
 [[nodiscard]] Link<T> *Link<T>::insert_static(Link *prev, T &&el) {
