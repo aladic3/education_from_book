@@ -32,7 +32,7 @@ position(pos_doc), old_str(old_str)
 
 
 void Document::push_back(char ch) {
-  this->lines.back().push_back(ch);
+  this->lines.back().push_back(ch);;
 
   if (ch == separated_char)
     lines.push_back({});
