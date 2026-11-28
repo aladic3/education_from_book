@@ -265,6 +265,12 @@ export struct Document {
 
   struct Concatenation_info;
 
+  /// count a whitespace-separated sequence of characters
+  int count_all_words();
+
+  /// count sequence of consecutive alphabetic characters
+  int count_alfa_words();
+
   void push_back(char ch);
   void insert(char ch, document_iterator left);
   void add_chapter(document_iterator lhs);
@@ -319,6 +325,7 @@ void ex5();
 void ex6();
 void ex7();
 void ex8();
+void ex9();
 
 decltype(auto) get_lexico_last_str(const std::vector<std::string>& vec);
 

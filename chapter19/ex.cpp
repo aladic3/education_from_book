@@ -90,6 +90,18 @@ decltype(auto) get_lexico_last_str(const std::vector<std::string>& vec) {
 }
 
 
+void ex9() {
+  const auto path =std::filesystem::path(PROJECT_SOURCE_DIR)
+  / "data" / "document.txt";
+
+  ch18::ex::File_handle file_handle {path};
+  ch19::document::Document document;
+  *file_handle.get_file() >> document;
+
+  std::cout << "Count all words: " << document.count_all_words() << '\n';
+  std::cout << "Count alpha words: " << document.count_alfa_words();
+}
+
 void ex8() {
   const auto path =std::filesystem::path(PROJECT_SOURCE_DIR)
   / "data" / "document.txt";

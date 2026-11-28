@@ -20,6 +20,39 @@ Document::Document() : lines()  { //std::initializer_list{Line(1,'x')}),
     (*lines.end()).begin()
     );
 }
+
+int Document::count_all_words() {
+  int result = 0;
+  bool space = true;
+  for (auto ch : *this) {
+    if (space && !std::isspace(ch)) {
+      ++result;
+      space=false;
+      continue;
+    }
+
+    if (std::isspace(ch)) space=true;
+  }
+
+  return result;
+}
+
+int Document::count_alfa_words() {
+  int result = 0;
+  bool letter = false;
+  for (auto ch : *this) {
+    if (!letter && std::isalpha(ch)) {
+      ++result;
+      letter = true;
+      continue;
+    }
+
+    if (!std::isalpha(ch)) letter = false;
+  }
+
+  return result;
+}
+
 Document::Concatenation_info::Concatenation_info(char *p_new_line,
                                                  const std::string &old_str,
                                                  const std::string &new_str,
@@ -155,7 +188,7 @@ document_iterator Document::begin() {
 }
 
 document_iterator Document::end() {
-  auto ee = lines.begin();
+  auto ee = lines.end();
   return {ee,(*ee).begin()};
 }
 document_iterator Document::begin() const {
